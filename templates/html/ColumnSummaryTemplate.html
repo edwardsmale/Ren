@@ -1,0 +1,48 @@
+<table class="ren-column-summary-window__table 
+       @(parameters.hasSummaryData ? 'ren-column-summary-window--has-summary-data' : '')
+       @(parameters.hasRangeData ? 'ren-column-summary-window--has-range-data' : '')" 
+       cellpadding="0"
+       cellspacing="0">
+    <tbody>
+    <tr>
+        <td class="ren-column-summary-window__key">Column Type:</td>
+        <td class="ren-column-summary-window__value">@parameters.columnType</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Column Index:</td>
+        <td class="ren-column-summary-window__value">@parameters.columnIndex</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Total Rows:</td>
+        <td class="ren-column-summary-window__value">@parameters.totalRows</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Value Count:</td>
+        <td class="ren-column-summary-window__value">@parameters.valueCount</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Blank Count:</td>
+        <td class="ren-column-summary-window__value">@parameters.blankCount</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Distinct Count:</td>
+        <td class="ren-column-summary-window__value">@parameters.distinctValueCount</td>
+    </tr>
+    <tr>
+        <td class="ren-column-summary-window__key">Populated:</td>
+        <td class="ren-column-summary-window__value">@parameters.percentageNonBlank</td>
+    </tr>
+    <tr class="ren-column-summary-window__summary-data">
+        <td class="ren-column-summary-window__key">Sum:</td>
+        <td class="ren-column-summary-window__value">@parameters.sum</td>
+    </tr>
+    <tr class="ren-column-summary-window__summary-data">
+        <td class="ren-column-summary-window__key">Average:</td>
+        <td class="ren-column-summary-window__value">@parameters.mean</td>
+    </tr>
+    <tr class="ren-column-summary-window__range-data">
+        <td class="ren-column-summary-window__key">Range:</td>
+        <td class="ren-column-summary-window__value">@parameters.min .. @parameters.max</td>
+    </tr>
+    </tbody>
+</table>

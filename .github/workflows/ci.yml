@@ -1,0 +1,31 @@
+# Builds the client, runs the client tests in Chromium, and again on the minified build, then
+# builds the .NET package and runs its tests on .NET Framework 4.8 and .NET 8.  It's on Windows
+# because the net48 tests need .NET Framework.  "dotnet run --project build/Ren.Build -- ci" runs
+# the same steps locally.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Playwright's own Chromium, since the runner has no Chrome for Testing.
+      - name: Install Chromium
+        run: |
+          dotnet build test/Ren.Client.Tests
+          pwsh test/Ren.Client.Tests/bin/Debug/net8.0/playwright.ps1 install chromium
+
+      - name: Build and test
+        run: dotnet run --project build/Ren.Build -- ci

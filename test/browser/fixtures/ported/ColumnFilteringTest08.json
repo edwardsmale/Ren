@@ -1,0 +1,61 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "DaysActive": {
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Product Code"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "Unique Searches Per Day": {
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "layout": {
+                "groupCtrlsCountMode": "NoCounts"
+            },
+            "dataRows": {
+                "columns": {
+                    "DaysActive": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "blank"
+                            }
+                        ]
+                    },
+                    "Product Code": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "blank"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests 1": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "CreatedOn",
+                "DaysActive",
+                "Product Code"
+            ]
+        }
+    }
+}

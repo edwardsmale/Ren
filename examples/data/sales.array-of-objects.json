@@ -1,0 +1,17 @@
+[
+    {"Date": "2026-07-01", "Product": "Stapler", "Category": "Desk accessories", "Quantity": 4, "Revenue": 14},
+    {"Date": "2026-07-03", "Product": "Ballpoint pens (pack of 10)", "Category": "Writing", "Quantity": 12, "Revenue": 15},
+    {"Date": "2026-07-08", "Product": "A4 copier paper (ream)", "Category": "Paper", "Quantity": 40, "Revenue": 162},
+    {"Date": "2026-07-15", "Product": "Sticky notes", "Category": "Paper", "Quantity": 25, "Revenue": 31.25},
+    {"Date": "2026-07-22", "Product": "Lever arch file", "Category": "Filing", "Quantity": 18, "Revenue": 41.4},
+    {"Date": "2026-08-04", "Product": "Stapler", "Category": "Desk accessories", "Quantity": 2, "Revenue": 7},
+    {"Date": "2026-08-05", "Product": "A4 copier paper (ream)", "Category": "Paper", "Quantity": 55, "Revenue": 222.75},
+    {"Date": "2026-08-12", "Product": "Highlighters (pack of 4)", "Category": "Writing", "Quantity": 9, "Revenue": 22.5},
+    {"Date": "2026-08-19", "Product": "Desk tidy", "Category": "Desk accessories", "Quantity": 3, "Revenue": 26.97},
+    {"Date": "2026-08-26", "Product": "Lever arch file", "Category": "Filing", "Quantity": 24, "Revenue": 55.2},
+    {"Date": "2026-09-02", "Product": "Ballpoint pens (pack of 10)", "Category": "Writing", "Quantity": 20, "Revenue": 25},
+    {"Date": "2026-09-09", "Product": "A4 copier paper (ream)", "Category": "Paper", "Quantity": 35, "Revenue": 141.75},
+    {"Date": "2026-09-16", "Product": "Sticky notes", "Category": "Paper", "Quantity": 30, "Revenue": 37.5},
+    {"Date": "2026-09-23", "Product": "Suspension files (box of 50)", "Category": "Filing", "Quantity": 5, "Revenue": 64.95},
+    {"Date": "2026-09-30", "Product": "Highlighters (pack of 4)", "Category": "Writing", "Quantity": 14, "Revenue": 35}
+]

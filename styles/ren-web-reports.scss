@@ -1,0 +1,158 @@
+@use "ren-variables" as *;
+@use "ren-images" as *;
+
+.ren-web-report-page
+{
+    margin: 0.25rem 0.5rem 0;
+    min-height: 90vh;
+}
+
+.ren-web-report--embedded-report
+{
+    .ren-web-report-page
+    {
+        margin: auto;
+        min-height: auto;
+    }
+}
+
+.ren-web-report--inside-popup 
+{
+    width: fit-content; /* Allows measurement of report inside popup. */
+    height: -webkit-fill-available;
+    overflow: hidden;
+
+    .ren-visualisation-target
+    {
+        opacity: 0;
+    }
+
+    .ren-web-report-page
+    {
+        min-height: unset;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0.25rem 0.75rem;
+        
+        height: -webkit-fill-available;
+    }
+}
+
+
+.ren-web-report
+{
+    height: fit-content;
+
+    font-family: Calibri, Arial, Helvetica, sans-serif;
+
+    h1, h2, h3, h4
+    {
+        margin: 0.5rem 0 0;
+        color: #17213A;
+    }
+
+    /* A report's title.  A smallish heading is a small title that sits among the content. */
+    h1:not(.ren-smallish-heading)
+    {
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+    }
+
+    h1.ren-smallish-heading
+    {
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    h3
+    {
+        font-size: 1rem;
+    }
+
+    /* After the headings, and as specific as the title's rule, so it wins over their margins. */
+    h1, h2, h3, h4
+    {
+        &.ren-no-margin
+        {
+            margin: 0;
+        }
+    }
+
+    p
+    {
+        margin: 0;
+    }
+
+    a,
+    a:visited,
+    a:active
+    {
+        color: #1f1fbf;
+        text-decoration-color: #a5a5ef;
+
+        &:hover
+        {
+            color: #0000e1;
+            text-decoration-color: #1a1abf;            
+            text-shadow: 0 0 1px #00008866;
+        }
+    }
+    /*
+        Always display all grid sets in web reports.
+    */
+    grid-set
+    {
+        display: block !important;
+    }
+    /*
+        Styles to use when the report is printed as a PDF.
+    */
+    @media print
+    {
+        body
+        {
+            width: 210mm;
+            height: 297mm;
+            overflow: visible;
+            margin: 5mm 5mm 5mm 5mm;
+        }
+
+        .ren-no-print, .ren-no-print *
+        {
+            display: none !important;
+        }
+
+        .ren-page-break
+        {
+            page-break-before: always;
+        }
+
+        .ren-data-grid__cell
+        {
+            /* Makes cell background colour work. */
+            -webkit-print-color-adjust: exact;
+        }
+
+        .ren-data-grid__column-heading,
+        .ren-data-grid__row-heading
+        {
+            display: none;
+        }
+    }
+
+    .ren-no-margin
+    {
+        margin: 0;
+    }
+
+    .ren-negative-bottom-margin
+    {
+        margin-bottom: -1rem;
+    }
+}
+
+.ren-visualisation-target
+{
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+}

@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
+    <RootNamespace>Ren</RootNamespace>
+    <PackageId>Ren</PackageId>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../../VERSION').Trim())</Version>
+    <Description>Ren, a client-side reporting library for data grids, charts, filters and report settings.  The package has the client's built files (ren.js, ren.css and the rest), which it copies into a web project when it builds, and a .NET library - that can optionally be used - to compress data before returning it to the client.</Description>
+    <Authors>Ed Smale</Authors>
+    <Copyright>Copyright (c) 2026 Ed Smale</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>reporting;tabular;renpack;data-grid;charts;javascript;client-side</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Ren.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!--
+    The package carries the client files from dist/ as well, with build/Ren.targets, which puts
+    them in a web project that references the package.  They must be the same release as the
+    package, so build the release first (the build command's "pack" does).  RenPackDevBuild=true
+    packs whatever's in dist/ instead, for trying a package out locally, as a prerelease version
+    named after the build (1.0.0-dev.d01e05e, say), so it can't be mistaken for a release.
+  -->
+  <PropertyGroup>
+    <RenDistDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../dist/'))</RenDistDirectory>
+    <_RenManifest Condition="Exists('$(RenDistDirectory)ren.manifest.json')">$([System.IO.File]::ReadAllText('$(RenDistDirectory)ren.manifest.json'))</_RenManifest>
+    <_RenDistVersion>$([System.Text.RegularExpressions.Regex]::Match('$(_RenManifest)', '"version"\s*:\s*"([^"]*)"').Groups[1].Value)</_RenDistVersion>
+    <_RenDistIsRelease>$([System.Text.RegularExpressions.Regex]::IsMatch('$(_RenManifest)', '"isRelease"\s*:\s*true'))</_RenDistIsRelease>
+    <PackageVersion Condition="'$(RenPackDevBuild)' == 'true' and '$(_RenDistIsRelease)' != 'True'">$(_RenDistVersion.Replace('+', '-'))</PackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="build\Ren.targets" Pack="true" PackagePath="build\" />
+    <None Include="$(RenDistDirectory)ren.*" Pack="true" PackagePath="statics\" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="RenCheckDistForPack" BeforeTargets="GenerateNuspec">
+    <Error Condition="'$(_RenManifest)' == ''" Text="There's no build in dist/ to pack.  Build Ren first." />
+    <Error Condition="'$(RenPackDevBuild)' != 'true' and ('$(_RenDistIsRelease)' != 'True' or '$(_RenDistVersion)' != '$(Version)')"
+           Text="dist/ has Ren $(_RenDistVersion), which isn't the $(Version) release.  Pack a release with the build command's &quot;pack $(Version)&quot;, or set RenPackDevBuild=true to pack it anyway." />
+  </Target>
+
+</Project>

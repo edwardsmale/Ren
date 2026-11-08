@@ -1,0 +1,42 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "CalcFunctionTests 1": {
+            "totalsRow": {
+                "position": "None"
+            },
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "Id": {
+                        "calcFunction": [
+                            "/**\n * @param {number} [compareTo=3] - The value to compare against.\n * @param {string} [trueValue=\"≥ $compareTo\"] - The string if greater or equal.\n * @param {string} [falseValue=\"< $compareTo\"] - The string if less.\n */\nreturn @value >= $compareTo ? \"$trueValue\" : \"$falseValue\";"
+                        ]
+                    },
+                    "Amount": {
+                        "calcFunction": [
+                            {
+                                "name": "greater-than-or-equal-to",
+                                "parameters": {
+                                    "compareTo": 15
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "CalcFunctionTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": ["Id", "Amount"]
+        }
+    }
+}

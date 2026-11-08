@@ -1,0 +1,8 @@
+{
+    "columns": ["Product", "Quantity", "OrderDate"],
+    "rows": [
+        ["Stapler", 3, "2024-05-01"],
+        ["Pens", 12, "2024-05-02"],
+        ["Paper", 5, "2024-05-03"]
+    ]
+}

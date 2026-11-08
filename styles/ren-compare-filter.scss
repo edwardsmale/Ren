@@ -1,0 +1,245 @@
+@use "ren-images" as *;
+
+/* Shared compare-filter control (Ren.CompareFilterControl), used by both the column header's Column
+   Filter popup and the filter module's per-column compare strip. */
+.ren-compare-filter
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+
+    &__operator-wrapper
+    {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 0;
+        // A manual dropdown arrow: the native select is transparent and covered by the symbol span,
+        // so its own arrow is hidden underneath — draw a small one in the reserved right-hand padding.
+        &::after
+        {
+            content: "▾";
+            position: absolute;
+            right: 0.15rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            color: #666666;
+            pointer-events: none;
+            z-index: 1;
+        }
+    }
+    // The select sits absolutely over the wrapper, stretched to whatever size the (in-flow) symbol
+    // text below gives the wrapper — so the collapsed value is never clipped, on page load or later,
+    // with no JS measurement needed.
+    &__operator
+    {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 0.75rem;
+        color: transparent;
+        cursor: pointer;
+        border: none;
+
+        &:focus,
+        &:focus-visible
+        {
+            outline: none;
+        }
+
+        option
+        {
+            color: initial;
+        }
+    }
+    // The context-menu picker's opener stands in for the select, in the same place and just as
+    // invisible: only the collapsed operator text beneath it and the ▾ arrow are seen.
+    &__operator--button
+    {
+        padding: 0;
+        background: transparent;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    &__operator-symbol
+    {
+        position: relative;
+        z-index: 1;
+        padding: 0 1.1rem 0 0.25rem;
+        pointer-events: none;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+    // Larger text when a bare comparison symbol (< ≤ > ≥) is shown rather than a longhand label.
+    &__operator-symbol--symbol
+    {
+        font-size: 1rem;
+    }
+
+    &__value-and-buttons-wrapper
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    &__value
+    {
+        border: solid 1px lightgray;
+        width: 6rem;
+        box-sizing: border-box;
+        font-size: 0.75rem;
+    }
+
+    /* The grip on the right edge of the value box, dragged to widen or narrow it.  Pulled left
+       across the flex gap so it sits against the box's edge rather than reading as a control of its
+       own, and shown only on hover so the strip stays as plain as it was without it. */
+    &__value-resize
+    {
+        flex-shrink: 0;
+        align-self: stretch;
+        margin-left: -0.25rem;
+        width: 4px;
+        min-height: 0.9rem;
+        background: transparent;
+        cursor: col-resize;
+
+        &:hover
+        {
+            background: #A0A0C8;
+        }
+    }
+
+    /* Shown in the value box's place while the custom function operator ("Custom...") is chosen:
+       its value is a function of the user's own, edited in the function editor window rather than
+       typed here.  Drawn as a link rather than a box so it reads as a way into the editor and takes
+       no more room in the strip than the box it stands in for. */
+    &__edit-function
+    {
+        flex-shrink: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.7rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #7A7AAA;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #333366;
+            text-decoration: underline;
+        }
+    }
+
+    &__apply
+    {
+        padding: 0.05rem 0;
+        border: solid 1px gray;
+        border-radius: 4px;
+        width: 19px;
+        height: 19px;
+        font-size: 0.75rem;
+        cursor: pointer;
+
+        // Pink while the column's compare filter is in effect, so a strip that is filtering is told
+        // apart at a glance from one whose inputs are merely filled in.
+        &--in-effect
+        {
+            background: #FFC0CB;
+        }
+        // Declared after --in-effect so the spinner's plain background wins while applying.
+        &--loading
+        {
+            background: transparent;
+            border: none;
+        }
+    }
+
+    &__clear
+    {
+        margin-left: -0.125rem;
+        border: none;
+        font-size: 0.6125rem;
+        cursor: pointer;
+        background: transparent;
+
+        &:disabled
+        {
+            color: #bbbbbb;
+            cursor: default;
+        }
+    }
+
+    /* The links beside the cross giving the column a further compare filter, reading as the word
+       joining it to this one: "and" for a filter a row must also pass, "or" for one it may pass
+       instead.  Small caps so they stay compact beside the buttons, whose row they share. */
+    &__join
+    {
+        flex-shrink: 0;
+        margin-left: 0.0625rem;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-variant: small-caps;
+        font-size: 0.675rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #7A7AAA;
+        opacity: 0.6;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #333366;
+            opacity: 1;
+            text-decoration: underline;
+        }
+    }
+
+    /* The word naming the join to the filter drawn beneath this one, on the filters of an OR group
+       above its last - which is the one carrying the links.  Set like the links so a group reads
+       evenly down its strips, but black and inert: it says what the join is rather than offering to
+       make one. */
+    &__join-word
+    {
+        flex-shrink: 0;
+        margin-left: 0.0625rem;
+        font-variant: small-caps;
+        font-size: 0.675rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #000000;
+    }
+
+    &__apply-tick
+    {
+        display: inline;
+    }
+
+    &__apply-spinner
+    {
+        display: none;
+        width: 14px;
+        height: 14px;
+        background-image: $loading-image;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+    }
+
+    &--compact
+    {
+        flex-wrap: wrap;
+        gap: 0.15rem;
+    }
+}

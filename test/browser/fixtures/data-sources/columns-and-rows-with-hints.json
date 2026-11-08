@@ -1,0 +1,11 @@
+{
+    "columns": [
+        { "name": "Product", "heading": "Item" },
+        { "name": "Code", "type": "string" },
+        { "name": "Price", "format": "currency" }
+    ],
+    "rows": [
+        ["Stapler", "007", 3.5],
+        ["Pens", "012", 1.25]
+    ]
+}

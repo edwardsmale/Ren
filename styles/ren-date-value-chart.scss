@@ -1,0 +1,224 @@
+.ren-value-resize-handle
+{
+    cursor: ns-resize;
+    fill: #999999;
+    opacity: 0;
+
+    &--active
+    {
+        height: 5px;
+        opacity: 0.2;
+    }
+}
+
+.ren-date-value-chart-legend-html
+{
+    // The rest of the legend's styles are inline.  Positioned for the lasso drawn inside it.
+    position: relative;
+
+    .ren-legend-lasso
+    {
+        position: absolute;
+        border: 1px dashed #666666;
+        background: rgba(0, 102, 204, 0.08);
+        box-sizing: border-box;
+        pointer-events: none;
+    }
+}
+
+// A background, as a border would move what it surrounds.  Important over the legend's inline one.
+.ren-date-value-chart-image-area
+{
+    background-color: rgba(0, 102, 204, 0.15) !important;
+}
+
+.ren-date-value-chart-marker-key
+{
+    // The key beneath a numbered chart, saying what each of the numbers at the marker lines stands
+    // for.  Laid out like the legend it sits above: a row of entries that wraps onto as many lines
+    // as it needs, and takes its height from the container rather than from the plot.
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    padding: 3px 4px;
+    font-size: 12px;
+    background: white;
+    border-top: 1px solid #cccccc;
+    box-sizing: border-box;
+
+    &__item
+    {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    &__number
+    {
+        font-weight: bold;
+    }
+
+    &__text
+    {
+        color: #333333;
+    }
+}
+
+.ren-axis-label
+{
+    font-family: Calibri, Arial, sans-serif;
+}
+
+// Left of the focus mode button (see ren-visualisation.scss), side by side, and like it shown
+// while the chart is hovered, and always while it is focused.
+.ren-date-value-chart-column-pickers
+{
+    position: absolute;
+    top: 0.25rem;
+    right: 1.875rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
+
+    // A popup filling its space stretches a visualisation's divs to its height (see
+    // ren-popup-window.scss), which would also cover the chart beneath.
+    height: auto !important;
+    opacity: 0;
+    transition: opacity 0.15s;
+
+    &:focus-within
+    {
+        opacity: 1;
+    }
+
+    &__picker
+    {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        max-width: 16rem;
+        padding: 1px 4px;
+        border: solid 1px transparent;
+        border-radius: 0.25rem;
+        background: rgba(255, 255, 255, 0.85);
+        color: #777777;
+        font-size: 11px;
+        line-height: 1.4;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &:hover
+        {
+            border-color: #B1B1B1;
+            background-color: #EEEEEE;
+            color: #222222;
+        }
+    }
+
+    &__value
+    {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #000000;
+    }
+}
+.ren-visualisation:hover > .ren-date-value-chart-column-pickers,
+.ren-visualisation--focused > .ren-date-value-chart-column-pickers
+{
+    opacity: 1;
+}
+
+// Left of the focus mode button, which a popped in window moves left of its own button.
+.ren-report-popup-window--popped-in .ren-visualisation > .ren-date-value-chart-column-pickers
+{
+    right: 3.125rem;
+}
+
+// A titled chart's pickers sit in a row kept free for them beneath the title, so that the title
+// doesn't move when they show.  Kept whether or not the chart has pickers, as the plot is fitted to
+// the room the title leaves before they are drawn.  The title's line is as tall as the cross filter
+// chips beside it (see ren-visualisation-cross-filter-indicators.scss), and level with them.
+$chart-title-padding-top: 4px;
+$chart-title-line-height: 22px;
+$chart-title-picker-row-height: 22px;
+$chart-subtitle-line-height: 16px;
+
+.ren-visualisation:has(.ren-chart-title) > .ren-date-value-chart-column-pickers
+{
+    top: $chart-title-padding-top + $chart-title-line-height + 2px;
+}
+
+.ren-visualisation:has(.ren-chart-subtitle) > .ren-date-value-chart-column-pickers
+{
+    top: $chart-title-padding-top + $chart-subtitle-line-height + 2px;
+}
+
+.ren-visualisation:has(.ren-chart-title + .ren-chart-subtitle)
+    > .ren-date-value-chart-column-pickers
+{
+    top: $chart-title-padding-top + $chart-title-line-height + $chart-subtitle-line-height + 2px;
+}
+
+// An untitled chart's pickers sit beneath its cross filter chips rather than over them.
+.ren-visualisation:not(:has(.ren-chart-title, .ren-chart-subtitle))
+{
+    &:has(> .ren-visualisation__cross-filters) > .ren-date-value-chart-column-pickers
+    {
+        top: 1.75rem;
+    }
+}
+
+// The subtitle takes the picker row from beneath the title.
+.ren-chart-title:has(+ .ren-chart-subtitle)
+{
+    padding-bottom: 0;
+}
+
+.ren-chart-title + .ren-chart-subtitle
+{
+    padding-top: 0;
+}
+
+// The rest of the titles' styles are inline.  Their sides are kept clear of the focus mode button.
+.ren-chart-title,
+.ren-chart-subtitle
+{
+    padding: $chart-title-padding-top 1.875rem $chart-title-picker-row-height;
+    line-height: $chart-title-line-height;
+
+    // Share the free space, which centres the title.
+    &::before,
+    &::after
+    {
+        content: "";
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .ren-report-popup-window--popped-in &
+    {
+        padding-left: 3.125rem;
+        padding-right: 3.125rem;
+    }
+}
+
+.ren-chart-subtitle
+{
+    line-height: $chart-subtitle-line-height;
+}
+
+// A pie is no taller than its chart is wide, so each chart of a multi-chart of pies is kept no
+// taller than that, its pie sitting up under its dates rather than centred in the room below.
+.ren-date-value-chart-multi-chart-grid--pies
+{
+    container-type: inline-size;
+
+    > .ren-date-value-chart-multi-chart-item > :first-child
+    {
+        max-height: calc(100cqw / var(--ren-multi-chart-columns, 1));
+    }
+}

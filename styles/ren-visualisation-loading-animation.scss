@@ -1,0 +1,90 @@
+$loading-square: linear-gradient(currentColor, currentColor);
+$loading-square-size: 36px 36px;
+
+.ren-visualisation-loading-animation
+{
+    position: absolute;
+    justify-self: flex-start;
+    left: 10px;
+    top: 10px;
+    scale: 0.25;
+    filter: contrast(2) brightness(1.25) hue-rotate(20deg);
+
+    // Three squares drawn as background layers, rather than child elements, so that the grid set's
+    // ::before below can show them too.  They appear one by one, pulse, then go from the left.
+    width: 150px;
+    height: 45px;
+    background-image: $loading-square, $loading-square, $loading-square;
+    background-position: 4px 5px, 56px 5px, 108px 5px;
+    background-repeat: no-repeat;
+    background-size: 0 0, 0 0, 0 0;
+    animation:
+        ren-visualisation-loading-squares 6.88s step-end infinite,
+        ren-visualisation-loading-pulse 1.36s ease-in-out infinite alternate;
+
+    // Inside an inline visualisation's target, left at its static position so it spins where the
+    // visualisation will appear, not over the top-left of whatever ancestor is positioned (often
+    // the report's title).  Being absolute, it takes up no space and adds no flex or grid gap.
+    &[data-target-selector]
+    {
+        left: auto;
+        top: auto;
+    }
+}
+
+@keyframes ren-visualisation-loading-squares
+{
+    0%
+    {
+        background-size: 0 0, 0 0, 0 0;
+    }
+
+    15.7%
+    {
+        background-size: $loading-square-size, 0 0, 0 0;
+    }
+
+    30.2%
+    {
+        background-size: $loading-square-size, $loading-square-size, 0 0;
+    }
+
+    40.1%
+    {
+        background-size: $loading-square-size, $loading-square-size, $loading-square-size;
+    }
+
+    94.8%
+    {
+        background-size: 0 0, $loading-square-size, $loading-square-size;
+    }
+
+    97.1%
+    {
+        background-size: 0 0, 0 0, $loading-square-size;
+    }
+}
+
+@keyframes ren-visualisation-loading-pulse
+{
+    from
+    {
+        color: #f17ab8;
+    }
+
+    to
+    {
+        color: #e94194;
+    }
+}
+
+// In place of a grid set hidden until it is ready to show (see ren.scss).  Left at its static
+// position, so it takes up no space in the grid set.
+grid-set:not(.ren-grid-set--shown)::before
+{
+    @extend .ren-visualisation-loading-animation;
+    content: "";
+    left: auto;
+    top: auto;
+    margin: 10px 0 0 10px;
+}

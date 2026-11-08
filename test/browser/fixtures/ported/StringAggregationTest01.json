@@ -1,0 +1,68 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "ProductCode": {
+                                "valueFormatFunction": {
+                                    "name": "product-code-pdp-link"
+                                }
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName",
+                            "CategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "ProductCode": {
+                                "valueFormatFunction": {
+                                    "name": "product-code-pdp-link"
+                                },
+                                "aggregationType": "Concatenate"
+                            },
+                            "ProductName": {
+                                "aggregationType": "SingleValueOrPlaceholder"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "ExpandIcon"
+                            },
+                            "AmazonASIN": {
+                                "aggregationType": "SingleValuesOnly"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "CategoryName": {
+                                "aggregationType": "DistinctValuesWithCounts"
+                            },
+                            "AmazonASIN": {
+                                "aggregationType": "CountDistinct"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "visibleColumns": [
+                "ParentCategoryName",
+                "CategoryName",
+                "ProductCode",
+                "ProductName",
+                "AmazonASIN"
+            ]
+        }
+    }
+}

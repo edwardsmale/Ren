@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tabular data set collection - Ren examples</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <h1 class="ren-example__title">Tabular data set collection</h1>
+    <p class="ren-example__paragraph">Ren's own JSON, which the other formats are converted into, and which a report server returns.  It can carry several tabs, the columns' aggregation and formats, and a compression dictionary that the compressed columns index into.  Any JSON that isn't one of the other formats is read as this.</p>
+    <p class="ren-example__paragraph">Data: <a href="/examples/data/sales.collection.json"><code class="ren-example__code">sales.collection.json</code></a></p>
+    <pre class="ren-example__code-block">{
+    "DataSourceUri": "...",
+    "TabularDataSets": [{
+        "Title": "Sales",
+        "TabularDatas": [{
+            "Title": "Sales",
+            "IsColumnCompressed": [false, true, true, true, false, false],
+            "ColumnModels": [{ "Heading": "Count", "Visible": false, ... }, ...],
+            "RowModels": [{ "CV": [1, 0, 23, 17, 4, 14] }, ...]
+        }]
+    }],
+    "CompressionDictionary": ["2026-07-01", ...]
+}</pre>
+    <ren-grid src="/examples/data/sales.collection.json"
+              data-format="tabular-data-set-collection"
+              show-row-and-column-headings />
+</body>
+</html>

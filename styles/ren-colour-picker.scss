@@ -1,0 +1,114 @@
+// A saturation/value square over a hue slider, with swatches of common colours beneath.
+.ren-colour-picker
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 12rem;
+    user-select: none;
+
+    // The background colour (the hue at full saturation and value) is set in JavaScript.
+    &__square
+    {
+        position: relative;
+        height: 8rem;
+        border: solid 1px darkgray;
+        border-radius: 0.1875rem;
+        background-image:
+            linear-gradient(to top, #000, transparent),
+            linear-gradient(to right, #fff, transparent);
+        cursor: crosshair;
+        touch-action: none;
+    }
+
+    &__marker
+    {
+        position: absolute;
+        width: 0.75rem;
+        height: 0.75rem;
+        box-sizing: border-box;
+        border: solid 2px white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    &__hue
+    {
+        box-sizing: border-box;
+        width: 100%;
+        height: 0.75rem;
+        margin: 0;
+        border-radius: 0.375rem;
+        background: linear-gradient(
+            to right, #f00 0%, #ff0 16.67%, #0f0 33.33%, #0ff 50%, #00f 66.67%, #f0f 83.33%,
+            #f00 100%
+        );
+        -webkit-appearance: none;
+        appearance: none;
+
+        &::-webkit-slider-thumb
+        {
+            width: 0.75rem;
+            height: 0.75rem;
+            box-sizing: border-box;
+            border: solid 2px white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+            background: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        &::-moz-range-thumb
+        {
+            width: 0.75rem;
+            height: 0.75rem;
+            box-sizing: border-box;
+            border: solid 2px white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+            background: transparent;
+        }
+    }
+
+    &__swatches
+    {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    &__swatch
+    {
+        width: 1rem;
+        height: 1rem;
+        padding: 0;
+        border: solid 1px darkgray;
+        border-radius: 0.125rem;
+        cursor: pointer;
+
+        &:hover
+        {
+            outline: solid 1px black;
+        }
+    }
+}
+
+// The popup window a colour picker opens in (see ren-colour-picker-window.js).
+.ren-colour-picker-window
+{
+    .ren-report-popup-window__content-container
+    {
+        padding: 0.75rem;
+    }
+
+    &__buttons
+    {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+        user-select: none;
+    }
+}

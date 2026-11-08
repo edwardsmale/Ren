@@ -1,0 +1,46 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "NumberAggregationWithNullsTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "OrderRevenue": {
+                                "aggregationType": "Min"
+                            },
+                            "DiscountAmount": {
+                                "aggregationType": "Max"
+                            }
+                        },
+                        "groupByColumns": [
+                            "AccountId"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "OrderRevenue": {
+                                "aggregationType": "Min"
+                            },
+                            "DiscountAmount": {
+                                "aggregationType": "Max"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NumberAggregationWithNullsTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "OrderId",
+                "AccountId",
+                "OrderRevenue",
+                "DiscountAmount"
+            ]
+        }
+    }
+}

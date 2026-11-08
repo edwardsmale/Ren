@@ -1,0 +1,74 @@
+{
+    "settingsVersion": "Fox",
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DateValueChartMarkerLineTests_Data",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DateValueChartMarkerLineTests_Data",
+            "reportContext": {
+                "reportContextGuid": "report-context-DateValueChartTest13",
+                "reportName": "DateValueChartTest13"
+            },
+            "dataGroupingSettingsGroup": "DateValueChartMarkerLineTests_Data 1",
+            "gridStateGroup": "report-context-DateValueChartTest13 DateValueChartMarkerLineTests_Data 1",
+            "visualisationSettingsGroup": "DateValueChart-None",
+            "filterGroup": "DateValueChartMarkerLineTests_Data 1",
+            "clientSide": true,
+            "chartDataGroupingSettings": {
+                "groupings": {
+                    "entries": [
+                        {
+                            "groupByColumnIndexes": [
+                                0
+                            ],
+                            "groupByCalcFunctions": [
+                                {
+                                    "name": "date-day-start"
+                                }
+                            ],
+                            "dateRange": {
+                                "from": "2024-01-03",
+                                "to": "2024-01-06"
+                            }
+                        },
+                        {
+                            "groupByColumnIndexes": []
+                        }
+                    ]
+                }
+            },
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "initialChartGroupCalcFunction": "date-day-start",
+            "isInsidePopup": true,
+            "isPopup": true,
+            "popupTitle": "Default Date Range",
+            "popupTop": "6.875rem",
+            "popupLeft": "0.9375rem",
+            "popupWidth": "1000px",
+            "popupHeight": "500px",
+            "resizeToFitContentOnLoad": false,
+            "fillAvailableSpace": true,
+            "showRowAndColumnHeadings": true,
+            "visualisationTop": "6.875rem",
+            "visualisationLeft": "0.9375rem",
+            "visualisationWidth": "1000px",
+            "visualisationHeight": "484px",
+            "selectedColumns": [
+                "Date",
+                "Searches"
+            ],
+            "series": [
+                {
+                    "column": "Searches",
+                    "label": "Searches",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046B8",
+                    "chartType": "Bar",
+                    "showValueLabels": false
+                }
+            ],
+            "tabularDataTransformers": []
+        }
+    ]
+}

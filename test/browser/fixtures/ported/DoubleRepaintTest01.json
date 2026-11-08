@@ -1,0 +1,157 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DoubleRepaintTest": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DoubleRepaintTest": {
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false,
+                    "displayOrder": 0
+                },
+                {
+                    "column": "Id",
+                    "displayOrder": 1
+                },
+                {
+                    "column": "Name",
+                    "displayOrder": 2
+                },
+                {
+                    "column": "Age",
+                    "displayOrder": 3
+                },
+                {
+                    "column": "CreatedOn",
+                    "displayOrder": 4
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false,
+                    "displayOrder": 5
+                }
+            ]
+        }
+    },
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DoubleRepaintTest",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DoubleRepaintTest",
+            "reportContext": {
+                "reportContextGuid": "report-context-DoubleRepaintTest01",
+                "reportName": "DoubleRepaintTest01"
+            },
+            "dataGroupingSettingsGroup": "DoubleRepaintTest",
+            "gridStateGroup": "report-context-DoubleRepaintTest01 DoubleRepaintTest 1",
+            "visualisationSettingsGroup": "DateValueChart-None",
+            "chartDataGroupingSettings": {
+                "groupings": {
+                    "entries": [
+                        {
+                            "groupByColumnIndexes": [4],
+                            "groupByCalcFunctions": [
+                                {
+                                    "name": "date-day-start"
+                                }
+                            ],
+                            "columns": {}
+                        },
+                        {
+                            "groupByColumnIndexes": []
+                        }
+                    ]
+                }
+            },
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "datePeriod": "Auto",
+            "fillAvailableSpace": true,
+            "filterGroup": "DoubleRepaintTest",
+            "isInsidePopup": true,
+            "isPopup": true,
+            "popupHeight": "240px",
+            "popupLeft": "1.9375rem",
+            "popupTop": "16.8125rem",
+            "resizeToFitContentOnLoad": false,
+            "selectedColumns": [
+                "CreatedOn",
+                "Age"
+            ],
+            "series": [
+                {
+                    "column": "Age",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046b8",
+                    "chartType": "Bar",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": true,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal"
+                }
+            ],
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": true,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "visualisationHeight": "224px",
+            "visualisationLeft": "1.9375rem",
+            "visualisationTop": "16.8125rem",
+            "visualisationWidth": "608px"
+        },
+        {
+            "visualisationTypeName": "FilterModule",
+            "sqlFilename": "DoubleRepaintTest",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DoubleRepaintTest",
+            "reportContext": {
+                "reportContextGuid": "report-context-DoubleRepaintTest01",
+                "reportName": "DoubleRepaintTest01"
+            },
+            "dataGroupingSettingsGroup": "report-context-DoubleRepaintTest01 DoubleRepaintTest 1[1]",
+            "gridStateGroup": "report-context-DoubleRepaintTest01 DoubleRepaintTest 1[1]",
+            "visualisationSettingsGroup": "FilterModule-None",
+            "clientSide": true,
+            "columnOverrides": {
+                "CreatedOn": {
+                    "included": true
+                }
+            },
+            "dataTabIndex": 1,
+            "filterGroup": "report-context-DoubleRepaintTest01 DoubleRepaintTest 1[1]",
+            "isInsidePopup": true,
+            "isPopup": true,
+            "maxHeight": "calc(100% - 22px)",
+            "maxWidth": "100%",
+            "popupHeight": "258px",
+            "popupIcon": "filter-icon.png",
+            "popupLeft": "46.25rem",
+            "popupTitle": "CreatedOn",
+            "popupTop": "17.6875rem",
+            "popupWidth": "343px",
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": true,
+            "sourceDataGroupingSettingsGroup": "DoubleRepaintTest",
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "visualisationHeight": "242px",
+            "visualisationLeft": "46.25rem",
+            "visualisationTop": "17.6875rem",
+            "visualisationWidth": "360px",
+            "resizeToFitContentOnLoad": false,
+            "showRightClickHint": false
+        }
+    ]
+}

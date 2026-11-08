@@ -1,0 +1,25 @@
+.ren-global-error-indicator
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.5rem 0;
+    width: fit-content;
+    color: #b00;
+    
+    text-align: center;
+    font-size: 0.75rem;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    z-index: 9999;
+
+    &__icon
+    {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 0.5rem;
+    }
+}

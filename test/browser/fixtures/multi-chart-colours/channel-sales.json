@@ -1,0 +1,12 @@
+{
+    "columns": ["Channel", "Brand", "Sales", "OrderDate"],
+    "rows": [
+        ["Amazon", "Acme", 60, "2024-03-15"],
+        ["Amazon", "Zenith", 40, "2024-03-15"],
+        ["Direct", "Acme", 10, "2024-03-15"],
+        ["Amazon", "Acme", 70, "2025-03-15"],
+        ["Amazon", "Zenith", 50, "2025-03-15"],
+        ["Other", "Acme", 80, "2025-03-15"],
+        ["Direct", "Zenith", 40, "2025-03-15"]
+    ]
+}

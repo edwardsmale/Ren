@@ -1,0 +1,115 @@
+// A task board (see Ren.CreateTaskBoard): its column headings and its lanes share a grid, each
+// lane laying out its heading and cells to the same columns as the board's header.
+.ren-task-board
+{
+    --ren-task-board-grid-columns:
+        var(--ren-task-board-lane-heading-width, 8rem)
+        repeat(var(--ren-task-board-column-count), var(--ren-task-board-column-width, 15.5rem));
+
+    width: max-content;
+
+    &__header
+    {
+        display: grid;
+        grid-template-columns: var(--ren-task-board-grid-columns);
+        column-gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    &__column-heading
+    {
+        padding-bottom: 0.25rem;
+        border-bottom: 2px solid #3046b8;
+        color: #3046b8;
+        font-weight: bold;
+    }
+
+    &__heading,
+    &__subheading
+    {
+        display: block;
+        min-height: 1.2em;
+    }
+
+    &__subheading
+    {
+        color: #666666;
+        font-size: 0.75rem;
+        font-weight: normal;
+    }
+
+    // An empty heading or subheading, shown as a placeholder while the heading is hovered so that
+    // it can be right-clicked to fill it in.
+    &__part--empty
+    {
+        visibility: hidden;
+        opacity: 0.45;
+        font-style: italic;
+    }
+
+    &__column-heading:hover &__part--empty
+    {
+        visibility: visible;
+    }
+
+    &--read-only &__part--empty
+    {
+        display: none;
+    }
+
+    &__heading.ren-task-board__part--empty::before
+    {
+        content: "heading";
+    }
+
+    &__subheading.ren-task-board__part--empty::before
+    {
+        content: "subheading";
+    }
+
+    &__lanes
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+// A lane's colour, on its heading and along the top of its cells, is --ren-task-lane-colour.
+.ren-task-lane
+{
+    display: grid;
+    grid-template-columns: var(--ren-task-board-grid-columns);
+    column-gap: 1rem;
+
+    &__heading
+    {
+        align-self: start;
+        min-height: 1.2em;
+        margin-top: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 1rem;
+        background-color: var(--ren-task-lane-colour, #3046b8);
+        color: white;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-align: center;
+
+        &[contenteditable]
+        {
+            outline: 2px solid var(--ren-task-lane-colour, #3046b8);
+            outline-offset: 2px;
+            cursor: text;
+        }
+    }
+
+    &__cell
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 2rem;
+        padding-top: 0.75rem;
+        border-top: 3px solid var(--ren-task-lane-colour, #3046b8);
+    }
+}

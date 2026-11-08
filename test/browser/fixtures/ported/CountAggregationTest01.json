@@ -1,0 +1,32 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "CountAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "SingleValueOrPlaceholder"
+                            }
+                        },
+                        "groupByColumns": [
+                            "OrderId"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "CountAggregationTest 1": {
+            "visibleColumns": [
+                "OrderId",
+                "Val"
+            ]
+        }
+    }
+}

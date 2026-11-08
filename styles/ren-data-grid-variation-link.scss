@@ -1,0 +1,75 @@
+.ren-data-grid__variation-links
+{
+    position: absolute;
+    width: fit-content;
+    user-select: none;
+    top: 0.375rem;
+}
+
+.ren-data-grid__variation-icon
+{
+    padding-right: 0.5rem;
+    line-height: 0.75rem;
+
+    &:before
+    {
+        content: "🔖";
+        font-size: 0.875rem;
+        filter: saturate(0.5);
+    }
+}
+
+.ren-data-grid__variation-menu-button
+{
+    cursor: pointer;
+
+    &:before
+    {
+        content: "...";
+        font-size: 1rem;
+        color: #b3b3b3;
+        line-height: 0.5rem;
+    }
+}
+
+.ren-data-grid__variation-link
+{
+    height: 0.75rem;
+    display: block;
+    padding: 0 0.5rem 0 0;
+    margin-right: 0.5rem;
+    color: #399ab1 !important;
+    text-decoration-color: #399ab1 !important;
+    font-size: 0.75rem;
+    font-family: Arial;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover
+    {
+        text-decoration: underline;
+        color: #001133;
+        text-decoration-color: #001133;
+    }
+
+    &--with-separator
+    {
+        border-right: solid 1px #bac1ff;
+    }
+
+    &--has-data-grouping-settings
+    {
+        color: #2d63a9 !important;
+    }
+
+    &--has-grid-state
+    {
+        color: #399ab1 !important;
+    }
+
+    &--has-both
+    {
+        color: #2d91a9 !important;
+    }
+}

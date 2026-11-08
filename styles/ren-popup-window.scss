@@ -1,0 +1,699 @@
+$heavy-multiplication-character: "\2716";
+
+$window-title-bar-colour: #20427d; // Dark greenish blue
+$window-title-bar-colour-ad-hoc-visualisation: #3d539ddd; // Translucent blue
+$window-title-bar-colour-popup-report: #134D23; // Dark green
+$window-title-bar-colour-success: #134D23; // Dark green
+
+// Focused windows (same colours at the moment)
+$window-title-bar-colour-focused: #20427d; // Dark greenish blue
+$window-title-bar-colour-ad-hoc-visualisation-focused: #3d539ddd; // Translucent blue
+$window-title-bar-colour-popup-report-focused: #134D23; // Dark green
+
+$window-popped-in-border-colour: #EFEFFF; // Very light grey
+
+$success-with-warning-window-title-bar-colour: #d5d51a;
+$error-window-title-bar-colour: #8B0000;
+$confirm-window-title-bar-colour: #007f14;
+
+$title-bar-height-standard: 1.5rem;
+$title-bar-height-thin: 0.5rem;
+
+.ren-report-popup-window
+{
+    position: absolute;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: Calibri, Arial;
+    box-shadow: 2px 2px 13px 1px rgba(3,3,22,0.51);
+    z-index: 999999;
+
+    &__title-bar
+    {
+        position: relative;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        // Negative top margin so that we can use height 100% on &__content.
+        margin-top: -$title-bar-height-standard;
+        background-color: $window-title-bar-colour;
+        padding: 0.25rem 0.5rem 0.25rem;
+        font-weight: bold;
+        font-size: 12px;
+        color: white;
+        cursor: default;
+
+        &--Success
+        {
+            background-color: $window-title-bar-colour-success;
+        }
+
+        &--SuccessWithWarning
+        {
+            color: black;
+            background-color: $success-with-warning-window-title-bar-colour; // Yellow
+
+            .ren-report-popup-window
+            {
+                &__warning-triangle
+                {
+                    margin-right: 0.35rem;
+                    font-size: 1rem;
+                    font-weight: lighter;
+                }
+
+                &__window-buttons
+                {
+                    filter: invert(1); // The yellow background is too light for white icons.
+                }
+            }
+        }
+
+        &--Error
+        {
+            background-color: $error-window-title-bar-colour;
+        }
+
+        &--Confirm
+        {
+            background-color: $confirm-window-title-bar-colour;
+        }
+    }
+
+    &__title-bar-drag-handle
+    {
+        position: absolute;
+        opacity: 0;
+    }
+
+    &__resize-handle
+    {
+        position: absolute;
+        z-index: 999999;
+
+        &--bottom-right
+        {
+            bottom: 0;
+            right: 0;
+            width: 1rem;
+            height: 0.375rem;
+            cursor: se-resize;
+        }
+
+        &--top
+        {
+            top: -0.375rem;
+            transform: translateY(-$title-bar-height-standard); // Adjust for title bar negative margin.
+            left: 0;
+            right: 0;
+            height: 0.75rem;
+            cursor: ns-resize;
+        }
+
+        &--right
+        {
+            top: 0;
+            right: -0.375rem;
+            bottom: 0.375rem;
+            width: 0.75rem;
+            cursor: ew-resize;
+        }
+
+        &--bottom
+        {
+            bottom: -0.375rem;
+            left: 0;
+            right: 0.375rem;
+            height: 0.75rem;
+            cursor: ns-resize;
+        }
+
+        &--left
+        {
+            top: 0;
+            left: -0.625rem;
+            bottom: 0;
+            width: 0.5rem;
+            cursor: ew-resize;
+        }
+    }
+    // Adjust title bar and top drag handle for thin title bar.
+
+    &__title-bar--thin
+    {
+        margin-top: -$title-bar-height-thin;
+        height: 0.5rem;
+    }
+
+    &__title-bar--ad-hoc-visualisation
+    {
+        background-color: $window-title-bar-colour-ad-hoc-visualisation;
+    }
+
+    &__title-bar--popup-report
+    {
+        background-color: $window-title-bar-colour-popup-report;
+    }
+
+    // A popped-in window's title bar stays transparent.
+    &--focused:not(.ren-report-popup-window--popped-in) > &__title-bar
+    {
+        background-color: $window-title-bar-colour-focused;
+
+        &.ren-report-popup-window__title-bar--ad-hoc-visualisation
+        {
+            background-color: $window-title-bar-colour-ad-hoc-visualisation-focused;
+        }
+
+        &.ren-report-popup-window__title-bar--popup-report
+        {
+            background-color: $window-title-bar-colour-popup-report-focused;
+        }
+
+        // These colours carry meaning, so are kept.
+        &.ren-report-popup-window__title-bar--Success
+        {
+            background-color: $window-title-bar-colour-success;
+        }
+
+        &.ren-report-popup-window__title-bar--SuccessWithWarning
+        {
+            background-color: $success-with-warning-window-title-bar-colour;
+        }
+
+        &.ren-report-popup-window__title-bar--Error
+        {
+            background-color: $error-window-title-bar-colour;
+        }
+
+        &.ren-report-popup-window__title-bar--Confirm
+        {
+            background-color: $confirm-window-title-bar-colour;
+        }
+    }
+
+    &__resize-handle--top--thin
+    {
+        transform: translateY(-$title-bar-height-thin);
+    }
+
+    &__title-bar-caption
+    {
+        flex-grow: 0;
+        flex-shrink: 1;
+        flex-basis: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        &--with-icon
+        {
+            padding-left: 1.5rem;
+            /* If the popup title is blank, the div will have zero size and we won't see the icon. */
+            /* Ensure a minimum width and height to prevent this. */
+            min-width: 1rem;
+            min-height: 0.875rem;
+            background-repeat: no-repeat;
+        }
+    }
+
+    &__window-buttons
+    {
+        display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-direction: row;
+        gap: 1rem;
+        margin-left: auto;
+        margin-right: 0.125rem;
+        z-index: 99999; /* Ensure buttons are on top of title bar drag handle. */
+
+        /* The container itself lets mouse events through to the drag handle beneath, so a hidden
+           button (the add-to-report button outside edit mode) still occupying its space doesn't
+           stop the window being dragged.  The buttons themselves take their events back. */
+        pointer-events: none;
+
+        > *
+        {
+            pointer-events: auto;
+        }
+    }
+
+    &__add-to-report-button,
+    &__pop-out-button,
+    &__close-button,
+    &__maximise-button,
+    &__minimise-button
+    {
+        cursor: pointer;
+        color: #BBBBBB;
+        font-weight: normal;
+
+        &:hover
+        {
+            color: white;
+        }
+    }
+
+    &__close-button
+    {
+        &::before
+        {
+            content: $heavy-multiplication-character;
+        }
+    }
+
+    &__maximise-button
+    {
+        &::before
+        {
+            content: '\1F5D6'; // Maximise window icon.
+        }
+
+        &.ren-maximised
+        {
+            &::before
+            {
+                content: '\1F5D7'; // Restore window icon.
+            }
+        }
+
+        &.ren-minimised
+        {
+            &::before
+            {
+                content: '\1F5D7'; // Restore window icon.
+            }
+        }
+    }
+
+    &__minimise-button
+    {
+        &::before
+        {
+            content: '\1F5D5'; // Minimise window icon.
+        }
+
+        &.ren-minimised
+        {
+            &::before
+            {
+                content: '\1F5D7'; // Restore window icon.
+            }
+        }
+    }
+
+    &__pop-out-button
+    {
+        align-self: flex-end;
+        margin-top: 0.125rem;
+        margin-bottom: -0.125rem;
+
+        &::before
+        {
+            content: '\25F1'; // Suitable icon.
+            font-size: 0.875rem;
+        }
+    }
+
+    &__add-to-report-button
+    {
+        &::before
+        {
+            content: '\2B9F'; // Down arrow/triangle icon.
+            font-size: 0.875rem;
+        }
+    }
+
+    .ren-visualisation__convert-to-popup-button
+    {
+        visibility: hidden; /* Hide the convert to popup button when the window is popped in. */
+    }
+
+    &--popped-in
+    {
+        border-color: $window-popped-in-border-colour;
+        /* Remove shadow when popped in (box-shadow is still used to provide the bottom border). */
+        box-shadow: 0 1px 0 0 $window-popped-in-border-colour;
+
+        .ren-report-popup-window__title-bar
+        {
+            padding: 0;
+            height: 0.675rem;
+            margin-top: -0.675rem;
+            cursor: move;
+            background-color: transparent;
+            border-bottom: solid 1px $window-popped-in-border-colour;
+        }
+
+        .ren-report-popup-window__title-bar-caption,
+        .ren-report-popup-window__window-buttons
+        {
+            visibility: hidden; /* Hide the title bar caption when the window is popped in. */
+        }
+
+        .ren-visualisation__convert-to-popup-button
+        {
+            visibility: visible; /* Hide the convert to popup button when the window is popped in. */
+        }
+
+        // A date/value chart's legend ends at the window's bottom edge, where the shadow would
+        // read as a border beneath the legend.
+        &:has(.ren-visualisation--date-value-chart)
+        {
+            box-shadow: none;
+        }
+    }
+
+    &__content
+    {
+        box-sizing: border-box;
+        background-color: white;
+        padding: 0.25rem;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Necessary, otherwise the top of reports overlap the window title bar. */
+        /*
+         * Note the height: 100% + overflow: hidden above.  This wrapper (the visualisation's
+         * .ren-visualisation element) is sized to the popup window and CLIPS its child, which
+         * silently defeats the __content-container's own vertical scrollbar: the container never
+         * sees any overflow because this element already swallowed it.  Grids/charts are fine
+         * because they scroll internally (e.g. .ren-grid-set__viewport).  A plain, non-self-scrolling
+         * visualisation placed in a popup (e.g. .ren-data-grouping-settings-editor) must therefore
+         * carry its own height: 100%; overflow: auto; to get a scrollbar when its content is taller
+         * than the window - see ren-data-grouping-settings-editor.scss.
+         */
+    }
+
+    &__content.ren-visualisation--date-value-chart
+    {
+        padding: 0;
+    }
+
+    &__content.ren-visualisation--word-cloud
+    {
+        padding: 1rem;
+    }
+
+    // Ensure the content container inside popup windows fill the available height when enabled.
+    &__content-container--fill-available-space
+    {
+        width: 100%;
+        height: 100%;
+        // Ensure visualisations inside popup windows fill the available height.
+        .ren-visualisation
+        {
+            height: -webkit-fill-available;
+            height: -moz-available;
+            height: stretch; // Standard syntax
+        }
+        // Ensure the container inside visualisations also fills the available height.
+        .ren-visualisation > div
+        {
+            height: -webkit-fill-available;
+            height: -moz-available;
+            height: stretch; // Standard syntax
+        }
+    }
+
+    // Laid out at a fixed base size and scaled to fit the window (see Ren.PopupWindow_ContentScale).
+    &__content-container--scaled
+    {
+        box-sizing: border-box;
+        max-height: none !important;
+        transform-origin: 0 0;
+    }
+
+    // Fills the browser window, whatever position and size it is given, with no title bar.
+    &--full-screen
+    {
+        position: fixed;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        box-shadow: none;
+
+        > .ren-report-popup-window__title-bar
+        {
+            display: none;
+        }
+    }
+}
+
+// The page behind a full screen window shows no scroll bars.
+html.ren-report-popup-window-full-screen-open,
+html.ren-report-popup-window-full-screen-open body
+{
+    overflow: hidden !important;
+}
+
+.ren-show-hide-columns-window
+{
+    min-width: 12rem;
+
+    &__column-list
+    {
+        padding-left: 0;
+        margin: 0;
+        font-size: 11px;
+        overflow: auto;
+        scrollbar-color: #AAAAAA #EEEEDD;
+        scrollbar-width: thin;
+    }
+
+    &__column-list-item
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.125rem;
+        padding: 0.0625rem;
+        margin: 0.125rem 0;
+        height: 1.4rem;
+        list-style-type: none;
+        cursor: default;
+        color: black;
+        background-color: white;
+        cursor: pointer;
+        user-select: none;
+        transition: opacity 0.2s ease, background-color 0.2s ease;
+
+        &--visible
+        {
+            color: white;
+            background-color: #4d85ff;
+        }
+
+        &--dragging
+        {
+            opacity: 0.6;
+        }
+    }
+
+    &__drag-handle
+    {
+        flex-shrink: 0;
+        margin-left: auto;
+        width: 1rem;
+        height: 1rem;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(1.1, 1.25);
+        color: lightgray;
+
+        &:active
+        {
+            cursor: grabbing;
+        }
+    }
+}
+
+.ren-data-grid__cell .ren-popup-report-cell-marker
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    background-color: #75ff6b;
+    opacity: 0.125;
+}
+
+/* Popup messages */
+
+.ren-popup-message
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &__content
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.5rem;
+        width: 100%;
+        font-size: 0.875rem;
+    }
+
+    &__buttons
+    {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    &__button
+    {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: 1px solid #BBBBBB;
+        border-radius: 0.25rem;
+        background-color: white;
+    }
+
+    &--Error
+    {
+        border-color: #BB0000;
+    }
+
+    &--SuccessWithWarning
+    {
+        border-color: #BBBB00;
+    }
+}
+
+/* Data source error popups */
+
+.ren-data-source-error
+{
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: 100%;
+    font-size: 0.875rem;
+
+    /* Scrolls on its own, so that the footer below it stays visible. */
+    &__body
+    {
+        flex: 1 1 auto;
+        padding: 0.5rem;
+        overflow-y: auto;
+    }
+
+    &__footer
+    {
+        flex: 0 0 auto;
+        border-top: 1px solid #DDDDDD;
+        padding: 0.5rem;
+        background-color: white;
+    }
+
+    &__summary
+    {
+        font-weight: 600;
+    }
+
+    &__user-message
+    {
+        max-width: 90rem;
+        text-align: left;
+        white-space: pre-wrap;
+    }
+
+    &__failures
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    /* A block per error message in the technical details popup. */
+    &__technical-failure + &__technical-failure
+    {
+        margin-top: 0.75rem;
+        border-top: 1px solid #DDDDDD;
+    }
+
+    &__details-link
+    {
+        align-self: center;
+        color: #5E70CD;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    &__section-heading
+    {
+        margin: 0.75rem 0 0.25rem;
+        color: #5E70CD;
+        font-size: 0.875rem;
+    }
+
+    &__section-content
+    {
+        margin: 0;
+        font-family: Consolas, monospace;
+        font-size: 0.8125rem;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    &__collapsible
+    {
+        margin-top: 0.75rem;
+    }
+
+    &__collapsible-summary
+    {
+        color: #5E70CD;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Prism token colours, matching the SQL editor's. */
+    &__sql .token
+    {
+        &.comment                    { color: #197F30; }
+        &.string                     { color: #FF0000; }
+        &.punctuation,
+        &.number,
+        &.sq-identifier              { color: black; }
+        &.operator                   { color: #7F7F91; }
+        &.variable                   { color: darkred; font-weight: bold; }
+        &.function,
+        &.pink-keyword,
+        &.system-variable            { color: #FF00FF; }
+        &.keyword                    { color: #0000FF; }
+        &.rg-token                   { color: #E826FF; font-weight: bold; }
+        &.rg-directive               { color: darkgreen; background-color: #EFEFEF; }
+        &.rg-aggregate-with-respect-to { background-color: #EFEFEF; color: #AF37BD; }
+        &.rg-report-description      { color: #008822; font-style: italic; }
+    }
+
+    &__copy-button
+    {
+        margin-left: 0.375rem;
+        border: 1px solid #BBBBBB;
+        border-radius: 0.25rem;
+        padding: 0 0.25rem;
+        background-color: #F4F4F4;
+        font-family: Calibri, Arial;
+        font-size: 0.6875rem;
+        line-height: 1.2;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+}

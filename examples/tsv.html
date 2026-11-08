@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tab-separated values - Ren examples</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <h1 class="ren-example__title">Tab-separated values</h1>
+    <p class="ren-example__paragraph">The column headings on the first line, then one line per row.  It's recognised by the content type <code class="ren-example__code">text/tab-separated-values</code>, otherwise you'll need <code class="ren-example__code ren-example__code--html">data-format="tsv"</code>, as here.  Ren works out the column types (although unfortunately the values currently all come through as strings).</p>
+    <p class="ren-example__paragraph">Data: <a href="/examples/data/sales.tsv"><code class="ren-example__code">sales.tsv</code></a></p>
+    <pre class="ren-example__code-block">Date	Product	Category	Quantity	Revenue
+2026-07-01	Stapler	Desk accessories	4	14
+...</pre>
+    <ren-grid src="/examples/data/sales.tsv"
+              data-format="tsv"
+              show-row-and-column-headings />
+</body>
+</html>

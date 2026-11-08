@@ -1,0 +1,40 @@
+.ren-column-summary-window
+{
+
+    &__table
+    {
+        margin: 1rem;
+        font-size: 0.8125rem;
+    }
+
+    &__key
+    {
+        padding-right: 1rem;
+    }
+
+    &__summary-data
+    {
+        display: none;
+    }
+
+    &--has-summary-data
+    {
+        .ren-column-summary-window__summary-data
+        {
+            display: table-row;
+        }
+    }
+
+    &__range-data
+    {
+        display: none;
+    }
+
+    &--has-range-data
+    {        
+        .ren-column-summary-window__range-data
+        {
+            display: table-row;
+        }
+    }
+}

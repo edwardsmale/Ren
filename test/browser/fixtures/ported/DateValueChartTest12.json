@@ -1,0 +1,34 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "date-value-chart-test-12": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "UserGuid": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "Add to cart %": {
+                                "calcFunction": [
+                                    "rowVals[\"AnyAddsToCart\"] / rowVals[\"UserGuid\"]"
+                                ]
+                            }
+                        },
+                        "groupByCalcFunctions": [
+                            {
+                                "name": "date-month-start"
+                            }
+                        ],
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    }
+}

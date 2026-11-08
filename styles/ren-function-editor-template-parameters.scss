@@ -1,0 +1,89 @@
+@use "ren-variables" as *;
+
+// The inputs for the $parameters a function declares in its header comment.
+.ren-function-editor-template-parameters
+{
+    padding: 0.25rem 0.5rem;
+    border: solid 1px lightgray;
+    border-radius: 0.25rem;
+    background-color: white;
+    font-size: 0.8125rem;
+
+    &__caption
+    {
+        display: block;
+        margin-bottom: 0.25rem;
+        cursor: help;
+    }
+
+    &__rows
+    {
+        display: grid;
+        grid-template-columns: max-content max-content minmax(0, 1fr);
+        align-items: center;
+        gap: 0.25rem 0.75rem;
+    }
+
+    // Each row's cells sit directly in the grid, so that the columns line up across rows.
+    &__row
+    {
+        display: contents;
+    }
+
+    &__name
+    {
+        font-family: $codeEditorFont;
+        font-weight: bold;
+    }
+
+    &__controls
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__text
+    {
+        width: 12rem;
+    }
+
+    &__number
+    {
+        width: 5rem;
+    }
+
+    &__slider
+    {
+        width: 10rem;
+    }
+
+    &__colour-text
+    {
+        width: 6rem;
+        font-family: $codeEditorFont;
+    }
+
+    &__swatch
+    {
+        width: 1.5rem;
+        height: 1.25rem;
+        padding: 0;
+        border: solid 1px darkgray;
+        border-radius: 0.1875rem;
+        cursor: pointer;
+
+        // A value that is not a colour shows as a crossed-out swatch.
+        background: linear-gradient(
+            to top right, white calc(50% - 1px), red, white calc(50% + 1px)
+        );
+    }
+
+    &__description
+    {
+        overflow: hidden;
+        color: #555;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}

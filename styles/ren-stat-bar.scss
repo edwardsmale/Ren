@@ -1,0 +1,43 @@
+@use "ren-variables" as *;
+
+.ren-stat-bar
+{
+    height: 100%;
+
+    &__container
+    {
+        height: 100%;
+        background-color: #F7F7F7;
+        box-shadow: 2px 2px 2px 0px #7d7d7dc7;
+    }
+
+    &__contents
+    {
+        margin: 0;
+        padding: 0.25rem;
+        box-sizing: border-box;
+        max-height: 20px;
+        font-size: 0.75rem;
+        overflow: hidden;
+    }
+
+    &__items
+    {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        flex-grow: 0;
+        width: 100%;
+    }
+}
+
+.ren-report-editor
+{
+    .ren-visualisation--stat-bar
+    {
+        left: unset!important;
+        right: 0!important;
+    }
+}

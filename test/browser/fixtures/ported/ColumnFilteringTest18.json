@@ -1,0 +1,19 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "column-filtering-test-18": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Kind"
+                }
+            }
+        }
+    }
+}

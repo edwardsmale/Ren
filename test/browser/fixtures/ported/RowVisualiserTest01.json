@@ -1,0 +1,32 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "row-visualiser-test-01": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Product": {
+                                "aggregationType": "NoTotal"
+                            }
+                        },
+                        "sortOrder": {
+                            "column": "Category"
+                        },
+                        "groupByColumns": [
+                            "Category"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Product"
+                }
+            }
+        }
+    }
+}

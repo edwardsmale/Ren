@@ -1,0 +1,428 @@
+@use "ren-variables" as *;
+
+$normalBorder: 1px solid #CCCCCC;
+$feintBorder: 1px solid #E8E8E8;
+$headingBackground: #EEEEEE;
+
+$fontSize: 0.75rem;
+
+/* GridSets */
+
+grid-set
+{
+    display: block;
+    // Ensure the font size is the same pre-transformation, because the column widths are measured
+    // before the table is transformed.
+    td, th
+    {
+        padding: 0.5rem;
+        font-size: 0.8125rem;
+        white-space: nowrap;
+    }
+}
+
+.ren-grid-set
+{
+    &__viewport,
+    &__tabs--many-tabs
+    {
+        max-width: 99vw;
+        overflow: scroll;
+    }
+
+    .ren-report-generator--editor &__viewport
+    {
+        height: calc(99vh - 179px);
+    }
+
+    &__title
+    {
+        margin: 2rem 0 1rem;
+        font-size: 1rem;
+        font-weight: bold;
+
+        &:first-of-type
+        {
+            margin-top: 0;
+        }
+    }
+
+    &__tabs
+    {
+        display: flex;
+        box-sizing: border-box;
+        background-color: $headingBackground;
+        position: absolute;
+        bottom: -23px;
+        z-index: 9999;
+    }
+
+    // Positioned against the bottom edge of the viewport in JavaScript.
+    &__max-height-resize-handle
+    {
+        position: absolute;
+        height: 5px;
+        cursor: row-resize;
+        z-index: 1000;
+    }
+
+    &__tab
+    {
+        padding: 0.25rem 0.5rem;
+        border-right: $normalBorder;
+        border-bottom: $normalBorder;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: $fontSize;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+
+        &--active
+        {
+            background-color: #FFFFFF;
+            color: #217346;
+            text-shadow: 0 0 0 lightgray;
+        }
+
+        &:first-of-type
+        {
+            border-left: $normalBorder;
+        }
+    }
+}
+
+.ren-data-grid
+{
+    position: relative;
+    table-layout: fixed;
+    border-collapse: collapse;
+    max-width: 100%;
+    white-space: nowrap;
+    width: 100%;
+
+    &--active
+    {
+        display: table;
+    }
+
+    // Always emphasise the bottom border of the top and top left frozen sections.
+    // Only emphasise the right border of the left and top left sections if columns are frozen.
+
+    &__heading-corner
+    {
+        position: absolute;
+        left: 0;
+        top: $reportTabsHeight;
+        height: $columnHeadingHeight;
+        border-bottom: 1px solid #AAAAAA;
+        z-index: 1000;
+        background-color: white;
+        cursor: cell;
+    }
+
+    &__frozen-top-left-section
+    {
+        position: absolute;
+        left: 0;
+        top: $reportTabsHeight;
+        background-color: white;
+        z-index: 999;
+    }
+
+    &__frozen-top-section-viewport
+    {
+        position: absolute;
+        left: 0;
+        top: $reportTabsHeight;
+        overflow: hidden;
+        z-index: 500;
+    }
+
+    &__frozen-top-section
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    &__frozen-left-section-viewport
+    {
+        position: absolute;
+        left: 0;
+        top: $reportTabsHeight;
+        overflow: hidden;
+        z-index: 500;
+    }
+
+    &__frozen-left-section
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    &__row-heading,
+    &__column-heading,
+    &__cell
+    {
+        position: absolute;
+        box-sizing: border-box;
+        padding: 0.25rem;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: $fontSize;
+        user-select: none;
+    }
+
+    &__row-heading,
+    &__column-heading,
+    &__cell
+    {
+        /*
+            The 'cell' cursor type is similar to the cursor that you get in Excel when you hover 
+            over a cell.
+            
+            There aren't matching cursor types for row and column headings, however.
+
+            In Excel, row headings have a right-arrow cursor, and column headings have a down- 
+            arrow.  In Chrome, these cursor types aren't available.
+            
+            So use 'cell' for headings too.
+        */
+        cursor: cell;
+    }
+
+    &__cell-error
+    {
+        color: red;
+    }
+
+    &__row-heading
+    {
+        left: 0;
+        border: $normalBorder;
+        box-sizing: border-box;
+        text-align: center;
+        background-color: $headingBackground;
+        font-weight: bold;
+    }
+
+    &__column-heading
+    {
+        top: 0;
+        height: $columnHeadingHeight;
+        text-align: center;
+        border: $normalBorder;
+        border-right: none;
+        box-sizing: border-box;
+        background-color: $headingBackground;
+        font-weight: bold;
+        transition: left 0.1s ease-out, width 0.1s ease-out;
+
+        &--dragging
+        {
+            opacity: 0.7;
+            background-color: #D3D3D3;
+            cursor: grabbing;
+            z-index: 1001;
+            transition: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    &__group-ctrls-heading
+    {
+        position: absolute;
+        top: 0;
+        height: $columnHeadingHeight + 1px;
+        border: $normalBorder;
+        border-bottom-width: 2px;
+        box-sizing: border-box;
+        background-color: $headingBackground;
+    }
+
+    &__group-ctrls
+    {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        width: 2.5rem;
+        height: $rowHeight + 2px; /* So we can have a bottom border, exposed when there is a gap row. */
+        padding: 0.25rem;
+        box-sizing: border-box;
+        cursor: cell;
+
+        border-top: $feintBorder;
+        border-left: $feintBorder;
+        border-bottom: $feintBorder;
+
+        background-color: white;
+    }
+
+    &__group-expand-collapse-button
+    {
+        margin-right: auto;
+        width: 0.625rem;
+        height: 0.625rem;
+    }
+    
+    &__group-expand-collapse-button
+    {
+        &::before
+        {
+            content: '+';
+            font-size: 11px;
+            border: solid 1px #ABABAB;
+            color: #6B6B6B;
+            text-align: center;
+            display: block;
+            background-color: white;
+            box-sizing: border-box;
+            width: 10px;
+            line-height: 9px;
+            cursor: pointer;
+        }
+    }
+
+    &__group-count
+    {
+        margin-top: 3px;
+        margin-left: auto;
+        
+        height: 21px;
+        line-height: 21px;
+        text-align: right;
+
+        font-size: 11px;
+        font-stretch: condensed;
+        color: #6B6B6B;
+        user-select: none;
+    }
+
+    &__cell
+    {
+        border: $feintBorder;
+        border-right: none;
+        background-color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: left 0.1s ease-out, width 0.1s ease-out;
+
+        &.ren-r-0
+        {
+            font-weight: bold;
+        }
+
+        // The aggregation type is drawn beside the value, on the right unless the style updater
+        // moves it left for a right-aligned column.  See Ren.AggregationIndicator.
+        &--agg-symbol::after,
+        &--agg-symbol-on-hover::after,
+        &--agg-label::after,
+        &--agg-label-on-hover::after
+        {
+            content: attr(data-agg);
+            position: absolute;
+            top: 50%;
+            right: 0.25rem;
+            transform: translateY(-50%);
+            font-size: 9px;
+            font-weight: normal;
+            font-style: normal;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        &--agg-symbol::after,
+        &--agg-symbol-on-hover::after
+        {
+            font-size: 10px;
+        }
+
+        &--agg-symbol-on-hover::after,
+        &--agg-label-on-hover::after
+        {
+            visibility: hidden;
+        }
+
+        &--agg-symbol-on-hover:hover::after,
+        &--agg-label-on-hover:hover::after
+        {
+            visibility: visible;
+        }
+
+        // A group cell whose aggregated values are of a different kind to the column's (e.g. a
+        // count of a text column) overrides the column's alignment.  Outranks the style updater's
+        // per-column rules.
+        &.ren-data-grid__cell--group.ren-data-grid__cell--align-right
+        {
+            text-align: right;
+        }
+
+        &.ren-data-grid__cell--group.ren-data-grid__cell--align-left
+        {
+            text-align: left;
+        }
+
+        &.ren-data-grid__cell--group.ren-data-grid__cell--align-right[data-agg]::after
+        {
+            right: auto;
+            left: 0.25rem;
+        }
+
+        &.ren-data-grid__cell--group.ren-data-grid__cell--align-left[data-agg]::after
+        {
+            right: 0.25rem;
+            left: auto;
+        }
+    }
+
+    &__header-cell-value
+    {
+        display: contents;
+    }
+
+    &__header-cell-down-arrow-button-container
+    {
+        position: absolute;
+        right: 2px;
+        top: 2px;
+    }
+
+    &__header-cell-down-arrow-button
+    {
+        padding: 2px;
+        background-color: #FCFCFD;
+        outline: 0;
+        border: solid 1px #A6ACB3;
+        height: 1.05rem;
+        line-height: 1.65rem;
+        font-size: 1.25rem;
+        cursor: pointer;
+    }
+
+    &__column-resize-handle
+    {
+        position: absolute;
+        margin-left: -2px;
+        top: 0;
+        right: -3px;
+        width: 6px;
+        height: $columnHeadingHeight;
+        cursor: col-resize;
+        z-index: 1000;
+        opacity: 0;
+
+        &--hidden
+        {
+            display: none;
+            pointer-events: none;
+        }
+    }
+
+    tr:hover
+    {
+        background-color: #EEF;
+    }
+}

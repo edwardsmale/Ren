@@ -1,0 +1,23 @@
+.ren-load-save-report-settings-window__cell-button,
+.ren-load-save-report-settings-window-save-as-form__save-button
+{
+    font-size: 0.67rem;
+    margin-top: -3px;
+    padding: 0.0625rem 0.3125rem;
+}
+
+.ren-load-save-report-settings-window-save-as-form
+{
+    margin-top: 1rem;
+
+    &__input
+    {
+        border: solid 1px #444444;
+    }
+
+    &__label,
+    &__input
+    {
+        font-size: 0.75rem;
+    }
+}

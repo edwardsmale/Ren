@@ -1,0 +1,10 @@
+<div class="ren-filter-module__item-strip">
+    @(parameters.showSortToggle
+        ? '<div class="ren-filter-module__item-strip-group ren-filter-module__item-strip-group--left js-ren-sort-toggle-group">' +
+          '<span class="ren-filter-module__item-strip-label js-ren-sort-toggle-label">Sort</span></div>'
+        : '')
+    @(parameters.showSingleSelectToggle
+        ? '<div class="ren-filter-module__item-strip-group js-ren-single-select-toggle-group">' +
+          '<span class="ren-filter-module__item-strip-label js-ren-single-select-toggle-label">Single</span></div>'
+        : '')
+</div>

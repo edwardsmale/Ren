@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Array of objects - Ren examples</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <h1 class="ren-example__title">Array of objects</h1>
+    <p class="ren-example__paragraph">One object per row, with each key being a column.  Every object has to have the same keys.  Ren works out the column types from the values, but if you want to give hints, you can send <code class="ren-example__code">{ "columns": [hints], "rows": [objects] }</code> instead.  It's recognised by the body starting with <code class="ren-example__code">[</code>.</p>
+    <p class="ren-example__paragraph">Data: <a href="/examples/data/sales.array-of-objects.json"><code class="ren-example__code">sales.array-of-objects.json</code></a></p>
+    <pre class="ren-example__code-block">[
+    { "Date": "2026-07-01", "Product": "Stapler", "Category": "Desk accessories", "Quantity": 4, "Revenue": 14 },
+    ...
+]</pre>
+    <ren-grid src="/examples/data/sales.array-of-objects.json"
+              data-format="array-of-objects"
+              show-row-and-column-headings />
+</body>
+</html>

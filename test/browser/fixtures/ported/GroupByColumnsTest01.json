@@ -1,0 +1,30 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "GroupByColumnsTest_Data 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            }
+        }
+    },
+    "gridState": {
+        "GroupByColumnsTest_Data 1": {
+            "visibleColumns": [
+                "CreatedOn",
+                "UserGuid"
+            ]
+        }
+    }
+}

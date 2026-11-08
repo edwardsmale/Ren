@@ -1,0 +1,48 @@
+/* The window of a visualisation's CSS filter effects (see
+   Ren.CreateVisualisationEffectsPopupWindow). */
+.ren-visualisation-effects-popup
+{
+    box-sizing: border-box;
+    height: 100%;
+
+    &__content
+    {
+        box-sizing: border-box;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Each row's label, slider, field and unit line up in columns with the other rows'. */
+    &__rows
+    {
+        display: grid;
+        grid-template-columns: auto 1fr 3.5rem auto;
+        align-items: center;
+        column-gap: 0.5rem;
+        row-gap: 0.375rem;
+    }
+
+    &__row
+    {
+        display: contents;
+    }
+
+    &__input
+    {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.1875rem 0.25rem;
+        border: solid 1px #B1B1B1;
+        font-size: 0.8125rem;
+    }
+
+    &__buttons
+    {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "FuzzRegressionTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "CreatedOn"
+                }
+            }
+        }
+    }
+}

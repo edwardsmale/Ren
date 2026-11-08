@@ -1,0 +1,147 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DataTabGroupTests Data": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//gAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEBAAAAAAIA/gAAAQAAAAD/AAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEBAAAAAAABAAH/AgAAAAAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAH9AAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//v8AAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAQAAAAD//wEAAAABAP8A//4AAAH+AA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Total Searches",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "DataTabGroupTests Data[1]": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//gAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEBAAAAAAIA/gAAAQAAAAD/AAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEBAAAAAAABAAH/AgAAAAAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAH9AAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//v8AAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAQAAAAD//wEAAAABAP8A//4AAAH+AA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Total Searches",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "DataTabGroupTests Data[2]": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//gAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEBAAAAAAIA/gAAAQAAAAD/AAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEBAAAAAAABAAH/AgAAAAAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAH9AAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//v8AAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAQAAAAD//wEAAAABAP8A//4AAAH+AA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Total Searches",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataTabGroupTests Data": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//gAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEBAAAAAAIA/gAAAQAAAAD/AAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEBAAAAAAABAAH/AgAAAAAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAH9AAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//v8AAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAQAAAAD//wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false
+                },
+                {
+                    "column": "Id"
+                },
+                {
+                    "column": "Active"
+                },
+                {
+                    "column": "CreatedOn"
+                },
+                {
+                    "column": "DaysActive"
+                },
+                {
+                    "column": "Search Terms"
+                },
+                {
+                    "column": "Total Searches",
+                    "visible": false
+                },
+                {
+                    "column": "Unique Searches Per Day"
+                },
+                {
+                    "column": "Product Code"
+                },
+                {
+                    "column": "Discontinued"
+                },
+                {
+                    "column": "Product Name"
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    },
+    "visualisationProperties": {
+        "GridSet DataTabGroupTests": {
+            "statBar": true,
+            "variations": true,
+            "quickLinks": true,
+            "showColumnHeaderDownArrows": true
+        }
+    }
+}

@@ -1,0 +1,47 @@
+.ren-tabbed-module-widget
+{
+    max-height: 100%;
+    font-size: 0.6875rem;
+    background-color: white;
+
+    > div
+    {
+        background-color: white;
+    }
+
+    &__tabstrip
+    {
+        display: flex;
+        justify-content: flex-start;
+        gap: 0.25rem;
+        padding-top: 0.25rem;
+        padding-left: 0.25rem;
+        border-bottom: solid 1px gray;
+        user-select: none;
+    }
+
+    &__tab
+    {
+        padding: 0.25rem;
+        background-color: #c0ffa4;
+        transform: scaleY(.9) translateY(1px);
+        padding-left: 0.375rem;
+        padding-right: 0.375rem;
+        border: solid 1px gray;
+        border-bottom: none;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        cursor: pointer;
+        color: black;
+        filter: brightness(0.7);
+        font-size: 0.8125rem;
+        user-select: none;
+
+        &--selected
+        {
+            background-color: white;
+            filter: none;
+            transform: translateY(1px);
+        }
+    }
+}

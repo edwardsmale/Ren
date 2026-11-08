@@ -1,0 +1,29 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "negative-filter-test-02": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                },
+                "filterSet": {
+                    "FilterModuleTests": {
+                        "columnValueFilters": {
+                            "Category": []
+                        },
+                        "negatedColumns": [
+                            "Category"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

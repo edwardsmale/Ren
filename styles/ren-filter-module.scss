@@ -1,0 +1,720 @@
+@use "sass:math";
+
+$optionCountColor: #346edd;
+
+/* The height of one value checkbox row inside a virtualised scroll box, gaps included.  Stated in
+   pixels because the rows are positioned by index against this exact number - see ROW_HEIGHT in
+   ren-filter-module-virtual-options.js, which must be kept in step with it. */
+$optionRowHeight: 20px;
+
+/* A busy spinner's size, and the gap between it and the checkbox it sits left of. */
+$busySpinnerSize: 10px;
+$busySpinnerGap: 2px;
+
+.ren-filter-module
+{
+    /* Fills the popup or inline target it lives in.  Items flow horizontally and wrap; a popup's
+       initial width is capped at 1000px by the creator, so a wide set of columns wraps onto multiple
+       rows there.  No cap of its own, so an inline module uses its target's full width. */
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.75rem;
+
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    overflow: auto;
+
+    font-family: Arial;
+    font-size: 0.75rem;
+
+    /* The colours an item's border takes when its filter is marked to be saved with the report
+       (see Ren.FilterModule_IncludeWhenSaving, which borders each marked item through a dynamic
+       stylesheet rather than a modifier class).  Red for a filter to be saved as a negative one -
+       the values it leaves out rather than the only ones it keeps (see Ren.FilterNegation) - so
+       that the two forms an included filter can be saved in are told apart at a glance. */
+    --ren-filter-module-mark-colour: #000000;
+    --ren-filter-module-mark-negative-colour: #CC0000;
+
+    /* Items stacked top to bottom, each only as tall as its content, wrapping into a further column
+       once the panel's height is used up (see itemFlow).  A scrolling item, capped at the panel's
+       height, takes a column of its own. */
+    &--column-flow
+    {
+        flex-direction: column;
+    }
+
+    /* While a drag-reorder is in progress, suppress text selection across the panel and let the items
+       slide over their transforms as they're temporarily reordered to preview the drop (the FLIP
+       animation in ren-filter-module-reorder.js drives the transform). */
+    &--reordering
+    {
+        user-select: none;
+
+        .ren-filter-module__item
+        {
+            transition: transform 0.15s ease;
+        }
+    }
+
+    &__item
+    {
+        /* Anchors the absolutely-positioned drag handle and resize grip to the item's edges. */
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        box-sizing: border-box;
+        padding: 0.375rem 0.5rem;
+        border: solid 1px #DDDDDD;
+        border-radius: 0.1875rem;
+
+        /* The item currently being dragged, dimmed so it stands out from its shuffling neighbours. */
+        &--dragging
+        {
+            opacity: 0.4;
+        }
+
+        /* An item split into rectangles - the heading and first compare form in one panel, any
+           further compare form in one of its own, the value checkboxes in another (see buildItem).
+           The item itself becomes a bare column so that only the panels are drawn, separated by the
+           gap above. */
+        &--panelled
+        {
+            padding: 0;
+            border: none;
+            background-color: transparent;
+        }
+
+        /* An item whose values are drawn into a scroll box is kept within the panel's height, the
+           box giving up rows rather than the panel growing a second scrollbar. */
+        &--scrolling
+        {
+            max-height: 100%;
+        }
+    }
+
+    /* The options panel (always the last) and options container between a capped item and its
+       scroll box may shrink below their content, so the squeeze reaches the box. */
+    &__item--scrolling > &__panel:last-child,
+    &__item--scrolling &__options
+    {
+        min-height: 0;
+    }
+
+    /* One of a panelled item's rectangles, carrying the border, background and padding the item
+       drops.  Stretched to the item's full width so the rectangles line up, and laid out as the same
+       column of rows the item itself is, so their contents sit exactly as they do unpanelled. */
+    &__panel
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        box-sizing: border-box;
+        padding: 0.375rem 0.5rem;
+        border: solid 1px #DDDDDD;
+        border-radius: 0.1875rem;
+        background-color: #FBFBFB;
+    }
+
+    /* An invisible handle spanning the item's top edge, showing a grab cursor and capturing the drag
+       to reorder the item.  It's a thin strip so it only overlays the very top edge of the item's
+       content. */
+    &__drag-handle
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 0.5rem;
+        cursor: grab;
+        z-index: 1;
+
+        &:active
+        {
+            cursor: grabbing;
+        }
+    }
+
+    /* The grip on an item's right edge, dragged to set the item to a fixed width. */
+    &__item-resize
+    {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 0.3125rem;
+        cursor: col-resize;
+        z-index: 1;
+    }
+
+    /* Held to the width it was dragged to, so its contents give way rather than widening it: the
+       rows narrow and their text is cut short. */
+    &__item--fixed-width
+    {
+        > *,
+        .ren-filter-module__option,
+        .ren-filter-module__node-row
+        {
+            min-width: 0;
+        }
+
+        .ren-filter-module__item-heading,
+        .ren-filter-module__option-text,
+        .ren-filter-module__total-label
+        {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    &__item-strip
+    {
+        /* Bleeds to the item's edges (cancelling its padding) so the strip spans full width. */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.25rem;
+
+        margin: -0.375rem -0.5rem 0;
+        padding: 0 0.5rem;
+        border-bottom: solid 1px #DDDDDD;
+    }
+
+    &__item-strip-label
+    {
+        font-size: 0.5rem;
+        color: #555555;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    &__item-strip-group
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+
+        /* Pins the "Sort" toggle to the left, pushing the "Single" toggle to the strip's right. */
+        &--left
+        {
+            margin-right: auto;
+        }
+    }
+
+    &__item-strip .ren-toggle-switch
+    {
+        transform: scale(0.5);
+        transform-origin: right center;
+
+        /* transform-origin: right keeps the shrunk switch pinned to the right of its original,
+           unscaled layout box, leaving dead space on its left; pull it in so "Single" sits close. */
+        margin-left: -1.5rem;
+    }
+
+    /* The heading and the small cross button removing the item's column share a row, the button
+       pushed to its right-hand end.  The gap is what keeps the cross clear of the heading on a
+       narrow item, where the two are what set the item's width between them (the item is sized to
+       its content, then pinned - see ren-filter-module-fixed-dimensions.js), so widening the gap
+       widens the item to match rather than crowding the heading. */
+    &__item-heading-row
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.125rem;
+    }
+
+    &__item-heading
+    {
+        margin-bottom: 0.125rem;
+        font-weight: bold;
+        white-space: nowrap;
+        color: #333333;
+    }
+
+    /* The heading carries the row's bottom margin when it stands alone; within the row the margin
+       belongs to the row itself, so the buttons sit level with the heading text.  The heading takes
+       the row's spare width so that the buttons stay together at its right-hand end, whether the
+       row carries one of them or both. */
+    &__item-heading-row > &__item-heading
+    {
+        margin-bottom: 0;
+        margin-right: auto;
+    }
+
+    /* Styled to match the compare filter's own clear button (.ren-compare-filter__clear). */
+    &__item-remove,
+    &__item-include-when-saving
+    {
+        /* Never squeezed by a long heading: the item's width is pinned after measurement, so a
+           re-render must not be able to shave the buttons down. */
+        flex-shrink: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-size: 0.6125rem;
+        line-height: 1;
+        color: #BBBBBB;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #888888;
+        }
+    }
+
+    /* The include-when-saving toggle, drawn to the left of the cross in edit mode only.  A touch
+       larger than the cross, since the ring glyphs read smaller than it at a given size. */
+    &__item-include-when-saving
+    {
+        font-size: 0.75rem;
+    }
+
+    /* Marked for inclusion, the ring is filled and drawn in the colour the buttons otherwise take
+       only on hover, so which filters the report is about to state reads at a glance. */
+    &__item-include-when-saving[data-include-when-saving="positive"]
+    {
+        color: #888888;
+
+        &:hover
+        {
+            color: #333333;
+        }
+    }
+
+    /* Marked to be saved as a negative filter, the filled ring takes the red the item's border does,
+       so the button says which of the two forms the next click steps on from. */
+    &__item-include-when-saving[data-include-when-saving="negative"]
+    {
+        color: #CC0000;
+
+        &:hover
+        {
+            color: #990000;
+        }
+    }
+
+    /* The row's gap is what keeps the buttons clear of the heading on a narrow item; between the two
+       buttons themselves it is too generous, so it is pulled back here. */
+    &__item-include-when-saving + &__item-remove
+    {
+        margin-left: -0.375rem;
+    }
+
+    /* The links saying what an item's values are made of: a binning function for them, or - while
+       one is in effect - its name and a cross removing it.  They sit at the right-hand end of the
+       heading row, just before the include-when-saving toggle and the item's cross, and are shown
+       whatever the mode, since how an item's values are grouped is a way of reading the report
+       rather than an edit to it. */
+    &__item-links
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        /* Never squeezed by a long heading, as the buttons beside them aren't: the item's width is
+           pinned after measurement, so a re-render must not be able to shave them down. */
+        flex-shrink: 0;
+    }
+
+    &__item-link
+    {
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.675rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #7A7AAA;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #333366;
+            text-decoration: underline;
+        }
+    }
+
+    /* The binning function in effect, stated where the link adding one would otherwise be.  Named in
+       full rather than as an __item-link so that Ren.ReportEditModeModule leaves it shown outside
+       edit mode: what an item's values are is a fact to read, where adding or dropping a binning
+       function is an edit.  Coloured as the binning box that used to state it was, so it reads as
+       that fact rather than as one more thing to add to the item. */
+    &__item-link-binning
+    {
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.675rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #5A5033;
+        cursor: pointer;
+
+        &:hover
+        {
+            text-decoration: underline;
+        }
+    }
+
+    /* The cross taking the binning function back off, beside its name.  Styled to match the item's
+       own cross (see __item-remove). */
+    &__item-link-clear
+    {
+        flex-shrink: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-size: 0.6125rem;
+        line-height: 1;
+        color: #BBBBBB;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #888888;
+        }
+    }
+
+    /* The compare-filter strips (Ren.CompareFilterControl) shown between the heading and the value
+       checkboxes, one per compare filter the column carries: the first enabled by "Show compare
+       filter", any further ones added by a strip's "and" link.  Each "and" group is drawn in a
+       panel of its own between the heading's panel and the values'. */
+    &__compare-strip
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 0.125rem;
+    }
+
+    /* The control takes the strip's width. */
+    &__compare-strip-control
+    {
+        display: flex;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* The strip ends its panel when the item is split into panels, so it needs no separation from
+       what would otherwise follow it. */
+    &__panel > &__compare-strip:last-child
+    {
+        margin-bottom: 0;
+    }
+
+    &__options
+    {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.75rem;
+
+        /* An enum's checkboxes stack vertically. */
+        &--vertical
+        {
+            flex-direction: column;
+            flex-wrap: nowrap;
+        }
+    }
+
+    /* The scroll box an item's value checkboxes are drawn into once there are more of them than it
+       shows at once, which builds only the rows in view (see ren-filter-module-virtual-options.js).
+       Its height is set inline, from the same row count and row height that module positions the rows
+       by.  The gutter is reserved whether or not a scrollbar is showing, so the width the item is
+       pinned at is the width its rows actually have to draw in. */
+    &__options-scroll
+    {
+        /* Only squeezed below its inline height when its item is capped at the panel's height, and
+           then never below a few rows. */
+        flex-shrink: 1;
+        min-height: 5 * $optionRowHeight;
+
+        /* Bled out to the left by a busy spinner's width (see __busy-spinner), so one left of a
+           row's checkbox is drawn rather than clipped. */
+        margin-left: -($busySpinnerSize + $busySpinnerGap);
+        padding-left: $busySpinnerSize + $busySpinnerGap;
+
+        /* Keeps the figures off the scrollbar. */
+        padding-right: 0.375rem;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+    }
+
+    /* Stands in for the whole list, so the scrollbar reads the column's full length while only a
+       window of rows exists.  Its height is set inline, as is the offset the window of rows is
+       translated down it by. */
+    &__options-spacer
+    {
+        position: relative;
+    }
+
+    &__options-window
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
+    /* Hidden rows carrying the column's longest captions and largest figures, which hold the item at
+       the width the whole list asks for even while the rows that need it are not built.  Zero-height
+       rather than display: none, which would contribute no width at all. */
+    &__options-sizer
+    {
+        height: 0;
+        overflow: hidden;
+        visibility: hidden;
+    }
+
+    /* Within a scroll box every row is exactly $optionRowHeight tall, gaps included, since the rows
+       are positioned by index rather than by flow - see ROW_HEIGHT in
+       ren-filter-module-virtual-options.js, which must be kept in step with this. */
+    &__options-scroll &__option,
+    &__options-scroll &__option-sizer-row
+    {
+        height: $optionRowHeight;
+
+        /* Clipped vertically only, leaving a busy spinner out to the left visible. */
+        overflow-x: visible;
+        overflow-y: clip;
+    }
+
+    /* A row's own hidden sizer twin is styled with it (see __options-sizer), so that the width it
+       holds the item at is the width the real row would have needed. */
+    &__option,
+    &__option-sizer-row
+    {
+        /* Checkbox on the left, text on the right. */
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.375rem;
+
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* The anchor a busy spinner is positioned against. */
+    &__option
+    {
+        position: relative;
+    }
+
+    &__checkbox
+    {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    /* Shown just left of a clicked checkbox until the page has finished updating for its filter
+       (see ren-filter-module-busy-indicator.js, which sets the delay before it fades in).  Out in
+       the item's padding, so the row doesn't shift.  Faded in by an animation rather than a timer,
+       as the compositor runs it while the filter blocks the page. */
+    &__busy-spinner
+    {
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        width: $busySpinnerSize;
+        height: $busySpinnerSize;
+        margin: math.div(-$busySpinnerSize, 2) $busySpinnerGap 0 0;
+        pointer-events: none;
+
+        opacity: 0;
+        animation: ren-filter-module-busy-spinner-reveal 0.15s linear both;
+    }
+
+    /* The row holding the "All" checkbox, with the "Invert" link pushed to its right end. */
+    &__all-row
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Turns the selection inside out.  Styled as the item's own links are (see __item-link), and
+       right-aligned within the "All" row. */
+    &__invert-link
+    {
+        /* The anchor a busy spinner is positioned against. */
+        position: relative;
+
+        flex-shrink: 0;
+        margin-left: auto;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.675rem;
+        line-height: 1;
+        white-space: nowrap;
+        color: #7A7AAA;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #333366;
+            text-decoration: underline;
+        }
+    }
+
+    /* A thin horizontal rule separating the "All" checkbox from the value checkboxes below it. */
+    &__divider
+    {
+        height: 0;
+        margin: 0.0625rem 0;
+        border-top: solid 1px #DDDDDD;
+    }
+
+    &__option-text
+    {
+        white-space: nowrap;
+        color: #333333;
+    }
+
+    &__option-count
+    {
+        /* Pushed to the container's right edge so every count and aggregated value aligns on the
+           right, past the label text.  In flat items the option label already stretches to full
+           width; in hierarchical items the label is grown to fill its node-row (see below), so the
+           right edge — and hence the counts — line up across both. */
+        margin-left: auto;
+        padding-left: 0.75rem;
+        white-space: nowrap;
+        color: $optionCountColor;
+    }
+
+    /* Dimmed when its option is deselected: a subset is selected and this value is excluded from the
+       item's total below.  Only the figure fades, not its checkbox label.  Read straight off the
+       checkbox the count follows in its label, so a filter change needs no class of its own. */
+    &__checkbox:not(:checked):not(:indeterminate) ~ .ren-filter-module__option-count
+    {
+        opacity: 0.6;
+    }
+
+    /* A row beneath an item's values showing their aggregated total, separated from them by a faint
+       dotted rule.  A direct child of the (full-width) options container, so its figure aligns to the
+       same right edge as the option counts above. */
+    &__total-row
+    {
+        display: flex;
+        align-items: center;
+        margin-top: 0.125rem;
+        padding-top: 0.25rem;
+        border-top: dotted 1px #DDDDDD;
+    }
+
+    &__total-label
+    {
+        white-space: nowrap;
+        color: #555555;
+    }
+
+    &__total-value
+    {
+        /* Matches __option-count so the total lines up beneath the values above. */
+        margin-left: auto;
+        padding-left: 0.75rem;
+        white-space: nowrap;
+        color: $optionCountColor;
+    }
+
+    /* A row in a hierarchical item: expand/collapse icon (or spacer) followed by the checkbox
+       label. */
+    &__node-row
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    /* Grow a hierarchical item's label to fill its node-row (past the expand icon) so its trailing
+       count can be pushed to the row's right edge, matching the flat items whose labels already span
+       full width.  min-width: 0 lets it shrink when the row is narrow rather than overflowing. */
+    &__node-row &__option
+    {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* Each nested level of a hierarchy is indented ~1rem beneath its parent.  max-height is set
+       inline (to 0 or the measured scrollHeight) rather than here, since animating max-height
+       requires transitioning between two concrete pixel values, not an arbitrary large constant. */
+    /* The container is a flex item of its own, so its parent's gap would otherwise open above it
+       even while collapsed, spacing a parent's row further from the next than a leaf's.  It is
+       pulled up over that gap, and its first row given it back inside, so it shows only when
+       expanded (and counts in the scrollHeight max-height animates to). */
+    &__children
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-top: -0.25rem;
+        margin-left: 1rem;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+
+        > :first-child
+        {
+            margin-top: 0.25rem;
+        }
+    }
+
+    /* The expand/collapse icon, mirroring the data grid's group expand/collapse button (a small
+       bordered box reading "+" when collapsed and "−" when expanded); the spacer keeps leaf-node
+       checkboxes aligned beneath it. */
+    &__expand-icon,
+    &__expand-spacer
+    {
+        flex: none;
+        box-sizing: border-box;
+        width: 10px;
+        height: 10px;
+    }
+
+    &__expand-icon
+    {
+        display: block;
+        border: solid 1px #ABABAB;
+        background-color: white;
+        color: #6B6B6B;
+        font-size: 11px;
+        line-height: 9px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    &__empty
+    {
+        color: #888888;
+        font-style: italic;
+    }
+}
+
+@keyframes ren-filter-module-busy-spinner-reveal
+{
+    from
+    {
+        opacity: 0;
+    }
+
+    to
+    {
+        opacity: 1;
+    }
+}

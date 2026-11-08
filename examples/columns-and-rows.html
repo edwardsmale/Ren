@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Columns and rows - Ren examples</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <h1 class="ren-example__title">Columns and rows</h1>
+    <p class="ren-example__paragraph">A <code class="ren-example__code">columns</code> array of column hints, and a <code class="ren-example__code">rows</code> array, with an array of values for each row (in column order).  It's recognised by the body starting with <code class="ren-example__code">{"columns":</code>, so you only need <code class="ren-example__code ren-example__code--html">data-format</code> if <code class="ren-example__code">rows</code> comes first.</p>
+    <p class="ren-example__paragraph">Data: <a href="/examples/data/sales.columns-and-rows.json"><code class="ren-example__code">sales.columns-and-rows.json</code></a></p>
+    <pre class="ren-example__code-block">{
+    "columns": [
+        { "name": "Date", "type": "date" },
+        { "name": "Product" },
+        ...
+        { "name": "Revenue", "format": "currency" }
+    ],
+    "rows": [
+        ["2026-07-01", "Stapler", "Desk accessories", 4, 14.00],
+        ...
+    ]
+}</pre>
+    <ren-grid src="/examples/data/sales.columns-and-rows.json"
+              data-format="columns-and-rows"
+              show-row-and-column-headings />
+</body>
+</html>

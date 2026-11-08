@@ -1,0 +1,36 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "ParentCategoryName": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "AmazonASIN": {
+                                "aggregationType": "CountDistinct"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "visibleColumns": [
+                "ParentCategoryName",
+                "CategoryName",
+                "ProductCode",
+                "ProductName",
+                "AmazonASIN"
+            ]
+        }
+    }
+}

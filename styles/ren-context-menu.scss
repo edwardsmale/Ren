@@ -1,0 +1,86 @@
+.ren-context-menu
+{
+    position: absolute;
+    font-family: Calibri, Arial, Helvetica, sans-serif;
+    font-size: 0.75rem;
+    border: solid 1px #888888;
+    background: white;
+    z-index: 9999999;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    user-select: none;
+
+    &__title-bar
+    {
+        display: flex;
+        margin-bottom: 0.125rem;
+        border-bottom: solid 1px #CCCCCC;
+        height: 0.875rem;
+        background: #DDDDDD;
+        box-shadow: inset -20px -11px 20px 2px rgba(19, 221, 243, 0.34);
+    }
+
+    &__section-heading
+    {
+        padding: 0.21875rem 0.25rem;
+        color: #339933;
+        cursor: default;
+    }
+
+    &__item
+    {
+        padding: 0.1875rem 1rem;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover,
+        &.ren-is-submenu-open
+        {
+            background: #4D85FF;
+            color: white;
+        }
+
+        &--separator
+        {
+            border-top: dotted 0.0625rem #CBCBCB;
+            margin: 0.1875rem 0.125rem 0;
+            height: 0;
+            padding: 0.1875rem 0 0;
+            pointer-events: none;
+        }
+
+        &--submenu
+        {
+            position: relative;
+            padding-right: 1.5rem;
+
+            &::after
+            {
+                content: '►';
+                position: absolute;
+                right: 0.5rem;
+            }
+        }
+
+        &--toggle-boolean
+        {
+            position: relative;
+
+            &::before
+            {
+                content: '✓';
+                position: absolute;
+                left: 0.25rem;
+                font-weight: bold;
+                opacity: 0;
+                transition: opacity 0.1s ease-in-out;
+            }
+
+            &.ren-is-checked::before
+            {
+                opacity: 1;
+            }
+        }
+    }
+}

@@ -1,0 +1,85 @@
+.ren-json-pretty
+{
+    font-size: 0.6875rem;
+
+    /* JSON syntax highlighting. */
+    &__string,
+    &__boolean,
+    &__null,
+    &__key
+    {
+        display: inline-block;
+        margin: 2px -1px 1px 1px;
+    }
+
+    &__string
+    {
+        color: #000000;
+        background-color: #e9ffd5;
+        box-shadow: 1px 1px 1px #c2d597;
+        transform: translate(-3px, -1px);
+
+        /* Highlighting for @ expressions in format functions. */
+
+        /* Expression depth 0 */
+        b
+        {
+            margin: 0 1px;
+            padding: 1px;
+            font-weight: normal;
+            background-color: #ffffa3;
+        }
+
+        /* Expression depth 1 */
+        i
+        {
+            margin: 0 2px;
+            padding: 1px;
+            font-weight: normal;
+            font-style: normal;
+            background-color: #d4e6ff;
+        }
+
+        /* Expression depth 2 */
+        u
+        {
+            margin: 0 2px;
+            padding: 1px;
+            text-decoration: none;
+            background-color: #fff5f7;
+        }
+    }
+
+    &__number
+    {
+        color: #000000;
+        background-color: lightgoldenrodyellow;
+        box-shadow: 1px 1px 1px #c2d597;
+        transform: translate(-3px, -1px);
+    }
+
+    &__boolean
+    {
+        color: #000000;
+        background-color: #fae4d2;
+        box-shadow: 1px 1px 1px #c2d597;
+        transform: translate(-3px, -1px);
+    }
+
+    &__null
+    {
+        color: gray;
+    }
+
+    &__key
+    {
+        vertical-align: top; /* So that layout is correct when the value is a multi-line string. */
+        color: #001f79;
+    }
+
+    &--wrap
+    {
+        white-space: normal;
+        line-break: anywhere;
+    }
+}

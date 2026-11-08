@@ -1,0 +1,71 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGridColumnTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "DataGridColumnTest 1__!Default": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "DataGridColumnTest 1__Another": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGridColumnTest 1": {
+            "queryEmbedding": "AAD//wAAAAEAAAD+AAAAAAABAAAA/v8AAAAAAAAAAP4AAAAAAAAAAAD/AAAAAAAAAQAB/gD/AAAAAAAAAAAAAAAAAAAAAAAAAAD/AAEAAAAAAQAAAP8AAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAEAAAEBAAAAAAD/AAAAAAD/AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAP8AAAAA/wAA/wAAAAAAAP7/AAAAAAAAAAD/AQAAAAAAAAD+/wAAAAAAAAAAAAD//gAAAP8AAAIAAAAAAAAAAAAAAAABAAD/AQAAAAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAA/gAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Amount",
+                "UpdatedDate",
+                "Status",
+                "CreatedDate",
+                "Email",
+                "Name",
+                "Id"
+            ]
+        },
+        "DataGridColumnTest 1__!Default": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Amount",
+                "UpdatedDate",
+                "Status",
+                "CreatedDate",
+                "Email",
+                "Name",
+                "Id"
+            ]
+        },
+        "DataGridColumnTest 1__Another": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Amount",
+                "UpdatedDate",
+                "Status",
+                "CreatedDate",
+                "Email",
+                "Name"
+            ]
+        }
+    }
+}

@@ -1,0 +1,76 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Product Code": {
+                                "aggregationType": "ExpandIconAlways"
+                            }
+                        },
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests 1": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "Unique Searches Per Day",
+                "Product Code"
+            ]
+        }
+    },
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DataGroupingSettingsTests",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DataGroupingSettingsTests",
+            "reportContext": {
+                "reportContextGuid": "report-context-DataGroupingSettingsTest22",
+                "reportName": "DataGroupingSettingsTest22"
+            },
+            "dataGroupingSettingsGroup": "DataGroupingSettingsTests 1",
+            "gridStateGroup": "report-context-DataGroupingSettingsTest22 DataGroupingSettingsTests 1",
+            "visualisationSettingsGroup": "DateValueChart-None",
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "datePeriod": "Auto",
+            "fillAvailableSpace": true,
+            "isInsidePopup": true,
+            "isPopup": true,
+            "popupHeight": "272px",
+            "popupLeft": "0.875rem",
+            "popupTop": "32.5625rem",
+            "popupWidth": "618px",
+            "resizeToFitContentOnLoad": false,
+            "selectedColumns": [
+                "CreatedOn",
+                "Unique Searches Per Day"
+            ],
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": true,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "visualisationHeight": "256px",
+            "visualisationLeft": "0.875rem",
+            "visualisationTop": "32.5625rem",
+            "visualisationTypeCount": 1,
+            "visualisationWidth": "635px"
+        }
+    ]
+}

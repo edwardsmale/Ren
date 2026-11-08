@@ -1,0 +1,45 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "DistinctValuesIncludingEmpty"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "SingleValuesOnly"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "DistinctValuesIncludingEmptyWithCounts"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "SingleValueOrPlaceholder"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "ParentCategoryName",
+                "CategoryName",
+                "AmazonASIN"
+            ]
+        }
+    }
+}

@@ -1,0 +1,113 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name"
+            ]
+        }
+    },
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DataGroupingSettingsTests",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DataGroupingSettingsTests",
+            "reportContext": {
+                "reportContextGuid": "report-context-ColumnFilteringTest06",
+                "reportName": "ColumnFilteringTest06"
+            },
+            "dataGroupingSettingsGroup": "DataGroupingSettingsTests",
+            "gridStateGroup": "report-context-ColumnFilteringTest06 DataGroupingSettingsTests 1",
+            "visualisationSettingsGroup": "DateValueChart-None",
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "datePeriod": "Auto",
+            "fillAvailableSpace": true,
+            "isInsidePopup": true,
+            "isPopup": true,
+            "popupHeight": "240px",
+            "popupLeft": "1.9375rem",
+            "popupTop": "16.8125rem",
+            "resizeToFitContentOnLoad": false,
+            "selectedColumns": [
+                "CreatedOn",
+                "Unique Searches Per Day"
+            ],
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": true,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "visualisationHeight": "224px",
+            "visualisationLeft": "1.9375rem",
+            "visualisationTop": "16.8125rem",
+            "visualisationTypeCount": 1,
+            "visualisationWidth": "608px"
+        },
+        {
+            "visualisationTypeName": "FilterModule",
+            "sqlFilename": "DataGroupingSettingsTests",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DataGroupingSettingsTests",
+            "reportContext": {
+                "reportContextGuid": "report-context-ColumnFilteringTest06",
+                "reportName": "ColumnFilteringTest06"
+            },
+            "dataGroupingSettingsGroup": "report-context-ColumnFilteringTest06 DataGroupingSettingsTests 1[1]",
+            "gridStateGroup": "report-context-ColumnFilteringTest06 DataGroupingSettingsTests 1[1]",
+            "visualisationSettingsGroup": "FilterModule-None",
+            "clientSide": true,
+            "columnOverrides": {
+                "CreatedOn": {
+                    "included": true
+                }
+            },
+            "dataTabIndex": 1,
+            "isInsidePopup": true,
+            "isPopup": true,
+            "maxHeight": "calc(100% - 22px)",
+            "maxWidth": "100%",
+            "popupHeight": "234px",
+            "popupIcon": "filter-icon.png",
+            "popupLeft": "46.25rem",
+            "popupTitle": "CreatedOn",
+            "popupTop": "17.6875rem",
+            "popupWidth": "240px",
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": true,
+            "sourceDataGroupingSettingsGroup": "DataGroupingSettingsTests",
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "visualisationHeight": "218px",
+            "visualisationLeft": "46.25rem",
+            "visualisationTop": "17.6875rem",
+            "visualisationWidth": "257px",
+            "showRightClickHint": false
+        }
+    ]
+}

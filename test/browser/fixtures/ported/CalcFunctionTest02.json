@@ -1,0 +1,28 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "CalcFunctionTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Amount": {
+                                "calcFunction": ["return (parseFloat(value) || 0) + 100"]
+                            }
+                        },
+                        "groupByColumns": ["Id"]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "CalcFunctionTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": ["Id", "Amount"]
+        }
+    }
+}

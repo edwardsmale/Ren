@@ -1,0 +1,38 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "NegativeAggregateValueTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "Max"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Num"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "Min"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NegativeAggregateValueTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Num",
+                "Val"
+            ]
+        }
+    }
+}

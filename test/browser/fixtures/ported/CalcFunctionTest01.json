@@ -1,0 +1,72 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "CalcFunctionTests 1": {
+            "queryEmbedding": "AAD/AAAA/wAAAAAAAAAAAAAAAAAA/gAAAAAAAAAAAAAAAAAAAAABAAABAAAAAAAAAAAAAAD/AAAAAAAA/wAAAAAAAAAAAAAAAAD/AQEAAAAAAf8AAAAAAAAAAAAAAP8AAAAAAAAAAAEAAAAAAAAAAAECAAAAAAAAAAAAAAD/AAEAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAA/wAAAAAAAP//AAD/AAAAAAAAAAAAAQAAAAAAAAD+AAAAAAAAAAAAAAD//gAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA/wAAAAAAAAAAAA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Amount",
+                "Name",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "Amount": {
+                        "calcFunction": [
+                            "return value ?? 0"
+                        ]
+                    },
+                    "Name": {
+                        "calcFunction": [
+                            "return value == null ? 0 : String(value).length"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "CalcFunctionTests 1": {
+            "queryEmbedding": "AAD/AAAA/wAAAAAAAAAAAAAAAAAA/gAAAAAAAAAAAAAAAAAAAAABAAABAAAAAAAAAAAAAAD/AAAAAAAA/wAAAAAAAAAAAAAAAAD/AQEAAAAAAf8AAAAAAAAAAAAAAP8AAAAAAAAAAAEAAAAAAAAAAAECAAAAAAAAAAAAAAD/AAEAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAA/wAAAAAAAP//AAD/AAAAAAAAAAAAAQAAAAAAAAD+AAAAAAAAAAAAAAD//gAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA/wAAAAAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false
+                },
+                {
+                    "column": "Id"
+                },
+                {
+                    "column": "Amount"
+                },
+                {
+                    "column": "Name"
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    },
+    "visualisationProperties": {
+        "GridSet CalcFunctionTests": {
+            "statBar": true,
+            "variations": true,
+            "quickLinks": true,
+            "showColumnHeaderDownArrows": true
+        }
+    }
+}

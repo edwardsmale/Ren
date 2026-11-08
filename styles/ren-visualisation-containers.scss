@@ -1,0 +1,28 @@
+// A container's child being dragged to a new place (see Ren.VisualisationContainerEditing).  It
+// moves among the others as it is dragged, so it is shown where it would be dropped.
+.ren-container-child-dragging
+{
+    cursor: grabbing;
+    user-select: none;
+}
+
+.ren-container-child--dragging
+{
+    opacity: 0.6;
+    outline: dashed 1px #668CAF;
+    outline-offset: 2px;
+    pointer-events: none;
+}
+
+// A child sliding to where the dragged child's move has put it.
+.ren-container-child--shifting
+{
+    transition: transform 0.15s ease-out;
+}
+
+.ren-container-children--drop-target
+{
+    outline: dashed 1px #9DB9D3;
+    outline-offset: 2px;
+    background-color: #EEF4FA;
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Named data source options - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+    <script type="application/json" class="js-ren-config">
+    { "endpoints": { "namedDataSources": "/test/browser/fixtures/data-sources/" } }
+    </script>
+    <script>
+        Ren.Extensions.registerNamedDataSourceOptions("columns-and-rows-with-hints", { noCache: true });
+        Ren.Extensions.registerNamedDataSourceOptions("background-status", { quiet: true });
+    </script>
+</head>
+<body>
+    <input type="hidden" class="js-ren-is-cache-enabled" value="True" />
+
+    <ren-grid data-source-name="columns-and-rows" show-row-and-column-headings />
+    <ren-grid data-source-name="columns-and-rows-with-hints" show-row-and-column-headings />
+    <ren-grid data-source-name="background-status" show-row-and-column-headings />
+</body>
+</html>

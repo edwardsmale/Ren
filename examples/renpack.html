@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Renpack - Ren examples</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <h1 class="ren-example__title">Renpack</h1>
+    <p class="ren-example__paragraph">The binary form of a compressed tabular data set collection.  It's a JSON envelope (without the rows or dictionary), followed by the dictionary and each column, packed at the narrowest width their values fit.  It's recognised by its first four bytes, <code class="ren-example__code">RENP</code>, and Ren's <code class="ren-example__code">Accept</code> header (<code class="ren-example__code">application/x-ren-tabular-v1</code>) tells a server it can send one.  It's read on a worker, so a big file doesn't hold up the page.  (This file was written by the .NET package's <code class="ren-example__code">RenPackWriter</code>, from the collection example.)</p>
+    <p class="ren-example__paragraph">Data: <a href="/examples/data/sales.renpack"><code class="ren-example__code">sales.renpack</code></a></p>
+    <ren-grid src="/examples/data/sales.renpack"
+              data-format="renpack"
+              show-row-and-column-headings />
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StackedFilters": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StackedFilters": {
+            "showRowAndColumnHeadings": true
+        }
+    },
+    "visualisations": [
+        {
+            "visualisationTypeName": "FilterModule",
+            "sqlFilename": "StackedFilters",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/StackedFilters",
+            "reportContext": {
+                "reportContextGuid": "report-context-FilterModuleStacked",
+                "reportName": "FilterModuleStacked"
+            },
+            "dataGroupingSettingsGroup": "report-context-FilterModuleStacked StackedFilters 1[1]",
+            "gridStateGroup": "report-context-FilterModuleStacked StackedFilters 1[1]",
+            "visualisationSettingsGroup": "FilterModule-Stacked",
+            "filterGroup": "report-context-FilterModuleStacked StackedFilters 1[1]",
+            "sourceDataGroupingSettingsGroup": "StackedFilters",
+            "clientSide": true,
+            "dataTabIndex": 1,
+            "columnOrder": [
+                "Subcategory",
+                "Brand"
+            ],
+            "columnOverrides": {
+                "Subcategory": {
+                    "included": true,
+                    "parentGroupings": [
+                        "Category"
+                    ]
+                },
+                "Brand": {
+                    "included": true
+                }
+            },
+            "fillAvailableSpace": true,
+            "fitPopupToContentExactly": true,
+            "isInsidePopup": true,
+            "isPopup": true,
+            "itemFlow": "Columns",
+            "popupTitle": "Filters",
+            "popupLeft": "16px",
+            "popupTop": "16px",
+            "popupWidth": "317px",
+            "popupHeight": "600px",
+            "showRightClickHint": false,
+            "verticalScrollbar": true,
+            "visualisationLeft": "16px",
+            "visualisationTop": "16px",
+            "visualisationWidth": "317px",
+            "visualisationHeight": "584px",
+            "tabularDataTransformers": []
+        }
+    ]
+}

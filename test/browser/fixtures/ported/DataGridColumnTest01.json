@@ -1,0 +1,71 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DataGridColumnTest 1": {
+            "queryEmbedding": "AAD//wAAAAEAAAD+AAAAAAABAAAA/v8AAAAAAAAAAP4AAAAAAAAAAAD/AAAAAAAAAQAB/gD/AAAAAAAAAAAAAAAAAAAAAAAAAAD/AAEAAAAAAQAAAP8AAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAEAAAEBAAAAAAD/AAAAAAD/AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAP8AAAAA/wAA/wAAAAAAAP7/AAAAAAAAAAD/AQAAAAAAAAD+/wAAAAAAAAAAAAD//gAAAP8AAAIAAAAAAAAAAAAAAAABAAD/AQAAAAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAA/gAAAAAAAA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Name",
+                "Email",
+                "Status",
+                "CreatedDate",
+                "UpdatedDate",
+                "Amount",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGridColumnTest 1": {
+            "queryEmbedding": "AAD//wAAAAEAAAD+AAAAAAABAAAA/v8AAAAAAAAAAP4AAAAAAAAAAAD/AAAAAAAAAQAB/gD/AAAAAAAAAAAAAAAAAAAAAAAAAAD/AAEAAAAAAQAAAP8AAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAEAAAEBAAAAAAD/AAAAAAD/AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAP8AAAAA/wAA/wAAAAAAAP7/AAAAAAAAAAD/AQAAAAAAAAD+/wAAAAAAAAAAAAD//gAAAP8AAAIAAAAAAAAAAAAAAAABAAD/AQAAAAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAA/gAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false
+                },
+                {
+                    "column": "Amount"
+                },
+                {
+                    "column": "UpdatedDate"
+                },
+                {
+                    "column": "Status"
+                },
+                {
+                    "column": "CreatedDate"
+                },
+                {
+                    "column": "Email"
+                },
+                {
+                    "column": "Name"
+                },
+                {
+                    "column": "Id"
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    },
+    "visualisationProperties": {
+        "GridSet DataGridColumnTest": {
+            "statBar": true,
+            "variations": true,
+            "quickLinks": true,
+            "showColumnHeaderDownArrows": true
+        }
+    }
+}

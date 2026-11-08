@@ -1,0 +1,35 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DateValueChartQuarterTests_Data 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Category"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "Quarter": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "date-quarter-name"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "DateValueChartQuarterTests_Data 1": {
+            "showRowAndColumnHeadings": true
+        }
+    }
+}

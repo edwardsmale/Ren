@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Change chart - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body>
+    <div class="detected">
+        <ren-change-chart src="/test/browser/fixtures/change-chart/change-chart.json" />
+    </div>
+    <div class="configured">
+        <ren-change-chart src="/test/browser/fixtures/change-chart/change-chart.json"
+            label-heading="Term" before-heading="RateBefore" after-heading="RateAfter"
+            before-label="Before" after-label="After"
+            value-format-function="percentage-no-dp"
+            label-popup-report="/SearchLog?Term={value}&amp;StartDate={row.StartDate:date}"
+            label-popup-report-title="Searches for {value}"
+            change-popup-report="/TermDetail?Term={row.Term}"
+            change-popup-report-title="Before and after" />
+    </div>
+</body>
+</html>

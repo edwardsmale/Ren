@@ -1,0 +1,18 @@
+<div class="ren-calendar-month js-ren-calendar-month qa-ren-calendar-month">
+    <button type="button"
+            class="ren-calendar-month__title js-ren-calendar-month-title qa-ren-calendar-month-title"
+            data-month-start="@parameters.monthStart"
+            title="Select the whole of @parameters.title">
+        @parameters.title
+    </button>
+    <div class="ren-calendar-month__days">
+        <span class="ren-calendar-month__weekday">Mon</span>
+        <span class="ren-calendar-month__weekday">Tue</span>
+        <span class="ren-calendar-month__weekday">Wed</span>
+        <span class="ren-calendar-month__weekday">Thu</span>
+        <span class="ren-calendar-month__weekday">Fri</span>
+        <span class="ren-calendar-month__weekday ren-calendar-month__weekday--weekend">Sat</span>
+        <span class="ren-calendar-month__weekday ren-calendar-month__weekday--weekend">Sun</span>
+        @parameters.daysHtml
+    </div>
+</div>

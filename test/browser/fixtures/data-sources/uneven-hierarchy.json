@@ -1,0 +1,11 @@
+{
+    "columns": ["Area", "Range", "Units"],
+    "rows": [
+        ["Paper", "Copier", 1],
+        ["Paper", "Card", 2],
+        ["Pens", null, 3],
+        ["Pens", null, 4],
+        ["Ink", "Black", 5],
+        ["Ink", null, 6]
+    ]
+}

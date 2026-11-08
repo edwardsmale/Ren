@@ -1,0 +1,270 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTest25": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "UserGuid": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "ExpandIcon"
+                            },
+                            "SearchLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "search-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdStringColumn": "CategoryKey",
+                                            "categoryNameColumn": "CategoryName"
+                                        }
+                                    }
+                                ]
+                            },
+                            "ViewSearchesLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "view-searches-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdColumn": "CategoryId",
+                                            "startDateColumn": "StartDate",
+                                            "endDateColumn": "EndDate"
+                                        }
+                                    }
+                                ]
+                            },
+                            "SearchTerm": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "blank"
+                                    }
+                                ]
+                            }
+                        },
+                        "sortOrder": {
+                            "column": "UserGuid"
+                        },
+                        "groupByColumns": [
+                            "CategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "UserGuid": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "SearchTerm": {
+                                "aggregationType": "SingleValuesOnly"
+                            },
+                            "SearchLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "search-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdStringColumn": "CategoryKey",
+                                            "categoryNameColumn": "CategoryName"
+                                        }
+                                    }
+                                ]
+                            },
+                            "ViewSearchesLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "view-searches-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdColumn": "CategoryId",
+                                            "startDateColumn": "StartDate",
+                                            "endDateColumn": "EndDate"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "sortOrder": {
+                            "isDescending": true,
+                            "column": "UserGuid"
+                        },
+                        "groupByColumns": [
+                            "SearchTerm"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "SearchLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "search-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdStringColumn": "CategoryKey",
+                                            "categoryNameColumn": "CategoryName"
+                                        }
+                                    }
+                                ]
+                            },
+                            "ViewSearchesLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "view-searches-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdColumn": "CategoryId",
+                                            "startDateColumn": "StartDate",
+                                            "endDateColumn": "EndDate"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "sortOrder": {
+                            "isDescending": true,
+                            "column": "UserGuid"
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "SearchTerm": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "blank"
+                            }
+                        ]
+                    },
+                    "CategoryName": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "blank"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTest25": {
+            "queryEmbedding": "////AAD//gH//wAAAAAD9f8CAAEC/gEAAAH//wEA+wAAAgIAAQABAQAAAAD+AwEAAf8C/gD//wD//gAAAQAAAP8A/wACAAD/AAEBAAEB//8A/wAB///8AAECAf//APwA/wABAP7/AgT/9f8BAgAAAAACAQD/BAL/Af4A/gAA+wAA//8BAAUD//8ACwEB/wD+AQIB/gAAAQEA/QAAAAH/AAH9Af4B/gH+AQAA+/8AAP8B/QABAAACAQEAAf8AAAAAAQIX/gAABwL9/v8B/f/+AQACAAAAAQAAAAABAAD/AwABAAACAfsAAQH/AQACAAIBAP//Af8AAf//AAEAAAABAA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false,
+                    "displayOrder": 0
+                },
+                {
+                    "column": "StartDate",
+                    "visible": false,
+                    "displayOrder": 1
+                },
+                {
+                    "column": "EndDate",
+                    "visible": false,
+                    "displayOrder": 2
+                },
+                {
+                    "column": "UserGuid",
+                    "displayOrder": 3
+                },
+                {
+                    "column": "CreatedOn",
+                    "visible": false,
+                    "displayOrder": 4
+                },
+                {
+                    "column": "SearchTerm",
+                    "displayOrder": 5
+                },
+                {
+                    "column": "Spell Correction",
+                    "visible": false,
+                    "displayOrder": 6
+                },
+                {
+                    "column": "CategoryKey",
+                    "visible": false,
+                    "displayOrder": 7
+                },
+                {
+                    "column": "CategoryId",
+                    "visible": false,
+                    "displayOrder": 8
+                },
+                {
+                    "column": "IsInitialSearch",
+                    "visible": false,
+                    "displayOrder": 9
+                },
+                {
+                    "column": "CategoryName",
+                    "displayOrder": 10
+                },
+                {
+                    "column": "Filters",
+                    "displayOrder": 11
+                },
+                {
+                    "column": "Number of Results",
+                    "displayOrder": 12
+                },
+                {
+                    "column": "Total Revenue",
+                    "displayOrder": 13
+                },
+                {
+                    "column": "Total Profit",
+                    "displayOrder": 14
+                },
+                {
+                    "column": "Product List",
+                    "visible": false,
+                    "displayOrder": 15
+                },
+                {
+                    "column": "Last Searched",
+                    "visible": false,
+                    "displayOrder": 16
+                },
+                {
+                    "column": "SearchLink",
+                    "displayOrder": 17
+                },
+                {
+                    "column": "ViewSearchesLink",
+                    "displayOrder": 18
+                },
+                {
+                    "column": "Has Suggestion",
+                    "visible": false,
+                    "displayOrder": 19
+                },
+                {
+                    "column": "Edit Suggestion",
+                    "visible": false,
+                    "displayOrder": 20
+                },
+                {
+                    "column": "Conversion %",
+                    "visible": false,
+                    "displayOrder": 21
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false,
+                    "displayOrder": 22
+                }
+            ]
+        }
+    }
+}

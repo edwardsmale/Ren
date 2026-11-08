@@ -1,0 +1,57 @@
+.ren-web-report-parameters-module-edit-popup
+{
+    &__flex-container
+    {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        padding-left: 0.125rem;
+    }
+
+    &__input-container
+    {
+        position: relative;
+        flex-grow: 1;
+    }
+
+    &__input-box,
+    &__dropdown-list
+    {
+        width: 100%;
+        box-sizing: border-box;
+        border: solid 1px #CCCCCC;
+
+        &:focus
+        {
+            outline: none;
+        }
+    }
+    
+    &__dropdown-list,
+    &__dropdown-list-option
+    {
+        font-size: 0.75rem;
+    }
+
+    &__clear-button
+    {
+        position: absolute;
+        right: 4px;
+        top: -2px;
+        color: lightgray;
+        user-select: none;
+
+        &:hover
+        {
+            color: gray;
+            cursor: pointer;
+        }
+    }
+
+    &__update-button
+    {
+        width: 20px;
+        user-select: none;
+        cursor: pointer;
+    }
+}

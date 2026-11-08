@@ -1,0 +1,41 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "ParseDateTimeUniversalTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "Str": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "parse-date-time-universal-test"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "ParseDateTimeUniversalTest 1": {
+            "queryEmbedding": "/wD/AAAAAAAAAQD/AAAAAAABAAAA/gAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAD/AAH/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA/wAAAAAABAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA==",
+            "columnWidths": {
+                "Str": 217
+            },
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Original",
+                "Str"
+            ]
+        }
+    }
+}

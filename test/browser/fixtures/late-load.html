@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Late load - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+</head>
+<body>
+    <ren-grid src="/examples/data/sales.renpack"
+              data-format="renpack"
+              show-row-and-column-headings />
+
+    <!-- Ren's scripts are added once the page has loaded, as a single-page app or a lazy loader
+         would add them, so DOMContentLoaded has long gone by the time ren.js runs. -->
+    <script>
+        window.addEventListener("load", () => {
+
+            const scripts = [
+                "/examples/lib/write-excel-file.v1.4.27.min.js",
+                "/dist/ren.js"
+            ];
+
+            const addNext = () => {
+
+                if (scripts.length === 0) return;
+
+                const script = document.createElement("script");
+
+                script.src = scripts.shift();
+                script.onload = addNext;
+                document.head.appendChild(script);
+            };
+
+            addNext();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<div class="ren-colour-picker">
+    <div class="ren-colour-picker__square js-ren-colour-picker-square">
+        <div class="ren-colour-picker__marker js-ren-colour-picker-marker"></div>
+    </div>
+    <input type="range"
+           class="ren-colour-picker__hue js-ren-colour-picker-hue"
+           min="0"
+           max="359"
+           step="1"
+           title="Hue" />
+    <div class="ren-colour-picker__swatches">
+        @(parameters.colours.map(colour => `
+            <button type="button"
+                    class="ren-colour-picker__swatch js-ren-colour-picker-swatch"
+                    title="@colour"
+                    style="background-color: @colour"
+                    data-colour="@colour"></button>
+        `).join(""))
+    </div>
+</div>

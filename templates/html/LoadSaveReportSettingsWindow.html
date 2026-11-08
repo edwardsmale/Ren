@@ -1,0 +1,39 @@
+<div class="ren-load-save-report-settings-window__content">
+
+    @(!parameters.anyData &&
+
+    `<div style="text-align: center; padding: 1rem; color: gray; font-size: 0.875rem">
+        No report settings files actually.
+    </div>`
+    ||
+    `<ren-grid data-source-uri="@parameters.dataSourceUri"
+               settings-group="@parameters.settingsGroup"
+               is-transitive="true"
+               is-child-visualisation="true"
+               exclude-from-serialization="true"
+               max-height="12.5rem"
+               quick-links="false"
+               show-column-header-down-arrows="false"
+               stat-bar="false"
+               totals-row="false"
+               variations="false" />
+
+        <script class="js-ren-report-settings"
+                type="application/json">
+            @parameters.reportSettings
+        </scr` + `ipt>`
+    )
+
+    <div class="ren-load-save-report-settings-window-save-as-form">
+        <label class="ren-load-save-report-settings-window-save-as-form__label" 
+               for="load-save-report-settings-window-save-as-form__input">
+            Save as:
+        </label>
+        <input type="text" 
+               class="ren-load-save-report-settings-window-save-as-form__input js-ren-load-save-report-settings-window-save-as-input qa-ren-load-save-report-settings-window-save-as-input"
+               autocomplete="off" />
+        <button class="ren-load-save-report-settings-window-save-as-form__save-button js-ren-load-save-report-settings-window-save-as-button qa-ren-load-save-report-settings-window-save-as-button">
+            Save
+        </button>
+    </div>
+</div>

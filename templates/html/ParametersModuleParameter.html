@@ -1,0 +1,22 @@
+<div class="ren-web-report-parameters-module__parameter">
+
+    <div class="ren-web-report-parameters-module__parameter-key ren-shadow-module__heading-label">
+        @parameters.label
+    </div>
+
+    <div class="ren-web-report-parameters-module__parameter-value qa-ren-parameters-module-value-@parameters.key">
+        @parameters.value
+    </div>
+
+    <div class="ren-web-report-parameters-module__clear-button js-ren-web-report-parameters-module-clear-button-@parameters.key qa-ren-web-report-parameters-module-clear-button-@parameters.key @(parameters.isClearButtonDisabled ? 'ren-web-report-parameters-module__clear-button--disabled' : '')"
+         data-parameter-key="@parameters.key"
+         @(parameters.hideButtons && 'hidden')>
+        ✖
+    </div>
+
+    <div class="ren-web-report-small-button js-ren-web-report-parameters-module-edit-button qa-ren-web-report-parameters-module-edit-button-@parameters.key"
+         data-parameter-key="@parameters.key"
+         @(parameters.hideButtons && 'hidden')>
+        ✎
+    </div>
+</div>

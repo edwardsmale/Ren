@@ -1,0 +1,71 @@
+@use "ren-variables" as *;
+
+// The keys suggested as a function editor's parameters are typed, at the caret.  On the body rather
+// than in the editor, whose edit box clips what overflows it, so on the context menu's layer, above
+// the popup windows' band (see Ren.PopupWindowOrder).
+.ren-function-editor-auto-complete
+{
+    position: fixed;
+    z-index: 9999999;
+    box-sizing: border-box;
+    min-width: 12rem;
+    max-width: 40rem;
+    max-height: 15rem;
+    margin: 0;
+    padding: 0.125rem 0;
+    overflow-y: auto;
+    border: solid 1px #EFDBA5;
+    background-color: white;
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.2);
+    list-style-type: none;
+    user-select: none;
+
+    &[hidden]
+    {
+        display: none;
+    }
+
+    &__item
+    {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        padding: 0.125rem 0.5rem;
+        white-space: nowrap;
+        line-height: 1.25;
+        font-family: $codeEditorFont;
+        font-size: 0.75rem;
+        color: #121212;
+        cursor: default;
+
+        &:hover
+        {
+            background-color: #E5F1FB;
+        }
+
+        &--selected,
+        &--selected:hover
+        {
+            background-color: #007ACC;
+            color: white;
+        }
+    }
+
+    &__text
+    {
+        flex-shrink: 0;
+    }
+
+    &__detail
+    {
+        margin-left: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #6a737d;
+    }
+
+    &__item--selected &__detail
+    {
+        color: #D7E9F7;
+    }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- A browser test that hangs fails after a minute rather than holding up the run. -->
+  <MSTest>
+    <TestTimeout>60000</TestTimeout>
+  </MSTest>
+</RunSettings>

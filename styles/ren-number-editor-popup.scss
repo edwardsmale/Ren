@@ -1,0 +1,35 @@
+/* The small window holding a single number, for the settings that are a number and are worth
+   seeing take effect as the number is changed (see Ren.CreateNumberEditorPopupWindow). */
+.ren-number-editor-popup
+{
+    box-sizing: border-box;
+    height: 100%;
+
+    /* The window is sized to this content when it opens, and the content is then given the whole
+       of the window, so that a window dragged bigger does not leave the field in a box of its
+       own. */
+    &__content
+    {
+        box-sizing: border-box;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    &__label
+    {
+        font-size: 0.8125rem;
+    }
+
+    &__input
+    {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.1875rem 0.25rem;
+        border: solid 1px #B1B1B1;
+        font-size: 0.8125rem;
+    }
+}

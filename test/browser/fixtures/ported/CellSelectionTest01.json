@@ -1,0 +1,29 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "CellSelectionTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "CellSelectionTests 1": {
+            "visibleColumns": [
+                "Id",
+                "Name",
+                "Nickname",
+                "RegisteredOn",
+                "LastPostedOn",
+                "Age",
+                "Birthday",
+                "TotalSpend",
+                "AvgMargin"
+            ]
+        }
+    }
+}

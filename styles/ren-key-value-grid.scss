@@ -1,0 +1,71 @@
+@use "ren-variables" as *;
+
+.ren-key-value-grid
+{
+    &__table
+    {
+        border-bottom: solid 1px lightgray;
+        border-right: solid 1px lightgray;
+    }
+
+    &__row
+    {
+        // The stripe follows the key rather than the grid row, since in the stacked layout one key
+        // occupies several grid rows and they must read as one block.
+        &--odd
+        {
+            background-color: #EEEEEE;
+        }
+    }
+
+    &__key-cell
+    {
+        font-weight: bold;
+        white-space: nowrap;
+        vertical-align: top;
+    }
+
+    &__heading-cell
+    {
+        font-weight: bold;
+        text-align: left;
+        white-space: nowrap;
+        background-color: #DDDDDD;
+    }
+
+    &__key-cell,
+    &__heading-cell,
+    &__row-label-cell,
+    &__value-cell
+    {
+        padding: 0.1875rem 0.25rem;
+        border-top: solid 1px lightgray;
+        border-left: solid 1px lightgray;
+        font-size: 0.75rem;
+    }
+    // The row's number, styled as the data grid's row headings are (see __row-heading in
+    // ren-report-display-grids.scss): its border, background and padding.  Declared after the
+    // shared cell rule so that its border wins over the shared one.
+    &__row-label-cell
+    {
+        min-width: 1.25rem;
+        padding: 0.25rem;
+        border: 1px solid #CCCCCC;
+        border-bottom: none;
+        background-color: #EEEEEE;
+        white-space: nowrap;
+        text-align: center;
+        font-weight: bold;
+        vertical-align: top;
+    }
+    // A key the source rows disagree about, so that what they differ over can be picked out at a
+    // glance.  Declared after the stripe so that it wins over it.
+    &__row--differing
+    {
+    }
+    // The part of a value that the other row does not share.
+    &__value-difference
+    {
+        font-weight: bold;
+    }
+}

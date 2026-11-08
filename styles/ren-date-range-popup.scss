@@ -1,0 +1,51 @@
+/* The small window holding the date/value chart's own date range, which reduces the dates the
+   chart draws without requerying (see Ren.CreateDateValueChartDateRangePopupWindow). */
+.ren-date-range-popup
+{
+    box-sizing: border-box;
+    height: 100%;
+
+    /* The window is sized to this content when it opens, and the content is then given the whole
+       of the window, so that a window dragged bigger does not leave the fields in a box of their
+       own. */
+    &__content
+    {
+        box-sizing: border-box;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    &__row
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Both labels are given the width of the wider one, so the two pickers line up. */
+    &__label
+    {
+        flex: 0 0 2.5rem;
+        font-size: 0.8125rem;
+    }
+
+    &__input
+    {
+        box-sizing: border-box;
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0.1875rem 0.25rem;
+        border: solid 1px #B1B1B1;
+        font-size: 0.8125rem;
+    }
+
+    &__buttons
+    {
+        margin-top: auto;
+        text-align: right;
+    }
+}

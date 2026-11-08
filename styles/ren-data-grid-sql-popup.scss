@@ -1,0 +1,43 @@
+.ren-data-grid-sql-popup
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    height: 100%;
+    font-size: 0.8125rem;
+
+    &__sql
+    {
+        flex: 1;
+        min-height: 6rem;
+        resize: none;
+        padding: 0.375rem;
+        border: solid 1px #999999;
+        box-sizing: border-box;
+        font-family: Consolas, monospace;
+        // Set rather than left to the browser's own textarea default, so that the popup's width can
+        // be sized to the width the SQL is written at.
+        font-size: 0.75rem;
+        // The SQL is written already wrapped, so a long line is one the reader is meant to scroll
+        // to rather than one to fold.
+        white-space: pre;
+        overflow: auto;
+        outline: none;
+    }
+
+    &__buttons
+    {
+        display: flex;
+        gap: 0.375rem;
+        justify-content: flex-end;
+        margin-top: 0.25rem;
+    }
+
+    // Pushes the buttons after it over to the right, leaving this one on the left of the same row.
+    &__left-button
+    {
+        margin-right: auto;
+    }
+}

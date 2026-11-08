@@ -1,0 +1,10 @@
+{
+    "columns": [
+        { "name": "Code", "type": "string" },
+        { "name": "Product", "heading": "Item" }
+    ],
+    "rows": [
+        { "Product": "Stapler", "Code": "007" },
+        { "Product": "Pens", "Code": "012" }
+    ]
+}

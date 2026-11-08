@@ -1,0 +1,34 @@
+<div class="ren-function-editor-template-parameters__row">
+    <span class="ren-function-editor-template-parameters__name js-ren-template-parameter-name"></span>
+    <span class="ren-function-editor-template-parameters__controls ren-function-editor-template-parameters__controls--@parameters.typeClass js-ren-template-parameter-controls">
+        @(parameters.type === "colour" ? `
+            <button type="button"
+                    class="ren-function-editor-template-parameters__swatch js-ren-template-parameter-swatch"
+                    title="Pick a colour"></button>
+            <input type="text"
+                   class="ren-function-editor-template-parameters__colour-text js-ren-template-parameter-value"
+                   spellcheck="false" />
+        ` : parameters.type === "boolean" ? `
+            <input type="checkbox"
+                   class="ren-function-editor-template-parameters__checkbox js-ren-template-parameter-value" />
+        ` : parameters.type === "number" ? `
+            <input type="number"
+                   class="ren-function-editor-template-parameters__number js-ren-template-parameter-value"
+                   min="@parameters.min"
+                   max="@parameters.max"
+                   step="@parameters.step" />
+        ` : `
+            <input type="text"
+                   class="ren-function-editor-template-parameters__text js-ren-template-parameter-value"
+                   spellcheck="false" />
+        `)
+        @(parameters.sliderStep ? `
+            <input type="range"
+                   class="ren-range-slider ren-function-editor-template-parameters__slider js-ren-template-parameter-slider"
+                   min="@parameters.min"
+                   max="@parameters.max"
+                   step="@parameters.sliderStep" />
+        ` : "")
+    </span>
+    <span class="ren-function-editor-template-parameters__description js-ren-template-parameter-description"></span>
+</div>

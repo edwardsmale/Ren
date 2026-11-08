@@ -1,0 +1,847 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "ren.config.schema.json",
+    "title": "Ren config",
+    "description": "Configures Ren. Given in the page's .js-ren-config element or to Ren.configure(), and merged over the library's defaults.",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "featureFlags": {
+            "type": "object",
+            "description": "Features to turn off, by setting them to false.",
+            "properties": {
+                "variationLinks": {
+                    "type": "boolean",
+                    "description": "The variation links in data grid sets."
+                },
+                "globalErrorHandler": {
+                    "type": "boolean",
+                    "description": "Catching the page's uncaught errors, to log them to renLogInsert and show the error indicator. Only done where renLogInsert is configured. Turn it off when the page has an error tracker of its own."
+                },
+                "saveShortcut": {
+                    "type": "boolean",
+                    "description": "Ctrl+S saving the report's settings in place of the browser saving the page."
+                },
+                "userFunctions": {
+                    "type": "boolean",
+                    "description": "Running functions and HTML that come from report settings or the function editor, with parameter values from report settings limited to ones that can't run as code. The library's own functions and templates, and those the page provides itself, still run. Turn it off where one user's saved report mustn't be able to run code in another's browser."
+                }
+            },
+            "additionalProperties": {
+                "type": "boolean"
+            }
+        },
+        "customSortOrders": {
+            "type": "array",
+            "description": "Orders a column sorts by in place of alphabetically, chosen by the first that holds every value in the column.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "values"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "values": {
+                        "type": "array",
+                        "description": "The values in order, matched in any case. An array of values shares one place.",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "dataSourceRequests": {
+            "type": "object",
+            "description": "Options every data source is requested with, applied before any request hook registered with Ren.Extensions.registerDataSourceRequestHook.",
+            "properties": {
+                "credentials": {
+                    "type": "string",
+                    "enum": [
+                        "omit",
+                        "same-origin",
+                        "include"
+                    ],
+                    "description": "Whether cookies are sent, as for fetch's credentials option."
+                },
+                "headers": {
+                    "type": "object",
+                    "description": "Headers added to each request, over Ren's own Accept and Cache-Control.",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "settingsStore": {
+            "type": "string",
+            "description": "Where report settings are kept: \"http\" for the server's endpoints, \"localStorage\" for the browser, or the name of a store registered with Ren.Extensions.registerSettingsStore.",
+            "default": "http",
+            "anyOf": [
+                {
+                    "enum": [
+                        "http",
+                        "localStorage"
+                    ]
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "endpoints": {
+            "type": "object",
+            "description": "The server URLs Ren calls. With none, Ren needs no server.",
+            "properties": {
+                "baseUrl": {
+                    "type": "string",
+                    "description": "Prefixed to every endpoint that starts with /. Empty for the page's own origin.",
+                    "default": ""
+                },
+                "generateReport": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Runs a report on the Home and Editor pages. Missing or null hides the feature that uses it."
+                },
+                "updateConnectionHeartbeat": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Keeps a report's database connection open. Missing or null hides the feature that uses it."
+                },
+                "disposeConnection": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Closes a report's database connection. Missing or null hides the feature that uses it."
+                },
+                "renLogInsert": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Records an entry in the log, when loggingEnabled is true. Missing or null hides the feature that uses it."
+                },
+                "eventInsert": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Records a usage event. Missing or null hides the feature that uses it."
+                },
+                "makeRequest": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Proxies a web request a function library function makes. Missing or null hides the feature that uses it."
+                },
+                "makeRequestAndExtract": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Proxies a web request and extracts part of the response. Missing or null hides the feature that uses it."
+                },
+                "namedDataSources": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "The base URI of the data sources named by a sqlFilename, which is appended to it. Missing or null hides the feature that uses it."
+                },
+                "fetchImage": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Fetches an image for inlining into a downloaded report. Missing or null hides the feature that uses it."
+                },
+                "listSharedFunctions": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Lists the shared function library functions. Missing or null hides the feature that uses it."
+                },
+                "sharedFunctions": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "The base URL of the shared function library actions. Missing or null hides the feature that uses it."
+                },
+                "loadUserReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Loads the user's report settings. Missing or null hides the feature that uses it."
+                },
+                "loadDefaultReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Loads the report's default settings. Missing or null hides the feature that uses it."
+                },
+                "loadWebReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Loads a web report's preset settings. Missing or null hides the feature that uses it."
+                },
+                "loadSqlBasedReportPresetSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Loads a SQL report's preset settings. Missing or null hides the feature that uses it."
+                },
+                "saveUserReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves the user's report settings. Missing or null hides the feature that uses it."
+                },
+                "saveDefaultReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves the report's default settings. Missing or null hides the feature that uses it."
+                },
+                "saveWebReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves a web report's preset settings. Missing or null hides the feature that uses it."
+                },
+                "saveSqlBasedReportPresetSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves a SQL report's preset settings. Missing or null hides the feature that uses it."
+                },
+                "deleteUserReportSettings": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Deletes the user's report settings. Missing or null hides the feature that uses it."
+                },
+                "listReportSettingsFiles": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Lists a report's settings files. Missing or null hides the feature that uses it."
+                },
+                "getReportSettingsFilePath": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Gets the path of a report's settings file. Missing or null hides the feature that uses it."
+                },
+                "convertToSettingsOnlyReport": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Converts a web report into a settings-only one. Missing or null hides the feature that uses it."
+                },
+                "uploadFiles": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Uploads files to an uploaded-files module. Missing or null hides the feature that uses it."
+                },
+                "savePastedData": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves data pasted into an uploaded-files module. Missing or null hides the feature that uses it."
+                },
+                "autoDetectUploadedFileDelimiter": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Detects the delimiter of an uploaded file. Missing or null hides the feature that uses it."
+                },
+                "visualisationDimensions": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Loads the remembered sizes of visualisations. Missing or null hides the feature that uses it."
+                },
+                "upsertVisualisationDimensions": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Saves the remembered size of a visualisation. Missing or null hides the feature that uses it."
+                }
+            },
+            "additionalProperties": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            }
+        },
+        "formatting": {
+            "type": "object",
+            "description": "How values are written in grids, charts and Excel downloads.",
+            "properties": {
+                "currencyPrefix": {
+                    "type": "string",
+                    "description": "Written before a currency amount.",
+                    "default": "£"
+                },
+                "currencySuffix": {
+                    "type": "string",
+                    "description": "Written after a currency amount, such as \" €\".",
+                    "default": ""
+                },
+                "decimalSeparator": {
+                    "type": "string",
+                    "default": "."
+                },
+                "thousandsSeparator": {
+                    "type": "string",
+                    "default": ","
+                },
+                "minusSign": {
+                    "type": "string",
+                    "default": "-"
+                },
+                "dateFormat": {
+                    "type": "string",
+                    "description": "The format of dates, from yyyy, yy, MMMM, MMM, MM, M, dd and d, with text in single quotes written as it is.",
+                    "default": "dd/MM/yyyy"
+                },
+                "dateTimeFormat": {
+                    "type": "string",
+                    "description": "The format of dates with a time of day, from the letters of dateFormat and HH, H, mm and ss.",
+                    "default": "dd/MM/yyyy HH:mm:ss"
+                }
+            },
+            "additionalProperties": false
+        },
+        "links": {
+            "type": "object",
+            "properties": {
+                "baseUrls": {
+                    "type": "object",
+                    "description": "Base URLs by name, which links are relative to. A base URL registered with Ren.Extensions.registerBaseUrl is used where one is missing.",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "liveRootUrls": {
+                    "type": "object",
+                    "description": "The root URLs of the live site by the name of the page global that holds them, such as reportRootUrl, which a report downloaded with live links has in place of the page's own. A page whose URL starts with the live reportRootUrl is on the live reporting site.",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "autoMenus": {
+            "type": "object",
+            "description": "The menus offered on elements with the ren-auto-menu class, keyed by the menu name in their ren-auto-menu--<menu-name> class.",
+            "additionalProperties": {
+                "type": "object",
+                "required": [
+                    "parameterName",
+                    "reports"
+                ],
+                "properties": {
+                    "parameterName": {
+                        "type": "string",
+                        "description": "The report parameter the value is passed as."
+                    },
+                    "columnHeadings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Headings of the data grid columns given the menu."
+                    },
+                    "columnHeadingContains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Text a heading contains (ignoring spaces and case) for its column to be given the menu."
+                    },
+                    "columnHeadingEndsWith": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Text a heading ends with (ignoring spaces and case) for its column to be given the menu."
+                    },
+                    "columnFormats": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The formats, as named in Ren.SpreadsheetColumnFormatEnum, a column must have one of to be given the menu."
+                    },
+                    "reports": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "reportName"
+                            ],
+                            "properties": {
+                                "reportName": {
+                                    "type": "string"
+                                },
+                                "text": {
+                                    "type": "string",
+                                    "description": "The item's text. The report name if missing."
+                                },
+                                "popupZoom": {
+                                    "type": "number"
+                                },
+                                "popupWidth": {
+                                    "type": "number",
+                                    "description": "The popup's width in pixels, rather than fitting it to the report."
+                                },
+                                "popupHeight": {
+                                    "type": "number",
+                                    "description": "The popup's height in pixels, rather than fitting it to the report."
+                                },
+                                "popupScaleContentToFit": {
+                                    "type": "boolean",
+                                    "description": "Resizing the popup scales the report to fit rather than laying it out afresh."
+                                },
+                                "queryParameters": {
+                                    "type": "object",
+                                    "description": "Added to the report's URL alongside the value.",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "hyperlinks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "text",
+                                "url"
+                            ],
+                            "properties": {
+                                "section": {
+                                    "type": "string",
+                                    "description": "The root menu section the link is listed under."
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "type": "string",
+                                    "description": "The URL, in which every {value} stands for the (URL-encoded) value."
+                                },
+                                "baseUrl": {
+                                    "type": "string",
+                                    "description": "The name of the base URL the url is relative to, as in links.baseUrls."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "semanticColumns": {
+            "type": "array",
+            "description": "Context menu items for data grid cells that take other values in the cell's row. An item is left out where a row value it takes is missing.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "columnProperties",
+                    "items"
+                ],
+                "properties": {
+                    "columnProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "The column model properties that mark a column the items are for, any one being enough."
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "text",
+                                "id"
+                            ],
+                            "properties": {
+                                "section": {
+                                    "type": "string",
+                                    "description": "The root menu section the item is listed under, placed by cellMenuSections."
+                                },
+                                "text": {
+                                    "type": "string",
+                                    "description": "A template, in which {value} stands for the cell's value, {row.Heading} for the row's Heading column and {row.Heading:date} for it without its time."
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "popupReport": {
+                                    "type": "string",
+                                    "description": "The URL of the report opened in a popup. A template, in which {value} stands for the cell's value, {row.Heading} for the row's Heading column and {row.Heading:date} for it without its time."
+                                },
+                                "popupReportTitle": {
+                                    "type": "string",
+                                    "description": "The popup's title, the text if missing. A template, in which {value} stands for the cell's value, {row.Heading} for the row's Heading column and {row.Heading:date} for it without its time."
+                                },
+                                "hyperlink": {
+                                    "type": "string",
+                                    "description": "The URL opened in a new tab. A template, in which {value} stands for the cell's value, {row.Heading} for the row's Heading column and {row.Heading:date} for it without its time."
+                                },
+                                "baseUrl": {
+                                    "type": "string",
+                                    "description": "The name of the base URL the hyperlink is relative to, as in links.baseUrls."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "loggingEnabled": {
+            "type": "boolean",
+            "description": "Logging errors and other events to renLogInsert. When true, the host must register the function that turns each log entry into the body it POSTs, with Ren.Extensions.registerLogEntryMapper. Defaults to false."
+        },
+        "cellMenuSections": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "The sections of the semantic column items and registered cell menu items, in the order they come in a cell's menu: after the clicked module's own sections and before Search. A section not named here or by Ren sorts ahead of every one that is, alphabetically."
+        },
+        "searchLinks": {
+            "type": "array",
+            "description": "Links in the Search submenu offered for any value, after Google's.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "text",
+                    "url"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The URL, in which {value} stands for the (URL-encoded) value."
+                    },
+                    "baseUrl": {
+                        "type": "string",
+                        "description": "The name of the base URL the url is relative to, as in links.baseUrls."
+                    }
+                }
+            }
+        },
+        "linkFormats": {
+            "type": "array",
+            "description": "Formats offered in the Links submenu of the Format menu, after the library's own.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "text",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the format function the format sets."
+                    },
+                    "parameters": {
+                        "type": "object",
+                        "description": "The parameters the format function is given."
+                    }
+                }
+            }
+        },
+        "theme": {
+            "type": "object",
+            "properties": {
+                "accent": {
+                    "type": "string",
+                    "description": "The colour that highlights what a chart draws attention to.",
+                    "default": "#0288d1"
+                },
+                "standardColours": {
+                    "type": "object",
+                    "description": "The colours of measures that appear across many reports, by a key saved in report settings, in the order they are offered in.",
+                    "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "colour"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "colour": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "workingDays": {
+            "type": "object",
+            "properties": {
+                "weekendDays": {
+                    "type": "array",
+                    "description": "The days of the week that are not working days, 0 being Sunday.",
+                    "default": [
+                        0,
+                        6
+                    ],
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                    }
+                },
+                "nonWorkingDays": {
+                    "type": "array",
+                    "description": "The yyyy-MM-dd dates of the other days that are not working days, such as bank holidays.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "workingDayWeights": {
+                    "type": "array",
+                    "description": "The rules that lower the weight of a working day from 1, the first that applies setting it.",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "weight"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "listedAs": {
+                                "type": "string",
+                                "description": "The name the tooltip lists the rule under, where that is not its own."
+                            },
+                            "weight": {
+                                "type": "number"
+                            },
+                            "when": {
+                                "type": "object",
+                                "description": "The conditions a day meets, all of them, for the rule to apply. With none, it applies to every day.",
+                                "properties": {
+                                    "dayRanges": {
+                                        "type": "array",
+                                        "description": "The day falls in any of the ranges, month 1 being January.",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "month",
+                                                "fromDay",
+                                                "toDay"
+                                            ],
+                                            "properties": {
+                                                "month": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 12
+                                                },
+                                                "fromDay": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 31
+                                                },
+                                                "toDay": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 31
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "daysOfWeek": {
+                                        "type": "array",
+                                        "description": "The day of the week is one of these, 0 being Sunday.",
+                                        "items": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 6
+                                        }
+                                    },
+                                    "easterHolidays": {
+                                        "type": "object",
+                                        "description": "The day falls within so many days of Easter Sunday.",
+                                        "required": [
+                                            "daysBefore",
+                                            "daysAfter"
+                                        ],
+                                        "properties": {
+                                            "daysBefore": {
+                                                "type": "integer"
+                                            },
+                                            "daysAfter": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "firstWorkingDaysOfYear": {
+                                        "type": "integer",
+                                        "description": "The day is in January and fewer than this many working days follow New Year's Day before it."
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "nonWorkingDayWeights": {
+                    "type": "array",
+                    "description": "The rules that set the weight of a non-working day, the first that applies setting it.",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "weight"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "listedAs": {
+                                "type": "string",
+                                "description": "The name the tooltip lists the rule under, where that is not its own."
+                            },
+                            "weight": {
+                                "type": "number"
+                            },
+                            "when": {
+                                "type": "object",
+                                "description": "The conditions a day meets, all of them, for the rule to apply. With none, it applies to every day.",
+                                "properties": {
+                                    "dayRanges": {
+                                        "type": "array",
+                                        "description": "The day falls in any of the ranges, month 1 being January.",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "month",
+                                                "fromDay",
+                                                "toDay"
+                                            ],
+                                            "properties": {
+                                                "month": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 12
+                                                },
+                                                "fromDay": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 31
+                                                },
+                                                "toDay": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 31
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "daysOfWeek": {
+                                        "type": "array",
+                                        "description": "The day of the week is one of these, 0 being Sunday.",
+                                        "items": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 6
+                                        }
+                                    },
+                                    "easterHolidays": {
+                                        "type": "object",
+                                        "description": "The day falls within so many days of Easter Sunday.",
+                                        "required": [
+                                            "daysBefore",
+                                            "daysAfter"
+                                        ],
+                                        "properties": {
+                                            "daysBefore": {
+                                                "type": "integer"
+                                            },
+                                            "daysAfter": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "firstWorkingDaysOfYear": {
+                                        "type": "integer",
+                                        "description": "The day is in January and fewer than this many working days follow New Year's Day before it."
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

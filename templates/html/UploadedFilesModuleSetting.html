@@ -1,0 +1,22 @@
+<div class="ren-web-report-uploaded-files-module__setting">
+
+    <div class="ren-web-report-uploaded-files-module__setting-label ren-shadow-module__heading-label @parameters.cellClass">
+        @parameters.label
+    </div>
+
+    <div class="ren-web-report-uploaded-files-module__setting-value qa-ren-uploaded-files-module-value-@parameters.key @parameters.cellClass">
+        @parameters.value
+    </div>
+
+    <div class="ren-web-report-uploaded-files-module__clear-button js-ren-web-report-uploaded-files-module-clear-button-@parameters.key qa-ren-web-report-uploaded-files-module-clear-button-@parameters.key js-ren-web-report-uploaded-files-module-clear-button @parameters.cellClass @(parameters.isClearButtonDisabled ? 'ren-web-report-uploaded-files-module__clear-button--disabled' : '')"
+         data-setting-key="@parameters.key"
+         @(parameters.hideButtons ? 'hidden' : '')>
+        ✖
+    </div>
+
+    <div class="ren-web-report-uploaded-files-module__edit-button ren-web-report-small-button js-ren-web-report-uploaded-files-module-edit-button qa-ren-web-report-uploaded-files-module-edit-button-@parameters.key @parameters.cellClass"
+         data-setting-key="@parameters.key"
+         @(parameters.hideButtons ? 'hidden' : '')>
+        ✎
+    </div>
+</div>

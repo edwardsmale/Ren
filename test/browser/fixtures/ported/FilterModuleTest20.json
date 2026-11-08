@@ -1,0 +1,24 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "filter-module-tests": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Unique Searches Per Day"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "formatting-menu-tests-01": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            }
+        }
+    }
+}

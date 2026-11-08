@@ -1,0 +1,28 @@
+
+/* Small button used for edit buttons and so on. */
+.ren-web-report-small-button
+{
+    margin-left: 0.25rem;
+    padding: 0.125rem;
+    box-sizing: border-box;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover
+    {
+        padding: 0.0625rem;
+        border: solid 1px #B1B1B1;
+        border-radius: 0.25rem;
+        background-color: #EEEEEE;
+    }
+
+    /* Prevent ugly border appearing when, after clicking the button, a key is pressed. */
+    &:focus, &:active
+    {
+        outline: 0;
+        outline-style: none;
+        outline-width: 0;
+    }
+}

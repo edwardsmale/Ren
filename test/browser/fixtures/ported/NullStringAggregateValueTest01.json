@@ -1,0 +1,43 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "NullStringAggregateValueTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Txt": {
+                                "aggregationType": "Max",
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "show-null-as-dash"
+                                    }
+                                ]
+                            }
+                        },
+                        "groupByColumns": [
+                            "Num"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "Txt": {
+                                "aggregationType": "Min"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NullStringAggregateValueTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Num",
+                "Txt"
+            ]
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "row-visualiser-test-03": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Product": {
+                                "aggregationType": "NoTotal"
+                            }
+                        },
+                        "sortOrder": {
+                            "column": "Category"
+                        },
+                        "groupByColumns": [
+                            "Category"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Product"
+                }
+            },
+            "doubleClick": {
+                "visualisationTypeName": "GridSet",
+                "reportName": "RowVisualiserTest03Report",
+                "popupTitle": "Category",
+                "parameters": {
+                    "Category": "Category"
+                }
+            }
+        }
+    }
+}

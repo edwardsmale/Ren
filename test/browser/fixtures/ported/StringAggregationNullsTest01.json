@@ -1,0 +1,39 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "Concatenate"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "CountDistinct"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "ParentCategoryName",
+                "ProductCode",
+                "AmazonASIN"
+            ]
+        }
+    }
+}

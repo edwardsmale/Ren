@@ -1,0 +1,25 @@
+.ren-visualisation-initialisation-error
+{
+    &__content
+    {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 180px;
+    }
+
+    &__icon
+    {
+        font-size: 2rem;
+        color: #d32f2f;
+        margin-bottom: 12px;
+    }
+
+    &__text
+    {
+        color: #d32f2f;
+        font-size: 0.9375rem;
+        text-align: center;
+    }
+}

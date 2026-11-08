@@ -1,0 +1,38 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "DistinctValues"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "AmazonASIN": {
+                                "aggregationType": "DistinctValuesWithCounts"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "ParentCategoryName",
+                "AmazonASIN"
+            ]
+        }
+    }
+}

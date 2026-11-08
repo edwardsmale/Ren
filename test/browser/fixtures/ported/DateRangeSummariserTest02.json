@@ -1,0 +1,31 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DateRangeSummariserComparisonTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "DateRangeSummary": {
+                        "calcFunction": [
+                            "return (Ren.DateRangeSummariser.getDateRangeComparisonSummary(rowVals.StartDate, rowVals.EndDate, rowVals.CompareStartDate, rowVals.CompareEndDate, '2026-06-11') ?? {}).dateRangeSummary ?? null"
+                        ]
+                    },
+                    "CompareDateRangeSummary": {
+                        "calcFunction": [
+                            "return (Ren.DateRangeSummariser.getDateRangeComparisonSummary(rowVals.StartDate, rowVals.EndDate, rowVals.CompareStartDate, rowVals.CompareEndDate, '2026-06-11') ?? {}).compareDateRangeSummary ?? null"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

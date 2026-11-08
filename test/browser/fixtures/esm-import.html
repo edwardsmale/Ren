@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ES module import - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <!-- ren.esm.js imported, as a page or a bundle using ES modules would. -->
+    <script type="module">
+        import Ren, { Ren as NamedRen } from "/dist/ren.esm.js";
+
+        window.importedRen = { isWindowRen: Ren === window.Ren, isNamedRen: Ren === NamedRen };
+    </script>
+</head>
+<body>
+    <ren-grid src="/examples/data/sales.renpack"
+              data-format="renpack"
+              show-row-and-column-headings />
+</body>
+</html>

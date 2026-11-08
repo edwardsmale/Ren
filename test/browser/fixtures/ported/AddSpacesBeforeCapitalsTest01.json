@@ -1,0 +1,38 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "AddSpacesBeforeCapitalsTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "Str": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "add-spaces-before-capitals"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "AddSpacesBeforeCapitalsTest 1": {
+            "queryEmbedding": "/wD/AAAAAAAAAQD/AAAAAAABAAAA/gAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAD/AAH/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA/wAAAAAABAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA==",
+            "showRowAndColumnHeadings": false,
+            "visibleColumns": [
+                "Original",
+                "Str"
+            ]
+        }
+    }
+}
