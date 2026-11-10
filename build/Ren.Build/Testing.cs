@@ -21,11 +21,10 @@ internal static class Testing
 
         if (minified) environment["REN_TEST_MINIFIED"] = "1";
 
-        return Step.RunAsync(
+        return TestStep.RunAsync(
             minified ? "Running the client tests on the minified build" : "Running the client tests",
-            "dotnet",
-            new[] { "test", ClientTestsProject }.Concat(dotnetTestArgs),
-            environment: environment);
+            new[] { ClientTestsProject }.Concat(dotnetTestArgs),
+            environment);
     }
 
     /// <summary>
@@ -38,7 +37,7 @@ internal static class Testing
         await RunClientTestsAsync(minified: false, []);
         await RunClientTestsAsync(minified: true, ["--no-build"]);
         await Step.RunAsync("Building the .NET package", "dotnet", ["build", DotnetSolution, "-c", "Release"]);
-        await Step.RunAsync("Running the .NET package's tests", "dotnet", ["test", DotnetSolution, "-c", "Release", "--no-build"]);
+        await TestStep.RunAsync("Running the .NET package's tests", [DotnetSolution, "-c", "Release", "--no-build"]);
 
         Log.Info("CI passed");
     }

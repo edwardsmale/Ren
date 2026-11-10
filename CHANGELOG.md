@@ -8,6 +8,7 @@ for what counts as a breaking change).
 
 Fix errors with pack command.
 Make minor tweaks to JS code layout + comments.
+Add progress indicator when running Ren tests.
 
 ## 1.1.2 (2026-11-10)
 
