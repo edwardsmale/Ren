@@ -405,12 +405,12 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
     test("getPieGroove_WithHole_FromHoleToRim", () => {
 
-        expect(Subdivisions.getPieGroove(Math.PI / 2, 0.5).path).toBe("M0.5,0L1,0");
+        expect(Subdivisions.getPieGroove(Math.PI / 2, 0.5).path).toBe("M500,0L1000,0");
     });
 
     test("getPieGroove_NoHole_FromCentreToRim", () => {
 
-        expect(Subdivisions.getPieGroove(Math.PI, 0).path).toBe("M0,0L0,1");
+        expect(Subdivisions.getPieGroove(Math.PI, 0).path).toBe("M0,0L0,1000");
     });
 
     test("getPieGroove_LevelGroove_HighlightBelow", () => {

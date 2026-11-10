@@ -10,6 +10,11 @@ Ren.DateValueChart_Pies = (() => {
 
     const MAX_HOLE_RADIUS = 0.9;
 
+    // The radius the slices, bands and grooves are drawn at, before being scaled to the pie's.
+    // Chrome hit-tests a path drawn at a radius of 1 and scaled up hundreds of times loosely, so
+    // that each band would catch clicks well beyond its edges, with the last drawn winning.
+    const PATH_RADIUS = 1000;
+
     const SLICE_CLASS = "ren-data-series__pie-slice";
     const SLICE_GROUP_CLASS = "ren-pie-slice";
 
@@ -38,23 +43,24 @@ Ren.DateValueChart_Pies = (() => {
         return Ren.DateValueChart_PieLabels.getRadiusPx(props, widestRadiusPx, periodWidthPx);
     };
 
-    const round = (value) => Math.round(value * 10000) / 10000;
+    const round = (value) => Math.round(value * 100) / 100;
 
-    // Angles run clockwise from 12 o'clock.
-    const pointAt = (angle, radius) =>
-        `${round(radius * Math.sin(angle))},${round(-radius * Math.cos(angle))}`;
+    // Angles run clockwise from 12 o'clock, and radii are shares of the pie's.
+    const pointAt = (angle, radius) => `${round(PATH_RADIUS * radius * Math.sin(angle))},`
+        + `${round(-PATH_RADIUS * radius * Math.cos(angle))}`;
 
     /**
-     * Gets the path of a whole ring (or disc, without a hole), of radius 1.  The hole is drawn the
-     * other way round from the rim, so it is left unfilled.
+     * Gets the path of a whole ring (or disc, without a hole).  The hole is drawn the other way
+     * round from the rim, so it is left unfilled.
      */
     const getRingPath = (holeRadius) => {
 
-        let path = "M0,-1A1,1 0 1 1 0,1A1,1 0 1 1 0,-1Z";
+        const rim = PATH_RADIUS;
+        let path = `M0,-${rim}A${rim},${rim} 0 1 1 0,${rim}A${rim},${rim} 0 1 1 0,-${rim}Z`;
 
         if (holeRadius > 0) {
 
-            const r = round(holeRadius);
+            const r = round(PATH_RADIUS * holeRadius);
             path += `M0,-${r}A${r},${r} 0 1 0 0,${r}A${r},${r} 0 1 0 0,-${r}Z`;
         }
 
@@ -62,8 +68,8 @@ Ren.DateValueChart_Pies = (() => {
     };
 
     /**
-     * Gets the path of a slice of a pie of radius 1, from one angle to another, in radians.  A
-     * slice of the whole pie is a ring, as an arc can't end where it starts.
+     * Gets the path of a slice of a pie from one angle to another, in radians.  A slice of the
+     * whole pie is a ring, as an arc can't end where it starts.
      */
     const getSlicePath = (startAngle, endAngle, holeRadius) => {
 
@@ -72,11 +78,13 @@ Ren.DateValueChart_Pies = (() => {
         if (sweep >= Math.PI * 2 - 1e-9) return getRingPath(holeRadius);
 
         const largeArc = sweep > Math.PI ? 1 : 0;
-        let path = `M${pointAt(startAngle, 1)}A1,1 0 ${largeArc} 1 ${pointAt(endAngle, 1)}`;
+        const rim = PATH_RADIUS;
+        let path = `M${pointAt(startAngle, 1)}A${rim},${rim} 0 ${largeArc} 1 `
+            + pointAt(endAngle, 1);
 
         if (holeRadius > 0) {
 
-            const r = round(holeRadius);
+            const r = round(PATH_RADIUS * holeRadius);
             path += `L${pointAt(endAngle, holeRadius)}`
                 + `A${r},${r} 0 ${largeArc} 0 ${pointAt(startAngle, holeRadius)}Z`;
         }
@@ -256,16 +264,17 @@ Ren.DateValueChart_Pies = (() => {
 
     /**
      * Gets the rules sizing the pies to the chart's scale.  The slices are drawn with a radius of
-     * 1 inside series groups scaled unevenly to the plot, so are scaled back to round, as are the
-     * bands and grooves subdividing them, which are styled by the subdivisions themselves.
+     * PATH_RADIUS inside series groups scaled unevenly to the plot, so are scaled to the pie's
+     * radius and back to round, as are the bands and grooves subdividing them, which are styled by
+     * the subdivisions themselves.
      */
     const buildStyles = (props, scaleX, scaleY) => {
 
         if (!isShown(props) || !(scaleX > 0) || !(scaleY > 0)) return [];
 
-        const radiusPx = getRadiusPx(props, scaleX, scaleY);
+        const radius = getRadiusPx(props, scaleX, scaleY) / PATH_RADIUS;
         const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
-        const scaling = `scale: ${radiusPx / scaleX} ${radiusPx / scaleY}; transform-origin: 0 0`;
+        const scaling = `scale: ${radius / scaleX} ${radius / scaleY}; transform-origin: 0 0`;
         const sliceDeclarations = `{ ${scaling}; stroke: white; stroke-width: 1px; `
             + "vector-effect: non-scaling-stroke; stroke-linejoin: round }";
 
@@ -313,6 +322,7 @@ Ren.DateValueChart_Pies = (() => {
     return {
         SLICE_CLASS,
         MAX_HOLE_RADIUS,
+        PATH_RADIUS,
         isShown,
         getClickTarget,
         getHoleRadius,

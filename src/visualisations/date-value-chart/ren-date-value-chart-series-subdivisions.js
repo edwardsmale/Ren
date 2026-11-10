@@ -341,9 +341,11 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         const x = Math.sin(angle);
         const y = -Math.cos(angle);
         const sign = x - y < 0 ? -1 : 1;
+        const rim = Ren.DateValueChart_Pies.PATH_RADIUS;
+        const hole = rim * holeRadius;
 
         return {
-            path: `M${round(x * holeRadius)},${round(y * holeRadius)}L${round(x)},${round(y)}`,
+            path: `M${round(x * hole)},${round(y * hole)}L${round(x * rim)},${round(y * rim)}`,
             normalX: round(-y * sign),
             normalY: round(x * sign)
         };

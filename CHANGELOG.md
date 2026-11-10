@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in the [README](README.md)
 for what counts as a breaking change).
 
+## Unreleased
+
+Fix pie chart subdivision hit testing (mouse position wasn't mapping to correct subdivision).
+
 ## 1.1.1 (2026-11-08)
 
 The NuGet package carries the client's built files, and build targets that copy them into a web

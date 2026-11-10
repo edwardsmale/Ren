@@ -24,25 +24,28 @@ describe("Ren.DateValueChart_Pies", () => {
 
     test("getSlicePath_QuarterWithoutHole_ArcFromTopToRightThenCentre", () => {
 
-        expect(Pies.getSlicePath(0, Math.PI / 2, 0)).toBe("M0,-1A1,1 0 0 1 1,0L0,0Z");
+        expect(Pies.getSlicePath(0, Math.PI / 2, 0))
+            .toBe("M0,-1000A1000,1000 0 0 1 1000,0L0,0Z");
     });
 
     test("getSlicePath_ThreeQuartersWithoutHole_LargeArc", () => {
 
-        expect(Pies.getSlicePath(0, Math.PI * 1.5, 0)).toBe("M0,-1A1,1 0 1 1 -1,0L0,0Z");
+        expect(Pies.getSlicePath(0, Math.PI * 1.5, 0)).toBe(
+            "M0,-1000A1000,1000 0 1 1 -1000,0L0,0Z"
+        );
     });
 
     test("getSlicePath_QuarterWithHole_InnerArcDrawnBack", () => {
 
         expect(Pies.getSlicePath(0, Math.PI / 2, 0.5))
-            .toBe("M0,-1A1,1 0 0 1 1,0L0.5,0A0.5,0.5 0 0 0 0,-0.5Z");
+            .toBe("M0,-1000A1000,1000 0 0 1 1000,0L500,0A500,500 0 0 0 0,-500Z");
     });
 
     test("getSlicePath_WholePieWithHole_RingWithHoleDrawnTheOtherWay", () => {
 
         expect(Pies.getSlicePath(0, Math.PI * 2, 0.5)).toBe(
-            "M0,-1A1,1 0 1 1 0,1A1,1 0 1 1 0,-1Z"
-            + "M0,-0.5A0.5,0.5 0 1 0 0,0.5A0.5,0.5 0 1 0 0,-0.5Z"
+            "M0,-1000A1000,1000 0 1 1 0,1000A1000,1000 0 1 1 0,-1000Z"
+            + "M0,-500A500,500 0 1 0 0,500A500,500 0 1 0 0,-500Z"
         );
     });
 
@@ -59,7 +62,7 @@ describe("Ren.DateValueChart_Pies", () => {
         // span 90% of 200px.
         const styles = Pies.buildStyles(props, 2, 0.5);
 
-        expect(styles[0]).toContain("scale: 45 180;");
+        expect(styles[0]).toContain("scale: 0.045 0.18;");
     });
 
     describe("getClickTarget", () => {
