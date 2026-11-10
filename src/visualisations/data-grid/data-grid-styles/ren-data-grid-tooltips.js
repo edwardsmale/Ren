@@ -5,7 +5,8 @@
  * A tooltip is worked out as its element is hovered and set as the element's title, so it is
  * never in the rendered grid and is always up to date.
  *
- * A header cell has no title by default, other than its heading where that is truncated.
+ * A header cell has no title by default, other than its heading where that is truncated.  A cell
+ * whose value is truncated shows the value instead of its cellTooltip or cellTooltipFunction.
  *
  * The heading tooltip functions are called with the heading text as their value, and no row.
  */
@@ -203,10 +204,29 @@ Ren.DataGridTooltips = (
         return element.querySelector(".ren-data-grid__header-cell-value")?.textContent ?? null;
     };
 
+    // A truncated cell shows its value in place of any tooltip of its own.
+    const getTruncatedCellTooltip = (element) => {
+
+        if (element.classList.contains("ren-h") || element.scrollWidth <= element.clientWidth) {
+            return null;
+        }
+
+        return element.textContent || null;
+    };
+
+    const getTooltipToApply = (element) => {
+
+        if (element.classList.contains("ren-h")) {
+            return getElementTooltip(element) || getTruncatedHeadingTooltip(element);
+        }
+
+        return getTruncatedCellTooltip(element) || getElementTooltip(element);
+    };
+
     // Sets an element's title to its tooltip, or puts back the title it had before.
     const applyTooltip = (element) => {
 
-        const tooltip = getElementTooltip(element) || getTruncatedHeadingTooltip(element);
+        const tooltip = getTooltipToApply(element);
 
         const isShowingTooltip = element.renAppliedTooltip !== undefined &&
             element.title === element.renAppliedTooltip;

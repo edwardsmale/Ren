@@ -7,6 +7,7 @@ for what counts as a breaking change).
 ## Unreleased
 
 Fix pie chart subdivision hit testing (mouse position wasn't mapping to correct subdivision).
+Show tooltips when data grid cell values are truncated.
 
 ## 1.1.1 (2026-11-08)
 
