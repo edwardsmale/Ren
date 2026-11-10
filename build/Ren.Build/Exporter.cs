@@ -79,7 +79,7 @@ internal static partial class Exporter
             await Step.RunAsync(
                 $"Packing v{version}",
                 "dotnet",
-                ["pack", project, "-c", "Release", "-o", packagesDirectory, "-nologo"],
+                ["pack", project, "-c", "Release", "-o", packagesDirectory, "-nologo", "--disable-build-servers"],
                 workingDirectory: worktree);
         });
 
@@ -110,11 +110,12 @@ internal static partial class Exporter
                 throw new BuildException($"{tag} is from before Ren was built with .NET, so it can't be exported this way.");
             }
 
-            // The worktree's build uses the tools this repo has already downloaded.
+            // The worktree's build uses the tools this repo has already downloaded.  Build servers
+            // would outlive the build holding files in the worktree, so it can't be removed.
             await Step.RunAsync(
                 $"Building {tag}",
                 "dotnet",
-                ["run", "--project", buildProject, "-c", "Release", "--", "build"],
+                ["run", "--project", buildProject, "-c", "Release", "--disable-build-servers", "--", "build"],
                 workingDirectory: worktree,
                 environment: new Dictionary<string, string> { ["REN_TOOLS"] = Tools.ToolsDirectory });
 
@@ -134,15 +135,65 @@ internal static partial class Exporter
         }
         finally
         {
-            RemoveWorktree(worktree);
+            // The release has been used by now, so a worktree that won't go only needs a warning.
+            // The next export or pack tries again.
+            if (!await TryRemoveWorktreeAsync(worktree))
+            {
+                Log.Warning($"Couldn't remove {worktree}, as something still has files open in it.  " +
+                    "Close it in any editor, run \"dotnet build-server shutdown\", and delete the " +
+                    "folder.");
+            }
         }
     }
 
     private static void RemoveWorktree(string worktree)
     {
-        if (Directory.Exists(worktree)) Git.Run("-c", "core.longpaths=true", "worktree", "remove", "--force", worktree);
+        if (!TryRemoveWorktree(worktree, out var error))
+        {
+            throw new BuildException($"Couldn't remove {worktree}, as something still has files open in it:\n{error}");
+        }
+    }
 
-        Git.Run("worktree", "prune");
+    /// <summary>
+    /// Removes the worktree, retrying for a few seconds while processes that have just exited
+    /// let go of its files, and gets whether it was removed.
+    /// </summary>
+    private static async Task<bool> TryRemoveWorktreeAsync(string worktree)
+    {
+        for (var attempt = 1; attempt <= 5; attempt++)
+        {
+            if (TryRemoveWorktree(worktree, out _)) return true;
+
+            await Task.Delay(TimeSpan.FromSeconds(attempt));
+        }
+
+        return false;
+    }
+
+    private static bool TryRemoveWorktree(string worktree, out string? error)
+    {
+        error = null;
+
+        // A removal that failed part way can leave the folder behind with git no longer knowing it
+        // as a worktree, so git can't remove it.
+        if (Directory.Exists(worktree)
+            && Git.TryRun("-c", "core.longpaths=true", "worktree", "remove", "--force", worktree) == null)
+        {
+            try
+            {
+                Directory.Delete(worktree, recursive: true);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                error = exception.Message;
+
+                return false;
+            }
+        }
+
+        Git.TryRun("worktree", "prune");
+
+        return true;
     }
 
     [GeneratedRegex(@"^\d+\.\d+\.\d+$")]
