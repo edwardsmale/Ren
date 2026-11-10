@@ -5,7 +5,7 @@
     <RootNamespace>Ren</RootNamespace>
     <PackageId>Ren</PackageId>
     <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../../VERSION').Trim())</Version>
-    <Description>Ren, a client-side reporting library for data grids, charts, filters and report settings.  The package has the client's built files (ren.js, ren.css and the rest), which it copies into a web project when it builds, and a .NET library - that can optionally be used - to compress data before returning it to the client.</Description>
+    <Description>A powerful client-side reporting library, providing data grids, charts, and data grouping, sorting and filtering.</Description>
     <Authors>Ed Smale</Authors>
     <Copyright>Copyright (c) 2026 Ed Smale</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
