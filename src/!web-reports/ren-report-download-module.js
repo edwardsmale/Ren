@@ -1,3 +1,6 @@
+/**
+ * Renders a button to download the report.
+ */
 Ren.ReportDownloadModule = (() => {
 
     let isModuleDisabled = true;

@@ -1,5 +1,3 @@
-(function (Ren) {
-
     Ren.GroupingsAdder_PopulateGroupings = function (
         tabularData,
         dataGroupingSettings,
@@ -246,4 +244,3 @@
             }
         };
     };
-})(Ren || (Ren = {}));

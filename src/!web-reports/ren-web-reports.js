@@ -1,3 +1,6 @@
+/**
+ * Logic and setup code for web reports.
+ */
 Ren.WebReports = (() => {
 
     /**

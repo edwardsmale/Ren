@@ -1,3 +1,6 @@
+/**
+ * Sets up the tabbed modules on the page.
+ */
 Ren.TabbedModules = (() => {
 
     const initialise = () => {

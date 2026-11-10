@@ -1,8 +1,8 @@
+/**
+ * Renders visualisations other than gridsets and datagrids.
+ */
 Ren.WebReportDisplay = (() => {
 
-    /**
-     * Renders visualisations other than gridsets and datagrids.
-     */
     const renderVisualisation = (visualisation, createFunction) => {
 
         const tabularData = Ren.DataSources.cloneTabularDataAndApplyTransformationsForVisualisation(

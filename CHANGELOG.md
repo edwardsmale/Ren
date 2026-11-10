@@ -7,6 +7,7 @@ for what counts as a breaking change).
 ## Unreleased
 
 Fix errors with pack command.
+Make minor tweaks to JS code layout + comments.
 
 ## 1.1.2 (2026-11-10)
 

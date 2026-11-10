@@ -145,10 +145,12 @@ Ren.AddDataGridQuickLinks = (
         }
         else {
 
+            const convertToPopupButtonWidth = 16;
+
             // In this case, the 'convert to popup' button is visible.
             left = Math.min(dimensions.dataGridWidth, container.clientWidth) -
-                138 -
-                Ren.ReportConstants.convertToPopupButtonWidth;
+                138 - 
+                convertToPopupButtonWidth;
         }
 
         // Kept within the container, which in a popup would otherwise scroll sideways to show the

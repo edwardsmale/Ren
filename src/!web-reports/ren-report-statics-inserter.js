@@ -1,7 +1,7 @@
 /**
  * Finds script and style elements which reference JS and CSS files, as opposed to inline scripts
- * and styles, and puts the contents of those files into the script and style elements, so that
- * they are present in the HTML file when it is downloaded.
+ * and styles, gets the contents of those files, minifies them and outputs them as script and style
+ * elements, so that they are present in the HTML file when it is downloaded.
  */
 Ren.ReportStaticsInserter = (() => {
 

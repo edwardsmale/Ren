@@ -1,3 +1,6 @@
+/**
+ * Code for downloading reports.
+ */
 Ren.ReportDownloader = (() => {
 
     const getDownloadFilename = () => {

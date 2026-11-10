@@ -1,5 +1,3 @@
-(function (Ren) {
-
     Ren.GroupingsAdder_SetColumnValueFormats = function (tabularData, dataGroupingSettings) {
 
         return function setColumnValueFormats(previousGrouping, newGrouping) {
@@ -141,4 +139,3 @@
             }
         };
     };
-})(Ren || (Ren = {}));

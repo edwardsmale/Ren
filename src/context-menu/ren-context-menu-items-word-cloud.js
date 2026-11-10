@@ -5,7 +5,6 @@ Ren.ContextMenuItems_WordCloud = (tabularData, contextMenu, visualisation, props
 
     const windowsMenuItems = Ren.ContextMenuItems_Windows(visualisation, tabularData.tabularDataGuid);
 
-    // Get palettes from centralized source
     const colourPalettes = Ren.WordCloud_Palettes.getPalettesAsArray();
 
     /**

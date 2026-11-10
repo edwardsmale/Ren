@@ -3,7 +3,10 @@
  * Used by both context menu and header cell down arrow renderer.
  */
 Ren.ColumnFilterMenuItemsHelper = (
-    tabularData, visualisation, dataGroupingSettings, sortFilterGroup
+    tabularData,
+    visualisation,
+    dataGroupingSettings,
+    sortFilterGroup
 ) => {
 
     const showFilterDataRowsWindow = (columnIdOrHeading, anchorElement) =>

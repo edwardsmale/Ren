@@ -27,13 +27,22 @@ namespace Ren.Tests
 
             var tabularData = collection.TabularDataSets[0].TabularDatas[0];
 
-            Assert.AreEqual(TabularData.VALUE_ENCODING_DATE_EPOCH_MS,
-                tabularData.ColumnValueEncodings[0]);
+            Assert.AreEqual(
+                TabularData.VALUE_ENCODING_DATE_EPOCH_MS,
+                tabularData.ColumnValueEncodings[0]
+            );
+
             Assert.IsTrue(tabularData.IsColumnCompressed[0]);
-            Assert.AreEqual(this.GetEpochMilliseconds(new DateTime(2024, 1, 15)),
-                tabularData.RowModels[0].CV[0]);
-            Assert.AreEqual(this.GetEpochMilliseconds(new DateTime(2024, 2, 29)),
-                tabularData.RowModels[1].CV[0]);
+            
+            Assert.AreEqual(
+                this.GetEpochMilliseconds(new DateTime(2024, 1, 15)),
+                tabularData.RowModels[0].CV[0]
+            );
+
+            Assert.AreEqual(
+                this.GetEpochMilliseconds(new DateTime(2024, 2, 29)),
+                tabularData.RowModels[1].CV[0]
+            );
         }
 
         [TestMethod]
@@ -48,9 +57,13 @@ namespace Ren.Tests
             var tabularData = collection.TabularDataSets[0].TabularDatas[0];
 
             Assert.AreEqual(TabularData.VALUE_ENCODING_DATE_TIME_EPOCH_MS,
-                tabularData.ColumnValueEncodings[0]);
-            Assert.AreEqual(this.GetEpochMilliseconds(new DateTime(2024, 1, 15, 13, 45, 10)),
-                tabularData.RowModels[0].CV[0]);
+                tabularData.ColumnValueEncodings[0]
+            );
+
+            Assert.AreEqual(
+                this.GetEpochMilliseconds(new DateTime(2024, 1, 15, 13, 45, 10)),
+                tabularData.RowModels[0].CV[0]
+            );
         }
 
         [TestMethod]
@@ -156,7 +169,8 @@ namespace Ren.Tests
             );
         }
 
-        private TabularDataSetCollection CreateCollection(TabularDataColumnFormatEnum columnFormat,
+        private TabularDataSetCollection CreateCollection(
+            TabularDataColumnFormatEnum columnFormat,
             params string[] values)
         {
             var rows = new string[values.Length][];
@@ -176,7 +190,8 @@ namespace Ren.Tests
             return collection;
         }
 
-        private TabularData CreateTabularData(TabularDataColumnFormatEnum[] columnFormats,
+        private TabularData CreateTabularData(
+            TabularDataColumnFormatEnum[] columnFormats,
             params string[][] rows)
         {
             var tabularData = new TabularData("Tab", null, rows.Length);
