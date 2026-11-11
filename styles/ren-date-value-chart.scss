@@ -222,3 +222,17 @@ $chart-subtitle-line-height: 16px;
         max-height: calc(100cqw / var(--ren-multi-chart-columns, 1));
     }
 }
+
+// Stands in, centred, for the chart of a period left with no rows, beneath its dates.
+.ren-date-value-chart-multi-chart-empty-period
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1.5rem 0.5rem 0.5rem;
+    box-sizing: border-box;
+    color: #666;
+    font-size: 0.875rem;
+    text-align: center;
+}

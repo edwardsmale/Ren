@@ -53,11 +53,18 @@ Ren.DateValueChart_MultiChart = (() => {
     /**
      * Gets the ranges the charts are drawn over: the latest periods the rows hold dates in, up to
      * the most charts, oldest first.  Where the chart has a date range of its own, the periods are
-     * those starting within it.
+     * those starting within it.  Contiguous ranges take in the periods between that hold no dates.
      */
-    const getRanges = (rows, dateHeading, datePeriod, maxChartCount, chartDateRange) => {
+    const getRanges = (
+        rows, dateHeading, datePeriod, maxChartCount, chartDateRange, isContiguous) => {
 
-        const stops = Ren.DateValueChart_PeriodSlider.getStops(rows, dateHeading, datePeriod);
+        const stops = Ren.DateValueChart_PeriodSlider.getStops(
+            rows,
+            dateHeading,
+            datePeriod,
+            isContiguous
+        );
+
         const ranges = [];
 
         // The first stop is the slider's "All", which is no period.
@@ -73,6 +80,72 @@ Ren.DateValueChart_MultiChart = (() => {
         }
 
         return ranges.slice(Math.max(ranges.length - maxChartCount, 0));
+    };
+
+    /**
+     * Gets the rows a multi-chart finds its periods in.  These are its own rows, or, where it
+     * keeps empty periods, the dates of every row its data holds, before any filter, so that
+     * filtering leaves its charts and slider where they were.
+     */
+    const getPeriodRows = (props) => {
+
+        const detection = props.multiChartDetection;
+        const tabularData = detection?.tabularData;
+
+        if (!props.multiChartKeepEmptyPeriods || !isMultiChart(props) || !tabularData) {
+            return props.rawInputData;
+        }
+
+        const columnResolver = detection.columnResolver || tabularData.columnResolver;
+        const columnIndex = columnResolver?.getColumnIndex(props.dateHeading);
+
+        if (columnIndex == null) return props.rawInputData;
+
+        const cached = props.multiChartPeriodRows;
+
+        if (cached && cached.tabularData === tabularData && cached.columnIndex === columnIndex) {
+            return cached.rows;
+        }
+
+        const rows = Ren.TabularDataAdapter_Array.getDataArray(
+            tabularData,
+            props.visualisation,
+            null,
+            false,
+            false,
+            0,
+            tabularData.DataRowCount,
+            false,
+            [columnIndex]
+        );
+
+        props.multiChartPeriodRows = { tabularData, columnIndex, rows };
+
+        return rows;
+    };
+
+    /**
+     * Gets the starts of the periods a multi-chart's own rows hold dates in, as keys, or null
+     * where it does not keep empty periods.
+     */
+    const getFilledPeriodStarts = (props, datePeriod) => {
+
+        if (!props.multiChartKeepEmptyPeriods) return null;
+
+        const stops = Ren.DateValueChart_PeriodSlider.getStops(
+            props.rawInputData,
+            props.dateHeading,
+            datePeriod
+        );
+
+        const starts = {};
+
+        for (let index = 1; index < stops.length; index++) {
+
+            starts[stops[index].range.from] = true;
+        }
+
+        return starts;
     };
 
     /**
@@ -400,6 +473,17 @@ Ren.DateValueChart_MultiChart = (() => {
     };
 
     /**
+     * Stands in for the chart of a period the rows hold no dates in.
+     */
+    const showEmptyPeriod = (item, range) => {
+
+        item.firstChild.replaceChildren(Ren.HtmlTemplateFunctions.reifyHtmlTemplate(
+            "DateValueChartMultiChartEmptyPeriod",
+            { dateRange: Ren.DateValueChart_DateRange.describe(range) }
+        ));
+    };
+
+    /**
      * Removes the charts drawn last time, their legend and their layout, from a chart's container.
      */
     const clear = (props) => {
@@ -473,13 +557,18 @@ Ren.DateValueChart_MultiChart = (() => {
 
         clear(props);
 
+        const datePeriod = Ren.DateValueChart_PeriodSlider.getPeriod(props.multiChartPeriod);
+
         const ranges = getRanges(
-            props.rawInputData,
+            getPeriodRows(props),
             props.dateHeading,
-            Ren.DateValueChart_PeriodSlider.getPeriod(props.multiChartPeriod),
+            datePeriod,
             getMaxChartCount(props),
-            props.chartDateRange
+            props.chartDateRange,
+            !!props.multiChartKeepEmptyPeriods
         );
+
+        const filledPeriodStarts = getFilledPeriodStarts(props, datePeriod);
 
         if (ranges.length === 0) {
 
@@ -573,6 +662,15 @@ Ren.DateValueChart_MultiChart = (() => {
 
             grid.appendChild(item);
 
+            if (filledPeriodStarts && !filledPeriodStarts[ranges[index].from]) {
+
+                showEmptyPeriod(item, ranges[index]);
+
+                if (props.multiChartShowDateRange !== false) addDateRangeLabel(item, chartProps);
+
+                continue;
+            }
+
             const message = drawChart(chartProps);
 
             if (typeof message === "string") {
@@ -628,6 +726,7 @@ Ren.DateValueChart_MultiChart = (() => {
         getChartSeriesNum,
         getColumnCount,
         getMaxChartCount,
+        getPeriodRows,
         getRanges,
         getSharedLegendProps,
         getXDomain,

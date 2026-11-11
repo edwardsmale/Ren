@@ -39,9 +39,10 @@ Ren.DateValueChart_MultiChartWheel = (() => {
     const getStops = (props, datePeriod) => {
 
         const cached = props.multiChartWheelStops;
+        const rows = Ren.DateValueChart_MultiChart.getPeriodRows(props);
 
         if (cached
-            && cached.rows === props.rawInputData
+            && cached.rows === rows
             && cached.datePeriod === datePeriod
             && cached.dateHeading === props.dateHeading) {
 
@@ -49,14 +50,14 @@ Ren.DateValueChart_MultiChartWheel = (() => {
         }
 
         const stops = Ren.DateValueChart_PeriodSlider.getStops(
-            props.rawInputData,
+            rows,
             props.dateHeading,
             datePeriod,
             true
         );
 
         props.multiChartWheelStops = {
-            rows: props.rawInputData,
+            rows,
             datePeriod,
             dateHeading: props.dateHeading,
             stops

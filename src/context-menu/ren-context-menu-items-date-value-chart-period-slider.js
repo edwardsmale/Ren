@@ -115,6 +115,20 @@ Ren.ContextMenuItems_DateValueChart_PeriodSlider = (chart) => {
         ticked: () => !!props.multiChartSlider
     };
 
+    const keepEmptyPeriodsMenuItem = {
+        text: "Keep empty periods",
+        id: "chart-multi-chart-keep-empty-periods",
+        title: "Keeps a chart for every period the data holds, whatever is filtered out, showing"
+            + " \"No data\" in those left empty.",
+        visible: () => isMultiChart(),
+        action: () => setChartSetting(
+            "multiChartKeepEmptyPeriods",
+            !props.multiChartKeepEmptyPeriods,
+            props.multiChartKeepEmptyPeriods ? false : undefined
+        ),
+        ticked: () => !!props.multiChartKeepEmptyPeriods
+    };
+
     const multiChartMenuItem = {
         section: "Dates",
         text: "Multi-chart",
@@ -123,7 +137,12 @@ Ren.ContextMenuItems_DateValueChart_PeriodSlider = (chart) => {
         submenu: buildPeriodOptions("multiChartPeriod", "chart-multi-chart-")
             .concat([Ren.MENU_SEPARATOR])
             .concat(maxChartCountMenuItems)
-            .concat([Ren.MENU_SEPARATOR, showDateRangesMenuItem, multiChartSliderMenuItem])
+            .concat([
+                Ren.MENU_SEPARATOR,
+                showDateRangesMenuItem,
+                multiChartSliderMenuItem,
+                keepEmptyPeriodsMenuItem
+            ])
     };
 
     return {

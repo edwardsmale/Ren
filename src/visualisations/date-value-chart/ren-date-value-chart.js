@@ -1227,6 +1227,7 @@ Ren.CreateDateValueChart = (() => {
         props.multiChartMaxCount = visualisation.multiChartMaxCount ?? null;
         props.multiChartShowDateRange = visualisation.multiChartShowDateRange !== false;
         props.multiChartSlider = visualisation.multiChartSlider === true;
+        props.multiChartKeepEmptyPeriods = visualisation.multiChartKeepEmptyPeriods !== false;
 
         // A <ren-date-value-chart> attribute states the enum by name.
         props.showIncompleteLastPeriod = typeof visualisation.showIncompleteLastPeriod === "string"

@@ -157,14 +157,15 @@ Ren.DateValueChart_PeriodSlider = (() => {
 
     /**
      * Gets a chart's timeline, as { stops, extent }, worked out again only once its rows or period
-     * change.
+     * change.  A multi-chart keeping empty periods takes it from every row its data holds.
      */
     const getChartTimeline = (props, datePeriod) => {
 
         const cached = props.periodSliderStops;
+        const rows = Ren.DateValueChart_MultiChart.getPeriodRows(props);
 
         if (cached
-            && cached.rows === props.rawInputData
+            && cached.rows === rows
             && cached.datePeriod === datePeriod
             && cached.dateHeading === props.dateHeading) {
 
@@ -172,12 +173,12 @@ Ren.DateValueChart_PeriodSlider = (() => {
         }
 
         const timeline = {
-            stops: getStops(props.rawInputData, props.dateHeading, datePeriod, true),
-            extent: DateRange().getDataExtent(props.rawInputData, props.dateHeading)
+            stops: getStops(rows, props.dateHeading, datePeriod, true),
+            extent: DateRange().getDataExtent(rows, props.dateHeading)
         };
 
         props.periodSliderStops = {
-            rows: props.rawInputData,
+            rows,
             datePeriod,
             dateHeading: props.dateHeading,
             timeline

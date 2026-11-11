@@ -135,11 +135,16 @@ Ren.VisualisationTypes_DateValueChart = {
         // by default), each named at its top left unless multiChartShowDateRange is false.  With
         // multiChartSlider, a slider beneath them steps back through the earlier periods.
         // Ctrl + wheel over the charts draws fewer or more of them, and Shift + wheel steps the
-        // periods they show, both kept in these settings and the chart's date range.
+        // periods they show, both kept in these settings and the chart's date range.  Unless
+        // multiChartKeepEmptyPeriods is false, the periods are every one from the first the data
+        // holds to the last, whatever is filtered out, and one left with no rows shows "No data
+        // for ..." in place of its chart, so that filtering leaves the charts and the slider where
+        // they were.
         multiChartPeriod: "String",
         multiChartMaxCount: "Number",
         multiChartShowDateRange: "Boolean",
         multiChartSlider: "Boolean",
+        multiChartKeepEmptyPeriods: "Boolean",
 
         // The range the chart's Reset button returns it to, defaulting to the range it is first
         // given on its date grouping entry.  Takes the same forms as that range.
@@ -477,6 +482,11 @@ Ren.VisualisationTypes_DateValueChart = {
         {
             name: "multiChartSlider",
             transform: (multiChartSlider) => multiChartSlider === true ? true : undefined
+        },
+        {
+            name: "multiChartKeepEmptyPeriods",
+            transform: (multiChartKeepEmptyPeriods) =>
+                multiChartKeepEmptyPeriods === false ? false : undefined
         },
 
         "markerLabelLayout",

@@ -1,3 +1,5 @@
+const { createTabularData } = require("./helpers/tabular-data");
+
 describe("Ren.DateValueChart_MultiChart", () => {
 
     const MultiChart = Ren.DateValueChart_MultiChart;
@@ -403,6 +405,126 @@ describe("Ren.DateValueChart_MultiChart", () => {
 
         expect(getItems()[0].textContent).toBe("No data to show.");
         expect(props.multiChartProps).toHaveLength(1);
+    });
+
+    test("getRanges_Contiguous_TakesInPeriodsWithNoDates", () => {
+
+        const ranges = MultiChart.getRanges(
+            createRows(),
+            "Date",
+            Ren.DatePeriodEnum.Year,
+            4,
+            null,
+            true
+        );
+
+        expect(getFroms(ranges)).toEqual(["2023-01-01", "2024-01-01", "2025-01-01"]);
+
+        const quarters = MultiChart.getRanges(
+            createRows(),
+            "Date",
+            Ren.DatePeriodEnum.Quarter,
+            3,
+            null,
+            true
+        );
+
+        expect(getFroms(quarters)).toEqual(["2025-01-01", "2025-04-01", "2025-07-01"]);
+    });
+
+    /**
+     * Gets the props of a multi-chart keeping empty periods, whose data holds a row in each of
+     * 2024, 2025 and 2026, and whose own rows, as filtered, are those given.
+     */
+    const createKeepEmptyPeriodsProps = (filteredYears, overrides) => {
+
+        const tabularData = createTabularData(
+            ["Date", "Sales"],
+            [["2024-03-01", 10], ["2025-03-01", 20], ["2026-03-01", 30]]
+        );
+
+        const dateHeading = tabularData.columnResolver.getColumnIdOrHeading(1);
+
+        return createProps(Object.assign({
+            dateHeading,
+            rawInputData: filteredYears.map(year => ({ [dateHeading]: year + "-03-01" })),
+            multiChartKeepEmptyPeriods: true,
+            multiChartDetection: {
+                inputData: null,
+                tabularData,
+                columnResolver: tabularData.columnResolver
+            }
+        }, overrides));
+    };
+
+    test("getPeriodRows_KeepEmptyPeriods_EveryRowBeforeAnyFilter", () => {
+
+        const props = createKeepEmptyPeriodsProps(["2024"]);
+
+        const rows = MultiChart.getPeriodRows(props);
+
+        expect(rows.map(row => row[props.dateHeading]))
+            .toEqual(["2024-03-01", "2025-03-01", "2026-03-01"]);
+        expect(MultiChart.getPeriodRows(props)).toBe(rows);
+    });
+
+    test("getPeriodRows_NotKeepingEmptyPeriods_ChartsOwnRows", () => {
+
+        const props =
+            createKeepEmptyPeriodsProps(["2024"], { multiChartKeepEmptyPeriods: false });
+
+        expect(MultiChart.getPeriodRows(props)).toBe(props.rawInputData);
+    });
+
+    test("render_KeepEmptyPeriodsLatestFilteredOut_ShowsNoDataInItsPlace", () => {
+
+        const props = createKeepEmptyPeriodsProps(["2024", "2025"]);
+        const drawn = [];
+
+        MultiChart.render(props, (chartProps) => {
+
+            drawn.push(chartProps.multiChartRange.from);
+            return null;
+        });
+
+        const labels = document.querySelectorAll(".ren-date-value-chart-multi-chart-date-range");
+
+        expect(drawn).toEqual(["2025-01-01"]);
+        expect(getItems()).toHaveLength(2);
+        expect(getItems()[1].querySelector(".ren-date-value-chart-multi-chart-empty-period")
+            .textContent.trim()).toBe("No data for 2026");
+        expect(Array.prototype.map.call(labels, label => label.textContent))
+            .toEqual(["2025", "2026"]);
+    });
+
+    test("render_KeepEmptyPeriodsMiddleFilteredOut_KeepsItsPlace", () => {
+
+        const props = createKeepEmptyPeriodsProps(["2024", "2026"], { multiChartMaxCount: 3 });
+        const drawn = [];
+
+        MultiChart.render(props, (chartProps) => {
+
+            drawn.push(chartProps.multiChartRange.from);
+            return null;
+        });
+
+        expect(drawn).toEqual(["2024-01-01", "2026-01-01"]);
+        expect(getItems()).toHaveLength(3);
+        expect(getItems()[1].textContent).toContain("No data for 2025");
+    });
+
+    test("render_NotKeepingEmptyPeriods_DrawsOnlyPeriodsItsRowsHold", () => {
+
+        const props = createKeepEmptyPeriodsProps(
+            ["2024", "2026"],
+            { multiChartMaxCount: 3, multiChartKeepEmptyPeriods: false }
+        );
+
+        MultiChart.render(props, () => null);
+
+        expect(getItems()).toHaveLength(2);
+        expect(document.querySelector(".ren-date-value-chart-multi-chart-empty-period"))
+            .toBeNull();
     });
 
     test("render_DrawnAgain_ReplacesCharts", () => {
