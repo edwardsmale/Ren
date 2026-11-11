@@ -1,4 +1,4 @@
-# Packs the release a pushed v* tag marks and pushes it to nuget.org, signing in with Trusted
+# Builds and tests the release a pushed v* tag marks, then packs it and pushes it to nuget.org, signing in with Trusted
 # Publishing, so there's no stored API key.  The pack refuses a tag whose VERSION doesn't match
 # it, or that doesn't build as a release.  nuget.org needs a Trusted Publishing policy for this
 # repo and this workflow file, and the repo needs a NUGET_USER secret holding the nuget.org
@@ -27,6 +27,16 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
+
+      # The same build and tests as CI, run here too, since CI is a separate workflow that this one
+      # doesn't wait for, so a release whose tests fail isn't published.
+      - name: Install Chromium
+        run: |
+          dotnet build test/Ren.Client.Tests
+          pwsh test/Ren.Client.Tests/bin/Debug/net8.0/playwright.ps1 install chromium
+
+      - name: Build and test
+        run: dotnet run --project build/Ren.Build -- ci
 
       - name: Pack
         run: |
