@@ -7,12 +7,14 @@
  * along with the word before it, so "{value} by {split}" reads "Revenue".
  *
  * The subtitle can name the filters in effect on the chart's rows: {filters} stands for them.  A
- * subtitle naming them is left out while nothing is filtered.
+ * subtitle naming them is hidden while nothing is filtered, keeping its room so the plot doesn't
+ * move as filters come and go.
  */
 Ren.DateValueChart_Title = (() => {
 
     const CLASS_NAME = "ren-chart-title";
     const SUBTITLE_CLASS_NAME = "ren-chart-subtitle";
+    const SUBTITLE_PLACEHOLDER_CLASS_NAME = SUBTITLE_CLASS_NAME + "--placeholder";
     const VALUE_TOKEN = /\{value\}/g;
     const SPLIT_TOKEN = /([^\s{}]+\s+)?\{split\}/g;
     const FILTERS_TOKEN = /\{filters\}/g;
@@ -227,6 +229,29 @@ Ren.DateValueChart_Title = (() => {
             );
 
             container.insertBefore(subtitleElement, before);
+        }
+        else if (getSubtitleTemplate(props).search(FILTERS_TOKEN) !== -1) {
+
+            // A subtitle naming the filters keeps its room while nothing is filtered, so that the
+            // plot doesn't jump as filters come and go.
+            const placeholderElement = createHeading(
+                SUBTITLE_CLASS_NAME,
+                [{ text: " ", isValue: false }],
+                "",
+                "3",
+                {
+                    "font-size": "12px",
+                    "visibility": "hidden"
+                }
+            );
+
+            placeholderElement.classList.add(SUBTITLE_PLACEHOLDER_CLASS_NAME);
+            placeholderElement.removeAttribute("role");
+            placeholderElement.removeAttribute("aria-level");
+            placeholderElement.removeAttribute("title");
+            placeholderElement.setAttribute("aria-hidden", "true");
+
+            container.insertBefore(placeholderElement, before);
         }
     };
 

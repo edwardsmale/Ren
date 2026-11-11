@@ -204,6 +204,24 @@ describe("Ren.DateValueChart_Title", () => {
             expect(children[2]).toBe(svg);
         });
 
+        test("render_FiltersSubtitleUnfiltered_RoomKeptHidden", () => {
+
+            spyOnFilters({});
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartTitle: "Sales", chartSubtitle: "{filters}", visualisation });
+
+            const children = container.children;
+
+            expect(children[1].classList.contains("ren-chart-subtitle")).toBe(true);
+            expect(children[1].classList.contains("ren-chart-subtitle--placeholder")).toBe(true);
+            expect(children[1].style.visibility).toBe("hidden");
+            expect(children[1].getAttribute("aria-hidden")).toBe("true");
+            expect(children[1].getAttribute("role")).toBeNull();
+            expect(children[2]).toBe(svg);
+        });
+
         test("render_SubtitleRemoved_TakenAway", () => {
 
             const { container, svg } = createChart();
