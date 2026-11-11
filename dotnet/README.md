@@ -4,7 +4,7 @@ Ren's NuGet package, `Ren`, has both sides of Ren:
 - The client's built files (`ren.js`, `ren.css`, their minified and ES module versions, their
   source maps, the schema and `ren.manifest.json`).  Its build targets copy them into a web
   project that references the package, before each build, so the files are always the version
-  the project references.  See "Using Ren in a site" in the [main README](../README.md).
+  the project references.  See "Getting it" in the [main README](../README.md).
 - An optional .NET library for the server side, for netstandard2.0 and .NET Framework 4.8, that
   writes data in Ren's formats, and can compress it before returning it to the client.  It came
   out of a reporting system that's used every day, so it's had a lot of use already, but anything
@@ -89,8 +89,9 @@ or if the client no longer accepts the content type.  That's why the package liv
 repo as the client.
 
 The package's own version (in `src/Ren/Ren.csproj`) is Ren's version, which the client shares (see
-"Versions" in the [main README](../README.md)).  It goes up a major version when either side's API
-changes in a way that breaks callers, which a renpack version bump doesn't on its own.
+"Versions" in [docs/development.md](../docs/development.md)).  It goes up a major version when
+either side's API changes in a way that breaks callers, which a renpack version bump doesn't on
+its own.
 
 ### Building and testing
 
@@ -104,7 +105,7 @@ dotnet test Ren.sln
 ```
 
 Packing needs a build of the client in the repo's `dist/` to put in the package, so pack with the
-build command's `pack` (see "Releasing" in the [main README](../README.md)) rather than
+build command's `pack` (see "Releasing" in [docs/development.md](../docs/development.md)) rather than
 `dotnet pack`.
 
 `RenPackGoldenFilesTests` checks the writer's output byte for byte against the files in the

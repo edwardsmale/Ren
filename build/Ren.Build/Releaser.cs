@@ -60,7 +60,7 @@ internal static class Releaser
         Git.Run("commit", "-q", "-am", "Ren " + version);
         Git.Run("tag", "-a", "v" + version, "-m", "Ren " + version);
 
-        Log.Info($"Released {version} as v{version}.  Pack it with \"pack {version}\", and publish the package (see \"Releasing\" in the README).");
+        Log.Info($"Released {version} as v{version}.  Pack it with \"pack {version}\", or push the tag to publish it (see \"Releasing\" in docs/development.md).");
     }
 
     /// <summary>

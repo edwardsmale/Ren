@@ -1,8 +1,15 @@
 # Changelog
 
 Each version's changes, newest first.  Ren follows semantic versioning, and the client library
-and the NuGet package (`Ren`) always share a version (see "Versions" in the [README](README.md)
-for what counts as a breaking change).
+and the NuGet package (`Ren`) always share a version (see "Versions" in
+[docs/development.md](docs/development.md) for what counts as a breaking change).
+
+## Unreleased
+
+Add diagnostic code for flaky test.
+Keep a Playwright trace of each failed browser test.
+Avoid chart jumping when filter summary appears.
+Update README.
 
 ## 1.1.8 (2026-11-11)
 

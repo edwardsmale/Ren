@@ -20,7 +20,7 @@
                             out with the same name as the project's repo's branch, the files come
                             from its dist folder instead of the package.  While they match, Ren's
                             watch copies each build into the folder too, so a refresh gets it
-                            without building the project (see Ren's README).
+                            without building the project (see Ren's docs/development.md).
       RenDist               A Ren repo's dist folder, to take the files from instead of the
                             package whatever the branches are.
   -->
