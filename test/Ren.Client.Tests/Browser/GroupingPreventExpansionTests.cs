@@ -177,6 +177,11 @@ public class GroupingPreventExpansionTests : BrowserTest
         await Expect(Ren.Root.Locator(ToggleSelector)).ToHaveCountAsync(2);
 
         await Ren.Root.Locator(ToggleSelector + " input").First.ClickAsync();
+
+        // So a click that lands elsewhere fails here, rather than as an expand button left showing.
+        await Expect(Ren.Root.Locator(ToggleSelector + " input").First).ToBeCheckedAsync();
+        await Expect(Ren.Root.Locator(ToggleSelector + " input").Nth(1)).Not.ToBeCheckedAsync();
+
         await Ren.WaitUntilLoadedAsync();
 
         await Poll(() => IsExpandButtonHiddenAsync(2)).ToBe(true);
