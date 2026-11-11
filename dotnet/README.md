@@ -1,16 +1,17 @@
-# Ren for .NET
+# Ren's .NET library
 
 Ren's NuGet package, `Ren`, has both sides of Ren:
 - The client's built files (`ren.js`, `ren.css`, their minified and ES module versions, their
   source maps, the schema and `ren.manifest.json`).  Its build targets copy them into a web
   project that references the package, before each build, so the files are always the version
   the project references.  See "Using Ren in a site" in the [main README](../README.md).
-- A .NET library for the server side, for netstandard2.0 and .NET Framework 4.8, that can
-  optionally be used to compress data before returning it to the client.  It came out
-  of a reporting system that's used every day, so it's had a lot of use already, but anything
+- An optional .NET library for the server side, for netstandard2.0 and .NET Framework 4.8, that
+  writes data in Ren's formats, and can compress it before returning it to the client.  It came
+  out of a reporting system that's used every day, so it's had a lot of use already, but anything
   that can produce an `IDataReader`, a `DataTable` or a list of objects can use it.
 
-The rest of this README is about the .NET library.
+The package's own README, which nuget.org shows, is [src/Ren/README.md](src/Ren/README.md).  The
+rest of this README is about the .NET library.
 
 ### Building a collection
 
