@@ -33,6 +33,7 @@ Ren.FilterModule_View = (s) => {
 
     const checkboxRefs = []; // { input, item, value }
     const allCheckboxRefs = []; // { input, item }
+    const booleanCheckboxRefs = []; // { input, item }
 
     // Each column's selection is read at most once per sync, so a scroll rebuilding a window of
     // option rows doesn't rebuild the sets behind them.
@@ -121,6 +122,14 @@ Ren.FilterModule_View = (s) => {
             const currentFilter = getFilterForColumn(ref.item.columnIdOrHeading).filter;
 
             ref.input.checked = filtering.areAllOptionsSelected(ref.item, currentFilter);
+        }
+
+        for (let i = 0; i < booleanCheckboxRefs.length; i++) {
+
+            const ref = booleanCheckboxRefs[i];
+            const currentFilter = getFilterForColumn(ref.item.columnIdOrHeading).filter;
+
+            ref.input.checked = filtering.isYesOnlyFilter(currentFilter);
         }
 
         includeWhenSaving.refresh();
@@ -375,6 +384,23 @@ Ren.FilterModule_View = (s) => {
     };
 
     /**
+     * Hides the item's border and unbolds its heading where its column settings say to, the border
+     * keeping the room it takes.
+     */
+    const applyItemAppearance = (itemElement, columnIdOrHeading) => {
+
+        if (!itemSettings.showBorder(columnIdOrHeading)) {
+
+            itemElement._addClass("ren-filter-module__item--borderless");
+        }
+
+        if (!itemSettings.showHeadingInBold(columnIdOrHeading)) {
+
+            itemElement._addClass("ren-filter-module__item--plain-heading");
+        }
+    };
+
+    /**
      * Gives an item the grip on its right edge that sets it to a fixed width, kept in the item's
      * column settings, and sizes it to any width already kept.
      */
@@ -581,7 +607,74 @@ Ren.FilterModule_View = (s) => {
         }
     };
 
+    // A Boolean column shown as one checkbox with its heading beside it, in place of its values
+    // and total.
+    const buildCheckboxItem = (item) => {
+
+        const itemElement = Ren.HtmlUtils.create("div")
+            ._addClass("ren-filter-module__item", "qa-ren-filter-module-item");
+
+        Ren.AddContextMenuItems(
+            itemElement,
+            () => menu.buildColumnActionMenuItems(item, false, false, false)
+        );
+
+        const input = Ren.HtmlUtils.create("input")
+            ._addClass("ren-filter-module__checkbox")
+            ._attr("type", "checkbox");
+
+        const headingElement = Ren.HtmlUtils.create("div")
+            ._addClass("ren-filter-module__item-heading", "qa-ren-filter-module-item-heading")
+            ._textContent(columnInfo.resolveHeading(item));
+
+        const checkboxLabel = Ren.HtmlUtils.create("label")
+            ._addClass("ren-filter-module__option", "ren-filter-module__checkbox-heading")
+            ._append(input, headingElement);
+
+        checkboxBehaviour.letFilterDriveCheckedState(
+            input,
+            busyIndicator.wrapCheckboxAction(
+                input,
+                busyIndicator.keyOf("booleanCheckbox", item.columnIdOrHeading),
+                () => filtering.onBooleanCheckboxToggled(item)
+            )
+        );
+
+        booleanCheckboxRefs.push({ input, item });
+
+        const headingRow = buildHeadingRow(checkboxLabel, item, null);
+
+        Ren.AddContextMenuItems(headingRow, () => {
+
+            const editHeadingItem = {
+                section: "View settings",
+                text: "Edit heading...",
+                id: "filter-module-edit-heading",
+                action: () => menu.openColumnHeadingEditor(item, headingElement)
+            };
+
+            return [editHeadingItem].concat(
+                menu.buildColumnActionMenuItems(item, true, true, false)
+            );
+        });
+
+        itemElement._append(headingRow);
+
+        reorder.decorateItemForReorder(itemElement, item.columnIdOrHeading);
+        decorateItemForWidthResize(itemElement, item.columnIdOrHeading);
+        applyItemAppearance(itemElement, item.columnIdOrHeading);
+        includeWhenSaving.applyItemBorder(item);
+
+        element._append(itemElement);
+    };
+
     const buildItem = (item) => {
+
+        if (item.isBoolean && itemSettings.getShowAsCheckbox(item.columnIdOrHeading) !== "Off") {
+
+            buildCheckboxItem(item);
+            return;
+        }
 
         const itemElement = Ren.HtmlUtils.create("div")
             ._addClass("ren-filter-module__item", "qa-ren-filter-module-item");
@@ -942,6 +1035,7 @@ Ren.FilterModule_View = (s) => {
 
         reorder.decorateItemForReorder(itemElement, item.columnIdOrHeading);
         decorateItemForWidthResize(itemElement, item.columnIdOrHeading);
+        applyItemAppearance(itemElement, item.columnIdOrHeading);
         includeWhenSaving.applyItemBorder(item);
 
         element._append(itemElement);
@@ -1030,7 +1124,8 @@ Ren.FilterModule_View = (s) => {
                     columnIdOrHeading: column.columnIdOrHeading,
                     columnIndex: column.columnIndex,
                     options: counts.buildOptions(column),
-                    fallbackHeading: column.fallbackHeading
+                    fallbackHeading: column.fallbackHeading,
+                    isBoolean: column.isBoolean === true
                 })
             });
         }
@@ -1055,6 +1150,7 @@ Ren.FilterModule_View = (s) => {
         virtualOptions.reset();
         checkboxRefs.length = 0;
         allCheckboxRefs.length = 0;
+        booleanCheckboxRefs.length = 0;
         includeWhenSaving.reset();
         hierCheckboxRefs.length = 0;
         hierAllCheckboxRefs.length = 0;
@@ -1117,6 +1213,7 @@ Ren.FilterModule_View = (s) => {
         buildAllRow,
         buildCompareStrips,
         decorateItemForWidthResize,
+        applyItemAppearance,
         focusCompareFilterOnNextRender
     };
 };

@@ -663,6 +663,7 @@ Ren.FilterModule_HierarchyView = (s) => {
         // Keyed on the leaf column, to match the item's other column-level state.
         reorder.decorateItemForReorder(itemElement, leafColumn.columnIdOrHeading);
         view.decorateItemForWidthResize(itemElement, leafColumn.columnIdOrHeading);
+        view.applyItemAppearance(itemElement, leafColumn.columnIdOrHeading);
 
         // The whole tree is one item, marked by the leaf column its combination filter is keyed on.
         includeWhenSaving.applyItemBorder(

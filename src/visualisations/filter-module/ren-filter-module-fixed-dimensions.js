@@ -1,7 +1,8 @@
 /**
  * Filter Module: pinning the items' measured dimensions, so a filter-driven re-render doesn't
  * reflow the panel beneath the pointer.  Any other change drops the pins and measures afresh.
- * Width is pinned exactly, height only as a minimum, so an expanding hierarchy isn't clipped.
+ * Both are pinned only as minimums, so an item can grow to show options a filter brings back, or an
+ * expanding hierarchy, but never shrinks beneath the pointer.
  */
 Ren.FilterModule_FixedDimensions = (s) => {
 
@@ -101,6 +102,9 @@ Ren.FilterModule_FixedDimensions = (s) => {
 
         const isColumnFlow = element.classList.contains("ren-filter-module--column-flow");
 
+        // Stacked in a column, an item would otherwise stretch to the column's widest.
+        const widthRule = isColumnFlow ? "width: max-content; " : "";
+
         for (let i = 0; i < keys.length; i++) {
 
             const dimensions = byKey[keys[i]];
@@ -113,7 +117,7 @@ Ren.FilterModule_FixedDimensions = (s) => {
             if (isColumnFlow && dimensions.floorHeight !== null) {
 
                 styles.push(
-                    `${selector} { width: ${dimensions.width}px; flex: 1 1 0%; ` +
+                    `${selector} { ${widthRule}min-width: ${dimensions.width}px; flex: 1 1 0%; ` +
                     `min-height: min(${dimensions.floorHeight}px, 100%); ` +
                     `max-height: min(${dimensions.height}px, 100%) }`
                 );
@@ -128,7 +132,8 @@ Ren.FilterModule_FixedDimensions = (s) => {
                 : `${dimensions.height}px`;
 
             styles.push(
-                `${selector} { width: ${dimensions.width}px; min-height: ${minHeight}; ` +
+                `${selector} { ${widthRule}min-width: ${dimensions.width}px; ` +
+                `min-height: ${minHeight}; ` +
                 `flex-shrink: 0 }`
             );
         }

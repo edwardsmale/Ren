@@ -150,7 +150,9 @@ Ren.FilterModule_IncludeWhenSaving = (s) => {
 
             if (!colour) continue;
 
-            const selector = `.ren-filter-module__item[data-reorder-key="${quoteKey(keys[i])}"]`;
+            // An item set not to show its border shows no mark either.
+            const selector = `.ren-filter-module__item[data-reorder-key="${quoteKey(keys[i])}"]`
+                + ":not(.ren-filter-module__item--borderless)";
 
             styles.push(`${selector} { border-color: ${colour} }`);
             styles.push(`${selector} .ren-filter-module__panel { border-color: ${colour} }`);

@@ -206,28 +206,48 @@ Ren.FilterModule_Menu = (s) => {
         action: () => itemSettings.toggleColumnFlow()
     });
 
-    // Offered on a hierarchy only, keyed on its leaf as the rest of its tree's state is.
-    const getInitialExpansionMenuItem = (leafColumnIdOrHeading) => {
+    // Builds a submenu ticking whichever of the options is set.  The first option, the default,
+    // is set apart from the rest.
+    const buildOptionSubmenu = (options, idPrefix, getValue, setValue) => {
 
-        const submenu = s.INITIAL_EXPANSION_OPTIONS.map((option) => ({
+        const submenu = options.map((option) => ({
             text: option.text,
             title: option.title,
-            id: "filter-module-initial-expansion-" + option.value,
-            ticked: () => itemSettings.getInitialExpansion(leafColumnIdOrHeading) === option.value,
-            action: () => itemSettings.setInitialExpansion(leafColumnIdOrHeading, option.value)
+            id: idPrefix + option.value,
+            ticked: () => getValue() === option.value,
+            action: () => setValue(option.value)
         }));
 
-        // "None" is set apart from the ways of expanding.
         submenu.splice(1, 0, Ren.MENU_SEPARATOR);
 
-        return {
-            text: "Initial expansion",
-            id: "filter-module-initial-expansion",
-            title: "How the tree's options are expanded when the report is opened",
-            submenu
-        };
+        return submenu;
     };
 
+    // Offered on a hierarchy only, keyed on its leaf as the rest of its tree's state is.
+    const getInitialExpansionMenuItem = (leafColumnIdOrHeading) => ({
+        text: "Initial expansion",
+        id: "filter-module-initial-expansion",
+        title: "How the tree's options are expanded when the report is opened",
+        submenu: buildOptionSubmenu(
+            s.INITIAL_EXPANSION_OPTIONS,
+            "filter-module-initial-expansion-",
+            () => itemSettings.getInitialExpansion(leafColumnIdOrHeading),
+            (value) => itemSettings.setInitialExpansion(leafColumnIdOrHeading, value)
+        )
+    });
+
+    // Offered on a Boolean column's item only.
+    const getShowAsCheckboxMenuItem = (columnIdOrHeading) => ({
+        text: "Show as checkbox",
+        id: "filter-module-show-as-checkbox",
+        title: "Shows the item as a single checkbox beside its heading",
+        submenu: buildOptionSubmenu(
+            s.SHOW_AS_CHECKBOX_OPTIONS,
+            "filter-module-show-as-checkbox-",
+            () => itemSettings.getShowAsCheckbox(columnIdOrHeading),
+            (value) => itemSettings.setShowAsCheckbox(columnIdOrHeading, value)
+        )
+    });
     // No sections, as submenus keep the order they are given.
     const buildViewSubmenuItems = (item) => {
 
@@ -306,6 +326,20 @@ Ren.FilterModule_Menu = (s) => {
                 id: "filter-module-show-total",
                 ticked: () => itemSettings.showTotal(leafColumnIdOrHeading),
                 action: () => itemSettings.toggleShowTotal(leafColumnIdOrHeading)
+            },
+            {
+                text: "Show border",
+                id: "filter-module-show-border",
+                title: "Shows the border around the item.  Hidden, it still takes up its room, so "
+                    + "the item stays where it is.",
+                ticked: () => itemSettings.showBorder(leafColumnIdOrHeading),
+                action: () => itemSettings.toggleShowBorder(leafColumnIdOrHeading)
+            },
+            {
+                text: "Show heading in bold",
+                id: "filter-module-show-heading-in-bold",
+                ticked: () => itemSettings.showHeadingInBold(leafColumnIdOrHeading),
+                action: () => itemSettings.toggleShowHeadingInBold(leafColumnIdOrHeading)
             }
         ];
 
@@ -314,6 +348,12 @@ Ren.FilterModule_Menu = (s) => {
 
             items.push(Ren.MENU_SEPARATOR);
             items.push(getInitialExpansionMenuItem(leafColumnIdOrHeading));
+        }
+
+        if (item.isBoolean === true) {
+
+            items.push(Ren.MENU_SEPARATOR);
+            items.push(getShowAsCheckboxMenuItem(columnIdOrHeading));
         }
 
         // The hint belongs to the module rather than the item, so is set apart from the rest.

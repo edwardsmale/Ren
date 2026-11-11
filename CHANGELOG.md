@@ -7,7 +7,10 @@ for what counts as a breaking change).
 ## Unreleased
 
 Fix filter saving when no data grid exists for the data source.
-Add options for initial expansion of hierarchical filter modules.
+Add options for initial expansion of hierarchical filter module items.
+Add option to show Boolean filter module items as checkboxes.
+Add style options to filter module items.
+Make expliticly-sized filter module items get wider if they need to.
 
 ## 1.1.4 (2026-11-10)
 

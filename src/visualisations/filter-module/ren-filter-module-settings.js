@@ -139,6 +139,14 @@ Ren.FilterModule_Settings = (s) => {
     const showTotal = (columnIdOrHeading) =>
         columnOverrides[columnIdOrHeading]?.showTotal !== false;
 
+    // Gets a value indicating whether the item's border is shown.
+    const showBorder = (columnIdOrHeading) =>
+        columnOverrides[columnIdOrHeading]?.showBorder !== false;
+
+    // Gets a value indicating whether the item's heading is shown in bold.
+    const showHeadingInBold = (columnIdOrHeading) =>
+        columnOverrides[columnIdOrHeading]?.showHeadingInBold !== false;
+
     // Gets how a hierarchy's tree is expanded when first shown, keyed on its leaf column (see
     // INITIAL_EXPANSION_OPTIONS).
     const getInitialExpansion = (leafColumnIdOrHeading) =>
@@ -149,6 +157,17 @@ Ren.FilterModule_Settings = (s) => {
 
         storeColumnSetting(leafColumnIdOrHeading, "initialExpansion", initialExpansion, "None");
         s.initialExpansionAppliedLeaves.delete(leafColumnIdOrHeading);
+        view.render();
+    };
+
+    // Gets how a Boolean column's item is shown as a single checkbox, or "Off" (see
+    // SHOW_AS_CHECKBOX_OPTIONS).
+    const getShowAsCheckbox = (columnIdOrHeading) =>
+        columnOverrides[columnIdOrHeading]?.showAsCheckbox ?? "Off";
+
+    const setShowAsCheckbox = (columnIdOrHeading, showAsCheckbox) => {
+
+        storeColumnSetting(columnIdOrHeading, "showAsCheckbox", showAsCheckbox, "Off");
         view.render();
     };
 
@@ -356,6 +375,18 @@ Ren.FilterModule_Settings = (s) => {
 
     const toggleShowTotal = (columnIdOrHeading) =>
         setShowTotal(columnIdOrHeading, !showTotal(columnIdOrHeading));
+
+    const setShowBorder = (columnIdOrHeading, isShown) =>
+        setColumnFlag(columnIdOrHeading, "showBorder", isShown, true);
+
+    const toggleShowBorder = (columnIdOrHeading) =>
+        setShowBorder(columnIdOrHeading, !showBorder(columnIdOrHeading));
+
+    const setShowHeadingInBold = (columnIdOrHeading, isShown) =>
+        setColumnFlag(columnIdOrHeading, "showHeadingInBold", isShown, true);
+
+    const toggleShowHeadingInBold = (columnIdOrHeading) =>
+        setShowHeadingInBold(columnIdOrHeading, !showHeadingInBold(columnIdOrHeading));
 
     // Gets a value indicating whether the "Right-click to add filters" hint is always shown, with
     // no setting to hide it, as in the Edit Groupings window.
@@ -708,8 +739,16 @@ Ren.FilterModule_Settings = (s) => {
         showTotal,
         setShowTotal,
         toggleShowTotal,
+        showBorder,
+        setShowBorder,
+        toggleShowBorder,
+        showHeadingInBold,
+        setShowHeadingInBold,
+        toggleShowHeadingInBold,
         getInitialExpansion,
         setInitialExpansion,
+        getShowAsCheckbox,
+        setShowAsCheckbox,
         isRightClickHintAlwaysShown,
         showRightClickHint,
         setShowRightClickHint,

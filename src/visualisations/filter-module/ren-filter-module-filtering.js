@@ -282,6 +282,47 @@ Ren.FilterModule_Filtering = (s) => {
         }
     };
 
+    // Gets a value indicating whether a Boolean column's filter shows its "Yes" rows alone, which
+    // is what ticks the item's single checkbox.
+    const isYesOnlyFilter = (currentFilter) => {
+
+        if (currentFilter == null) return false;
+
+        let hasYes = false;
+
+        for (let i = 0; i < currentFilter.length; i++) {
+
+            const value = String(currentFilter[i]);
+
+            if (value === "0") return false;
+
+            if (value === "1") hasYes = true;
+        }
+
+        return hasYes;
+    };
+
+    // Ticking shows "Yes" alone.  Unticking shows "No" alone, or both where the item is set to
+    // "Yes or both".
+    const onBooleanCheckboxToggled = (item) => {
+
+        const columnIdOrHeading = item.columnIdOrHeading;
+
+        if (!isYesOnlyFilter(getColumnFilter(columnIdOrHeading))) {
+
+            setFilterValues(columnIdOrHeading, ["1"]);
+            return;
+        }
+
+        if (itemSettings.getShowAsCheckbox(columnIdOrHeading) === "YesOrNo") {
+            setFilterValues(columnIdOrHeading, ["0"]);
+        }
+        else {
+
+            removeFilter(columnIdOrHeading);
+        }
+    };
+
     // Only the column's own options are weighed, so values it no longer shows are dropped.
     const onInvertToggled = (item) => {
 
@@ -1034,6 +1075,8 @@ Ren.FilterModule_Filtering = (s) => {
         areAllOptionsSelected,
         clearColumnFilterIfNotRestricting,
         onAllToggled,
+        isYesOnlyFilter,
+        onBooleanCheckboxToggled,
         onInvertToggled,
         onHierarchyInvertToggled,
         columnsKeyOf,

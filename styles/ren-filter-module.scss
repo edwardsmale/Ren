@@ -96,6 +96,23 @@ $busySpinnerGap: 2px;
         {
             max-height: 100%;
         }
+
+        /* Its border made transparent rather than removed, so the item keeps its size and lines up
+           with its bordered neighbours. */
+        &--borderless
+        {
+            border-color: transparent;
+        }
+    }
+
+    &__item--borderless &__panel
+    {
+        border-color: transparent;
+    }
+
+    &__item--plain-heading &__item-heading
+    {
+        font-weight: normal;
     }
 
     /* The options panel (always the last) and options container between a capped item and its
@@ -247,6 +264,23 @@ $busySpinnerGap: 2px;
     {
         margin-bottom: 0;
         margin-right: auto;
+    }
+
+    /* A Boolean item shown as one checkbox, its heading beside it in place of its values.  It takes
+       the row's spare width, as a lone heading does. */
+    &__checkbox-heading
+    {
+        margin-right: auto;
+        min-width: 0;
+    }
+
+    /* Nudged down a pixel: centring the boxes leaves the bold text looking slightly high beside
+       the checkbox. */
+    &__checkbox-heading > &__item-heading
+    {
+        margin-bottom: 0;
+        position: relative;
+        top: 1px;
     }
 
     /* Styled to match the compare filter's own clear button (.ren-compare-filter__clear). */

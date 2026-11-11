@@ -116,6 +116,26 @@ Ren.FilterModule_Constants = (() => {
         }
     ];
 
+    // How a Boolean column's item can be shown as a single checkbox beside its heading, stored as
+    // its showAsCheckbox.  "Off" is the default, so is never stored.
+    const SHOW_AS_CHECKBOX_OPTIONS = [
+        {
+            value: "Off",
+            text: "Off",
+            title: "Shows the column's Yes and No values as checkboxes of their own"
+        },
+        {
+            value: "YesOrNo",
+            text: "Yes or No",
+            title: "Ticked shows only Yes, unticked shows only No"
+        },
+        {
+            value: "YesOrBoth",
+            text: "Yes or both",
+            title: "Ticked shows only Yes, unticked shows both Yes and No"
+        }
+    ];
+
     return {
         DERIVED_DATE_LEVELS,
         DERIVED_LEVEL_SEPARATOR,
@@ -128,6 +148,7 @@ Ren.FilterModule_Constants = (() => {
         DEFAULT_BOTH_LABEL,
         NODE_KEY_SEPARATOR,
         INITIAL_EXPANSION_OPTIONS,
+        SHOW_AS_CHECKBOX_OPTIONS,
         SORT_TOGGLE_TITLE,
         SINGLE_SELECT_TOGGLE_TITLE
     };
