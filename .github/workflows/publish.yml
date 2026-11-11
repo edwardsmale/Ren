@@ -38,6 +38,15 @@ jobs:
       - name: Build and test
         run: dotnet run --project build/Ren.Build -- ci
 
+      # A trace of each browser test that failed, to open in Playwright's trace viewer.
+      - name: Keep the failed tests' traces
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-traces
+          path: TestResults/traces/
+          if-no-files-found: ignore
+
       - name: Pack
         run: |
           $version = $env:GITHUB_REF_NAME.Substring(1)
