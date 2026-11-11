@@ -125,6 +125,10 @@ Ren.CreateFilterModule = (tabularData, visualisation) => {
     // Not cleared by render(), so redrawing preserves which branches were open.
     s.expandedNodeKeys = new Set();
 
+    // The leaf columns of the hierarchies whose initial expansion has been applied, so a redraw
+    // leaves the user's own expanding and collapsing alone.
+    s.initialExpansionAppliedLeaves = new Set();
+
     // Wired in once the panel element and mark stylesheet exist.
     wire("includeWhenSaving");
     wire("reorder");

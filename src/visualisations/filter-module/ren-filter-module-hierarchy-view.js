@@ -35,11 +35,76 @@ Ren.FilterModule_HierarchyView = (s) => {
     // A root node's ancestors, shared rather than made per node.
     const NO_ANCESTORS = [];
 
+    // Adds or removes the keys of nodes and, where deep, every parent node beneath them.
+    const setNodesExpanded = (nodes, isExpanded, deep) => {
+
+        for (let i = 0; i < nodes.length; i++) {
+
+            if (nodes[i].isLeaf) continue;
+
+            if (isExpanded) {
+                expandedNodeKeys.add(nodes[i].key);
+            }
+            else {
+
+                expandedNodeKeys.delete(nodes[i].key);
+            }
+
+            if (deep) setNodesExpanded(nodes[i].children, isExpanded, deep);
+        }
+    };
+
+    // Applied once per hierarchy, or again when the setting changes, so a redraw keeps the
+    // branches the user has since opened or closed.  An empty tree waits for one with options.
+    const applyInitialExpansion = (tree, leafColumnIdOrHeading) => {
+
+        const appliedLeaves = s.initialExpansionAppliedLeaves;
+
+        if (appliedLeaves.has(leafColumnIdOrHeading) || tree.length === 0) return;
+
+        appliedLeaves.add(leafColumnIdOrHeading);
+
+        setNodesExpanded(tree, false, true);
+
+        switch (itemSettings.getInitialExpansion(leafColumnIdOrHeading)) {
+
+            case "FirstLevel":
+                setNodesExpanded(tree, true, false);
+                break;
+
+            case "Full":
+                setNodesExpanded(tree, true, true);
+                break;
+
+            case "FirstOption":
+                setNodesExpanded([tree[0]], true, false);
+                break;
+
+            case "FirstOptionFully":
+                setNodesExpanded([tree[0]], true, true);
+                break;
+
+            case "FullyIfOneTopLevelOption":
+                if (tree.length === 1) setNodesExpanded(tree, true, true);
+                break;
+
+            case "FullyIfTwoOrFewerTopLevelOptions":
+                if (tree.length <= 2) setNodesExpanded(tree, true, true);
+                break;
+
+            case "FullyIfThreeOrFewerTopLevelOptions":
+                if (tree.length <= 3) setNodesExpanded(tree, true, true);
+                break;
+        }
+    };
+
     const buildHierarchicalItem = (hierarchyColumns) => {
 
         const topColumn = hierarchyColumns[0];
         const leafColumn = hierarchyColumns[hierarchyColumns.length - 1];
         const tree = counts.buildHierarchyTree(hierarchyColumns);
+
+        applyInitialExpansion(tree, leafColumn.columnIdOrHeading);
 
         // The key of the hierarchy's combination filter.
         const hierarchyChain = columnInfo.chainOf(hierarchyColumns);

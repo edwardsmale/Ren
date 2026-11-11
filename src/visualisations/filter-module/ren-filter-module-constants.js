@@ -68,6 +68,54 @@ Ren.FilterModule_Constants = (() => {
     const SINGLE_SELECT_TOGGLE_TITLE =
         "On: only one value can be selected at a time.  Off: any number can be selected.";
 
+    // How a hierarchy's tree is expanded when first shown, stored as its leaf column's
+    // initialExpansion.  "None" is the default, so is never stored.
+    const INITIAL_EXPANSION_OPTIONS = [
+        {
+            value: "None",
+            text: "None",
+            title: "Shows only the top-level options, every one collapsed"
+        },
+        {
+            value: "FirstLevel",
+            text: "Expand first level",
+            title: "Expands every top-level option to show the level beneath it"
+        },
+        {
+            value: "Full",
+            text: "Expand fully",
+            title: "Expands every option at every level"
+        },
+        {
+            value: "FirstOption",
+            text: "Expand first option",
+            title: "Expands the first top-level option to show the level beneath it"
+        },
+        {
+            value: "FirstOptionFully",
+            text: "Expand first option fully",
+            title: "Expands the first top-level option and every option beneath it"
+        },
+        {
+            value: "FullyIfOneTopLevelOption",
+            text: "Expand fully if only one top-level option",
+            title: "Expands every option at every level when there is only one top-level "
+                + "option, otherwise leaves them all collapsed"
+        },
+        {
+            value: "FullyIfTwoOrFewerTopLevelOptions",
+            text: "Expand fully if 2 or fewer top-level options",
+            title: "Expands every option at every level when there are no more than two "
+                + "top-level options, otherwise leaves them all collapsed"
+        },
+        {
+            value: "FullyIfThreeOrFewerTopLevelOptions",
+            text: "Expand fully if 3 or fewer top-level options",
+            title: "Expands every option at every level when there are no more than three "
+                + "top-level options, otherwise leaves them all collapsed"
+        }
+    ];
+
     return {
         DERIVED_DATE_LEVELS,
         DERIVED_LEVEL_SEPARATOR,
@@ -79,6 +127,7 @@ Ren.FilterModule_Constants = (() => {
         DEFAULT_ALL_LABEL,
         DEFAULT_BOTH_LABEL,
         NODE_KEY_SEPARATOR,
+        INITIAL_EXPANSION_OPTIONS,
         SORT_TOGGLE_TITLE,
         SINGLE_SELECT_TOGGLE_TITLE
     };

@@ -139,6 +139,19 @@ Ren.FilterModule_Settings = (s) => {
     const showTotal = (columnIdOrHeading) =>
         columnOverrides[columnIdOrHeading]?.showTotal !== false;
 
+    // Gets how a hierarchy's tree is expanded when first shown, keyed on its leaf column (see
+    // INITIAL_EXPANSION_OPTIONS).
+    const getInitialExpansion = (leafColumnIdOrHeading) =>
+        columnOverrides[leafColumnIdOrHeading]?.initialExpansion ?? "None";
+
+    // Applied straight away, replacing whatever the user has expanded or collapsed.
+    const setInitialExpansion = (leafColumnIdOrHeading, initialExpansion) => {
+
+        storeColumnSetting(leafColumnIdOrHeading, "initialExpansion", initialExpansion, "None");
+        s.initialExpansionAppliedLeaves.delete(leafColumnIdOrHeading);
+        view.render();
+    };
+
     // Gets a value indicating whether a column is shown; none is until explicitly included.
     const isColumnIncluded = (column) =>
         columnOverrides[column.columnIdOrHeading]?.included === true;
@@ -695,6 +708,8 @@ Ren.FilterModule_Settings = (s) => {
         showTotal,
         setShowTotal,
         toggleShowTotal,
+        getInitialExpansion,
+        setInitialExpansion,
         isRightClickHintAlwaysShown,
         showRightClickHint,
         setShowRightClickHint,

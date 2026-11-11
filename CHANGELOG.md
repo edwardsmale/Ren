@@ -7,6 +7,7 @@ for what counts as a breaking change).
 ## Unreleased
 
 Fix filter saving when no data grid exists for the data source.
+Add options for initial expansion of hierarchical filter modules.
 
 ## 1.1.4 (2026-11-10)
 

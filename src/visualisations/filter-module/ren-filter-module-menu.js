@@ -206,6 +206,28 @@ Ren.FilterModule_Menu = (s) => {
         action: () => itemSettings.toggleColumnFlow()
     });
 
+    // Offered on a hierarchy only, keyed on its leaf as the rest of its tree's state is.
+    const getInitialExpansionMenuItem = (leafColumnIdOrHeading) => {
+
+        const submenu = s.INITIAL_EXPANSION_OPTIONS.map((option) => ({
+            text: option.text,
+            title: option.title,
+            id: "filter-module-initial-expansion-" + option.value,
+            ticked: () => itemSettings.getInitialExpansion(leafColumnIdOrHeading) === option.value,
+            action: () => itemSettings.setInitialExpansion(leafColumnIdOrHeading, option.value)
+        }));
+
+        // "None" is set apart from the ways of expanding.
+        submenu.splice(1, 0, Ren.MENU_SEPARATOR);
+
+        return {
+            text: "Initial expansion",
+            id: "filter-module-initial-expansion",
+            title: "How the tree's options are expanded when the report is opened",
+            submenu
+        };
+    };
+
     // No sections, as submenus keep the order they are given.
     const buildViewSubmenuItems = (item) => {
 
@@ -218,7 +240,7 @@ Ren.FilterModule_Menu = (s) => {
         const sortToggleChangesOrder = item.sortToggleChangesOrder === true
             || item.options?.sortToggleChangesOrder === true;
 
-        return [
+        const items = [
             {
                 text: "Show single toggle",
                 id: "filter-module-show-single-select-toggle",
@@ -284,12 +306,21 @@ Ren.FilterModule_Menu = (s) => {
                 id: "filter-module-show-total",
                 ticked: () => itemSettings.showTotal(leafColumnIdOrHeading),
                 action: () => itemSettings.toggleShowTotal(leafColumnIdOrHeading)
-            },
-
-            // The hint belongs to the module rather than the item, so is set apart from the rest.
-            Ren.MENU_SEPARATOR,
-            getShowRightClickHintMenuItem()
+            }
         ];
+
+        // Added with its separator only on a hierarchy, so a flat item has no empty group.
+        if (item.groupByLeafColumnIdOrHeading != null) {
+
+            items.push(Ren.MENU_SEPARATOR);
+            items.push(getInitialExpansionMenuItem(leafColumnIdOrHeading));
+        }
+
+        // The hint belongs to the module rather than the item, so is set apart from the rest.
+        items.push(Ren.MENU_SEPARATOR);
+        items.push(getShowRightClickHintMenuItem());
+
+        return items;
     };
 
     // Gets the "View settings" menu item, whose section is sorted to the top of the menu.  It
