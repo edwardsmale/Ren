@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in the [README](README.md)
 for what counts as a breaking change).
 
-## Unreleased
+## 1.1.8 (2026-11-11)
 
 Fix flaky test.
 Run tests and check they pass before publishing to Nuget.org.
