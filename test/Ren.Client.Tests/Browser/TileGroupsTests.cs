@@ -126,11 +126,24 @@ public class TileGroupsTests : BrowserTest
         await Ren.OpenAsync("tile-groups.html");
         await Poll(GetTitlesAsync).ToEqual(new[] { "Category Sales", "Brand Sales" });
 
-        var from = await DragCategorySalesOverBrandSalesAsync();
-
         var brandSales = Page.Locator(".ren-visualisation--link-tile", new() { HasText = "Brand Sales" });
 
-        await Expect(brandSales).ToHaveClassAsync(new Regex("ren-container-child--shifting"));
+        // The class is only there for the length of the slide, which can be over before a check made
+        // once the mouse has finished moving, so its being added is recorded as it happens.
+        await brandSales.EvaluateAsync("""
+            element => {
+                window.renTestShifted = false;
+                new MutationObserver(() => {
+                    if (element.classList.contains("ren-container-child--shifting")) {
+                        window.renTestShifted = true;
+                    }
+                }).observe(element, { attributes: true, attributeFilter: ["class"] });
+            }
+            """);
+
+        var from = await DragCategorySalesOverBrandSalesAsync();
+
+        await Poll(() => Page.EvaluateAsync<bool>("() => window.renTestShifted")).ToBe(true);
         await Expect(brandSales).Not.ToHaveClassAsync(new Regex("ren-container-child--shifting"));
 
         var settled = (await GetTile("Brand Sales").BoundingBoxAsync())!;
