@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in the [README](README.md)
 for what counts as a breaking change).
 
+## Unreleased
+
+Fix filter saving when no data grid exists for the data source.
+
 ## 1.1.4 (2026-11-10)
 
 Update Nuget package description.

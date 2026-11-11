@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json.Nodes;
 
 namespace Ren.Client.Tests.Browser;
 
@@ -11,6 +12,8 @@ public class ChartFilterGroupTests : BrowserTest
     private const string Fixture = "chart-filter-group.html";
 
     private const string FilterGroup = "Shared filters";
+
+    private const string ItemHeading = "Category";
 
     private async Task<double> ChartTotalAsync()
     {
@@ -116,5 +119,58 @@ public class ChartFilterGroupTests : BrowserTest
         var saved = await Ren.SavedSettingsAsync();
 
         Expect(saved?["dataGroupingSettings"]?.ToJsonString() ?? "{}").Not.ToContain(FilterGroup);
+    }
+
+    private async Task<JsonNode?> SettingsFileAsync() => JsonNode.Parse(
+        await Page.EvaluateAsync<string>("() => window.Ren.ReportSerializer.serializeReportSettings()")
+    );
+
+    private async Task<JsonNode?> SettingsFileWithStructuresFilteredOutAsync(bool isMarked)
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await FilterModule.ClickNodeCheckboxAsync(Ren, null, "Structures");
+        await Ren.WaitUntilLoadedAsync();
+
+        if (isMarked)
+        {
+            await FilterModule.CycleIncludeWhenSavingAsync(Ren, ItemHeading);
+        }
+
+        return await SettingsFileAsync();
+    }
+
+    // Nothing renders the group's settings, so its filters are all there is of them to keep.
+    [TestMethod("SettingsFile_FilterGroupHasNoGridAndFilterMarked_KeepsOnlyTheFilter")]
+    public async Task SettingsFile_FilterGroupHasNoGridAndFilterMarked_KeepsOnlyTheFilter()
+    {
+        var saved = await SettingsFileWithStructuresFilteredOutAsync(true);
+
+        var groupSettings = saved?["dataGroupingSettings"]?[FilterGroup]?.AsObject();
+
+        Expect(string.Join(",", groupSettings?.Select(property => property.Key) ?? [])).ToBe("dataRows");
+        Expect(groupSettings?["dataRows"]?["filterSet"]?.ToJsonString() ?? "").ToContain("Castings");
+    }
+
+    [TestMethod("SettingsFile_FilterGroupHasNoGridAndFilterUnmarked_LeavesOutTheGroup")]
+    public async Task SettingsFile_FilterGroupHasNoGridAndFilterUnmarked_LeavesOutTheGroup()
+    {
+        var saved = await SettingsFileWithStructuresFilteredOutAsync(false);
+
+        Expect(saved?["dataGroupingSettings"]?.ToJsonString() ?? "{}").Not.ToContain(FilterGroup);
+    }
+
+    [TestMethod("Reload_FilterGroupHasNoGridAndFilterMarked_RestoresTheFilter")]
+    public async Task Reload_FilterGroupHasNoGridAndFilterMarked_RestoresTheFilter()
+    {
+        await Ren.OpenAsync(Fixture);
+        var unfilteredTotal = await ChartTotalAsync();
+
+        var saved = await SettingsFileWithStructuresFilteredOutAsync(true);
+        await Ren.OpenWithSettingsAsync(Fixture, saved);
+
+        await Poll(() => FilterModule.IsNodeCheckedAsync(Ren, null, "Castings")).ToBe(true);
+        Expect(await FilterModule.IsNodeCheckedAsync(Ren, null, "Structures")).ToBe(false);
+        Expect(await ChartTotalAsync()).ToBeLessThan(unfilteredTotal);
     }
 }

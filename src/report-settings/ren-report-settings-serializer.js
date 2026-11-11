@@ -48,6 +48,8 @@ Ren.ReportSerializer = (() => {
 
             if (vis.dataGroupingSettingsGroup === key || vis.gridStateGroup === key) return true;
 
+            if (vis.filterGroup === key) return true;
+
             if (vis.visualisationTypeName === "GridSet" && vis.instance?.dataGroupingSettings) {
 
                 const isGridSettingsGroup = vis.instance.dataGroupingSettings.some(
@@ -63,6 +65,45 @@ Ren.ReportSerializer = (() => {
 
             return false;
         });
+    };
+
+    /**
+     * Sets the settings of each filterGroup that no grid owns to just its filters as they stand on
+     * the page, as nothing renders the rest.
+     */
+    const setFilterGroupOnlySettings = (allDataGroupingSettings, visualisations) => {
+
+        const entries = Ren.DataGroupingSettingsCollection.entries;
+
+        for (let i = 0; i < entries.length; i++) {
+
+            const settings = entries[i];
+
+            if (!settings.isFilterGroupOnly || settings.isDestroyed) continue;
+
+            const settingsGroup = settings.dataGroupingSettingsGroup;
+            const visualisation = visualisations.find(
+                vis => vis.filterGroup === settingsGroup && !vis.excludeFromSerialization
+            );
+
+            if (!visualisation) continue;
+
+            allDataGroupingSettings[settingsGroup] = {};
+
+            if (!settings.dataRows?.filterSet) continue;
+
+            const tabularData =
+                Ren.DataSources.cloneTabularDataAndApplyTransformationsForVisualisation(
+                    visualisation
+                );
+
+            if (tabularData == null) continue;
+
+            const filterSet = Ren.DataGroupingSettingsTransformer.transform(tabularData, settings)
+                .dataRows?.filterSet;
+
+            if (filterSet) allDataGroupingSettings[settingsGroup].dataRows = { filterSet };
+        }
     };
 
     /**
@@ -123,6 +164,8 @@ Ren.ReportSerializer = (() => {
             reportSettings.gridState,
             Ren.ReportSettings_GridStateCollection.allGridState
         );
+
+        setFilterGroupOnlySettings(reportSettings.dataGroupingSettings, visualisations);
 
         if (Ren.GlobalReportSettingsCollection) {
 
@@ -219,6 +262,9 @@ Ren.ReportSerializer = (() => {
 
             reportSettings.dataGroupingSettings = Ren.ReportSettings_IncludedFilters
                 .withoutUnmarkedFilters(reportSettings.dataGroupingSettings);
+
+            // A filterGroup's settings hold only filters, so are empty where none was marked.
+            Ren.ObjectUtils.deleteAllEmptyObjects(reportSettings.dataGroupingSettings);
         }
 
         return Ren.JsonUtils.serialize(reportSettings, 4);
