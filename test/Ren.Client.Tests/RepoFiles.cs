@@ -19,6 +19,14 @@ internal static partial class RepoFiles
         !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("REN_TEST_MINIFIED"));
 
     /// <summary>
+    /// Gets whether to trace each browser test, keeping the traces of those that fail, as
+    /// REN_TEST_TRACE=1 asks.  It's off by default, as tracing every test slows a full run enough
+    /// for tests to time out on a busy machine.
+    /// </summary>
+    public static bool TestTraced =>
+        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("REN_TEST_TRACE"));
+
+    /// <summary>
     /// Gets the built file under test, as a path from the repo's root.
     /// </summary>
     public static string BuiltScript => TestMinified ? "/dist/ren.min.js" : "/dist/ren.js";

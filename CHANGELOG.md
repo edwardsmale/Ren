@@ -7,7 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Add diagnostic code for flaky test.
-Keep a Playwright trace of each failed browser test.
+Keep a Playwright trace of each failed browser test when REN_TEST_TRACE=1 (as on CI), as tracing every test made full local runs time out.
 Avoid chart jumping when filter summary appears.
 Update README.
 Fix pie labels outside the pies disappearing when the pies are close together or their charts narrow.

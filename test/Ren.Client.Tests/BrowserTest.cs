@@ -35,7 +35,7 @@ public abstract partial class BrowserTest
         RepoFiles.AssertBuilt();
 
         Context = await TestBrowser.NewContextAsync(ContextOptions);
-        await Context.Tracing.StartAsync(new() { Screenshots = true, Snapshots = true });
+        if (RepoFiles.TestTraced) await Context.Tracing.StartAsync(new() { Screenshots = true, Snapshots = true });
         Page = await Context.NewPageAsync();
         Page.PageError += (_, error) => pageErrors.Add(error);
         Ren = new RenContext(Page);
@@ -55,20 +55,21 @@ public abstract partial class BrowserTest
         {
             if (Context != null)
             {
-                await SaveTraceIfFailedAsync();
+                if (RepoFiles.TestTraced) await SaveTraceIfFailedAsync();
                 await Context.CloseAsync();
             }
         }
     }
 
     /// <summary>
-    /// The folder a failed test's trace is saved to, which CI keeps when a run fails.  Open a trace
+    /// The folder a failed test's trace is saved to when REN_TEST_TRACE=1 (as on CI, which keeps
+    /// the traces when a run fails).  Open a trace
     /// with "pwsh test/Ren.Client.Tests/bin/Debug/net8.0/playwright.ps1 show-trace &lt;file&gt;", or at
     /// trace.playwright.dev.
     /// </summary>
     public static string TracesFolder => Path.Combine(RepoFiles.Root, "TestResults", "traces");
 
-    // Every test is traced, and the trace kept only if it failed.
+    // With tracing on, every test is traced, and the trace kept only if it failed.
     private async Task SaveTraceIfFailedAsync()
     {
         try
