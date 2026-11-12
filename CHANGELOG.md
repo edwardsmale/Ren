@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.1.9 (2026-11-12)
 
 Add diagnostic code for flaky test.
 Keep a Playwright trace of each failed browser test when REN_TEST_TRACE=1 (as on CI), as tracing every test made full local runs time out.
