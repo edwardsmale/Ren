@@ -625,8 +625,42 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
         const rules = Subdivisions.buildStyles({});
         const markRule = rules.find(rule => rule.startsWith("." + Subdivisions.BAR_MARK_CLASS));
 
-        expect(markRule).toContain("fill: transparent");
+        expect(markRule).toContain("fill: var(--ren-subdivision-shade, transparent)");
         expect(markRule).toContain("stroke: none");
+    });
+
+    test("getBandShade_OneBand_LeftInTheSeriesColour", () => {
+
+        expect(Subdivisions.getBandShade(0, 1)).toBeNull();
+    });
+
+    test("getBandShade_TwoBands_DarkestThenLightest", () => {
+
+        expect(Subdivisions.getBandShade(0, 2)).toBe("rgba(0, 0, 0, 0.2)");
+        expect(Subdivisions.getBandShade(1, 2)).toBe("rgba(255, 255, 255, 0.26)");
+    });
+
+    test("getBandShade_ThreeBands_DarkestLightestThenTheColourItself", () => {
+
+        expect(Subdivisions.getBandShade(0, 3)).toBe("rgba(0, 0, 0, 0.2)");
+        expect(Subdivisions.getBandShade(1, 3)).toBe("rgba(255, 255, 255, 0.26)");
+        expect(Subdivisions.getBandShade(2, 3)).toBeNull();
+    });
+
+    test("getBandShade_ManyBands_NeighboursAlternateDarkerAndLighter", () => {
+
+        const count = Subdivisions.MAX_SUBDIVISIONS;
+        const shades = [];
+
+        for (let i = 0; i < count; i++) shades.push(Subdivisions.getBandShade(i, count));
+
+        for (let i = 0; i < count; i++) {
+            expect(shades[i].startsWith(i % 2 === 0 ? "rgba(0," : "rgba(255,")).toBe(true);
+        }
+
+        expect(shades[0]).toBe("rgba(0, 0, 0, 0.2)");
+        expect(shades[count - 1]).toBe("rgba(255, 255, 255, 0.26)");
+        expect(new Set(shades).size).toBe(count);
     });
 
     test("buildStyles_BarChart_GroovesDarkCreaseAndLightHighlight", () => {

@@ -292,7 +292,8 @@ public class DateValueChartSubdivisionsTests : BrowserTest
             """);
 
         Expect(style.Stroke).ToBe("none");
-        Expect(style.Fill).ToBe("rgba(0, 0, 0, 0)");
+        // The largest band is washed a little darker than its bar, the rest lighter in turn.
+        Expect(style.Fill).ToMatch(new Regex(@"^rgba\(0, 0, 0, 0\.\d+\)$"));
 
         // A groove runs between each pair of neighbouring bands, a dark crease with a highlight a
         // pixel below it, and leaves clicks to the bands beneath it.

@@ -1,10 +1,13 @@
 /**
  * Subdivides a date/value chart's bars and pie slices by a further column, each value of it a band
- * of the bar or slice, in the series' colour, with narrow grooves between them. The bars and slices
- * are drawn as ever, with the bands and grooves over them, so their colours, tooltips and menus
- * carry on working and the bands always fill them exactly. A band's size is its share of the bar or
- * slice, which for an aggregation that doesn't add up, such as an average, is only a share of the
- * bands' total.
+ * of the bar or slice, in a subtly lighter or darker shade of the series' colour, with narrow grooves
+ * between them.  Neighbouring bands take shades from opposite ends of the range, so each stands out
+ * from those beside it.  The bars and slices are drawn as ever, with the bands and grooves over
+ * them, so their colours, tooltips and menus carry on working and the bands always fill them
+ * exactly.  A band's shade is a translucent wash of black or white over its bar or slice, so it
+ * follows the colour drawn beneath it, however that is filtered, highlighted or faded.  A band's
+ * size is its share of the bar or slice, which for an aggregation that doesn't add up, such as an
+ * average, is only a share of the bands' total.
  *
  * Bands are left out where a transform has changed what a bar's height means, and for an "Other"
  * series, as it has no rows of its own.
@@ -62,6 +65,17 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
     // How much darker a groove's crease is than its series' colour, and its highlight lighter, in
     // CIELAB lightness (out of 100).
     const GROOVE_LIGHTNESS_SHIFT = 16;
+
+    // A bar's or slice's bands are shaded at levels spread evenly from darker than its colour to
+    // lighter, taken in turn from the darker and the lighter half, so that neighbouring bands
+    // differ by about half the range however many there are.  The darkest and lightest are washed
+    // with these opacities of black and white, which keeps even them closer to their own series'
+    // colour than to another's.
+    const MAX_DARKENING_OPACITY = 0.2;
+    const MAX_LIGHTENING_OPACITY = 0.26;
+
+    // The custom property holding a band's shade, which the rule for the bands fills them with.
+    const SHADE_PROPERTY = "--ren-subdivision-shade";
 
     // A light series colour takes dark labels.
     const MAX_WHITE_LABEL_BRIGHTNESS = 160;
@@ -402,9 +416,35 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
             + `${subdivision.label}: ${value} (${share})`;
     };
 
-    const appendMark = (props, parentNode, className, pathData, context, subdivision) => {
+    /**
+     * Gets the translucent wash shading the band at an index of a bar's or slice's bands, or null
+     * for a band left in the colour itself.  The levels, from -1 (darkest) to 1 (lightest), are
+     * split into a darker and a lighter half, and the bands take one from each in turn, so that
+     * the first, largest band is the darkest, the second the darkest of the lighter half, and so
+     * on.
+     */
+    const getBandShade = (index, count) => {
+
+        if (count < 2) return null;
+
+        const darkerCount = Math.ceil(count / 2);
+        const levelIndex = index % 2 === 0
+            ? index / 2
+            : darkerCount + (index - 1) / 2;
+        const level = -1 + 2 * levelIndex / (count - 1);
+
+        if (Math.abs(level) < 1e-9) return null;
+
+        return level < 0
+            ? `rgba(0, 0, 0, ${round(-level * MAX_DARKENING_OPACITY)})`
+            : `rgba(255, 255, 255, ${round(level * MAX_LIGHTENING_OPACITY)})`;
+    };
+
+    const appendMark = (props, parentNode, className, pathData, context, subdivision, shade) => {
 
         const mark = Ren.Svg.append(parentNode, "path", { "class": className, "d": pathData });
+
+        if (shade) mark.style.setProperty(SHADE_PROPERTY, shade);
 
         // The row, as a bar's own path has, for what looks up the data behind a mark clicked.
         Ren.Svg.setDatum(mark, context.row);
@@ -493,7 +533,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
                     BAR_MARK_CLASS,
                     getBarMarkPath(bar, startShare, endShare),
                     context,
-                    subdivisions[i]
+                    subdivisions[i],
+                    getBandShade(i, subdivisions.length)
                 );
 
                 addPendingLabel(props, seriesIndex, subdivisions[i], {
@@ -547,7 +588,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
                 PIE_MARK_CLASS,
                 Ren.DateValueChart_Pies.getSlicePath(startAngle, endAngle, holeRadius),
                 context,
-                subdivisions[i]
+                subdivisions[i],
+                getBandShade(i, subdivisions.length)
             );
 
             // The pie, row and title are for a label stacked around the pie (see takeAroundLabels).
@@ -1009,9 +1051,9 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
     };
 
     /**
-     * Gets the rules styling every band, groove and label.  A band's fill is kept transparent even
-     * from the rules that colour a selected bar's paths, which would hide the bands of a selected
-     * bar.  The grooves are given shades of their series' colour by buildColourStyles, and until
+     * Gets the rules styling every band, groove and label.  A band is filled only with its shade,
+     * or kept transparent, even against the rules that colour a selected bar's paths, which would
+     * hide the bands of a selected bar.  The grooves are given shades of their series' colour by buildColourStyles, and until
      * then are translucent black and white.  A bar's grooves run level, so are kept sharp on whole
      * pixels.
      */
@@ -1022,7 +1064,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
             : props.seriesNamesInBarsFontSize
                 ?? Ren.DateValueChart_StyleUpdater.defaultLabelFontSizes.seriesNamesInBars;
 
-        const markDeclarations = "{ fill: transparent !important; stroke: none }";
+        const markDeclarations =
+            `{ fill: var(${SHADE_PROPERTY}, transparent) !important; stroke: none }`;
         const grooveDeclarations = "fill: none !important; pointer-events: none; "
             + "vector-effect: non-scaling-stroke; stroke-linecap: butt; stroke-width: 1px";
 
@@ -1074,6 +1117,7 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         getLabelPlacement,
         areLabelsAround,
         getSubdivisions,
+        getBandShade,
         getMarkSubdivision,
         setMarkSubdivision,
         takeAroundLabels,
