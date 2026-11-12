@@ -37,8 +37,6 @@ jobs:
 
       - name: Build and test
         run: dotnet run --project build/Ren.Build -- ci
-        env:
-          REN_TEST_TRACE: "1"
 
       # A trace of each browser test that failed, to open in Playwright's trace viewer.
       - name: Keep the failed tests' traces

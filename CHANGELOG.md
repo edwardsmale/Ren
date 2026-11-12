@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Stop tracing browser tests on CI too, as it nearly doubled the tests' time there.  Set REN_TEST_TRACE=1 to trace them.
+
 ## 1.1.9 (2026-11-12)
 
 Add diagnostic code for flaky test.
