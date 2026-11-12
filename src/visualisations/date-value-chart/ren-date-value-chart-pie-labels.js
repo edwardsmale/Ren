@@ -68,6 +68,15 @@ Ren.DateValueChart_PieLabels = (() => {
     const MIN_SHRUNK_RADIUS_SHARE = 0.5;
     const CALLOUT_SPACING_PX = 1;
 
+    // The pies are shrunk by up to MAX_FIT_SHRINK of their radius, in FIT_SHRINK_STEPS steps,
+    // where that brings the labels stacked beside them nearer level with their slices: to within
+    // FIT_ALLOWED_DISPLACEMENT_EMS of it, or as near as any shrink does, give or take
+    // FIT_TOLERANCE_EMS (see fitStackedLabels).
+    const MAX_FIT_SHRINK = 0.15;
+    const FIT_SHRINK_STEPS = 6;
+    const FIT_ALLOWED_DISPLACEMENT_EMS = 1.5;
+    const FIT_TOLERANCE_EMS = 0.5;
+
     const ELLIPSIS = "…";
 
     const LINE_HEIGHT_EMS = 1.15;
@@ -564,10 +573,130 @@ Ren.DateValueChart_PieLabels = (() => {
     };
 
     /**
-     * Gets the radius the pies are drawn at, in screen pixels, given their widest, which is
-     * narrowed to leave room either side for the columns of labels around them.
+     * Gets how far, at most, any label stacked beside the pies is from level with its connector's
+     * bend, were the pies drawn at a radius, in a plot of a height.  The labels' heights are
+     * estimated from their lines, so that the answer doesn't change once they're measured.
      */
-    const getRadiusPx = (props, widestRadiusPx, periodWidthPx) => {
+    const getStackedDisplacementPx = (props, labels, radiusPx, plotHeightPx) => {
+
+        const lineHeightPx = getFontSizePx(props) * LINE_HEIGHT_EMS;
+        const centreY = plotHeightPx / 2;
+        const columns = new Map();
+
+        for (let i = 0; i < labels.length; i++) {
+
+            const label = labels[i];
+            const angle = (label.slice.startAngle + label.slice.endAngle) / 2;
+            const key = label.pie;
+            const side = Math.sin(angle) >= 0 ? 1 : 0;
+
+            if (!columns.has(key)) columns.set(key, [[], []]);
+
+            columns.get(key)[side].push({
+                slice: label.slice,
+                elbowY: centreY - Math.cos(angle) * (radiusPx + CALLOUT_ELBOW_PX),
+                size: { height: (label.lines.length + 0.1) * lineHeightPx }
+            });
+        }
+
+        const result = { hidden: 0 };
+        let displacementPx = 0;
+
+        columns.forEach(sides => {
+
+            for (let s = 0; s < sides.length; s++) {
+
+                const stacked = stackColumn(sides[s], plotHeightPx, result);
+
+                for (let i = 0; i < stacked.length; i++) {
+
+                    displacementPx = Math.max(
+                        displacementPx,
+                        Math.abs(stacked[i].centreY - stacked[i].elbowY)
+                    );
+                }
+            }
+        });
+
+        return displacementPx;
+    };
+
+    /**
+     * Shrinks the pies, by as small a fraction as does it, where that lets the labels stacked
+     * beside them sit nearer level with their slices: where there are more of them near the top
+     * or the foot of a pie than fit beside it there, so that they are spread further round it,
+     * beside slices not their own.  Every pie shrinks alike, by what the most crowded needs, and
+     * by no more than MAX_FIT_SHRINK of its radius.
+     */
+    const fitStackedLabels = (props, radiusPx, plotHeightPx) => {
+
+        if (!(plotHeightPx > 0) || !(radiusPx > 0)) return radiusPx;
+
+        const isStacked = isStackedPlacement(getPlacement(props));
+        const labels = (props.pieLabelNodes || []).filter(label =>
+            (isStacked || label.isSubdivision)
+            && (label.isSubdivision
+                || props.series?.[label.slice.seriesIndex]?.showValueLabels !== false));
+
+        if (labels.length < 2) return radiusPx;
+
+        const cache = props.pieRadiusFit;
+        const key = `${radiusPx}|${plotHeightPx}|${getFontSizePx(props)}|${labels.length}`;
+
+        if (cache && cache.labels === props.pieLabelNodes && cache.key === key) {
+            return cache.radiusPx;
+        }
+
+        const displacements = [];
+        let leastPx = Infinity;
+
+        for (let step = 0; step <= FIT_SHRINK_STEPS; step++) {
+
+            const candidatePx = radiusPx * (1 - MAX_FIT_SHRINK * step / FIT_SHRINK_STEPS);
+            const displacementPx =
+                getStackedDisplacementPx(props, labels, candidatePx, plotHeightPx);
+
+            displacements.push({ radiusPx: candidatePx, displacementPx });
+            leastPx = Math.min(leastPx, displacementPx);
+        }
+
+        // The least shrinking that brings the labels about as near their slices as any does, or
+        // near enough, a shrink that gains them only a few pixels not being worth having.
+        const fontSizePx = getFontSizePx(props);
+        const acceptablePx = Math.max(leastPx, fontSizePx * FIT_ALLOWED_DISPLACEMENT_EMS)
+            + fontSizePx * FIT_TOLERANCE_EMS;
+        let fittedPx = radiusPx;
+
+        for (let i = 0; i < displacements.length; i++) {
+
+            if (displacements[i].displacementPx <= acceptablePx) {
+
+                fittedPx = displacements[i].radiusPx;
+                break;
+            }
+        }
+
+        props.pieRadiusFit = { labels: props.pieLabelNodes, key, radiusPx: fittedPx };
+
+        return fittedPx;
+    };
+
+    /**
+     * Gets the radius the pies are drawn at, in screen pixels, given their widest, which is
+     * narrowed to leave room either side for the columns of labels around them, and shrunk a
+     * little further where that keeps the labels nearer their slices (see fitStackedLabels).
+     */
+    const getRadiusPx = (props, widestRadiusPx, periodWidthPx, plotHeightPx) => fitStackedLabels(
+        props,
+        getColumnRadiusPx(props, widestRadiusPx, periodWidthPx),
+        plotHeightPx
+    );
+
+    /**
+     * Gets the radius the pies are drawn at, in screen pixels, given their widest, narrowed to
+     * leave room either side for the columns of labels around them.
+     */
+    const getColumnRadiusPx = (props, widestRadiusPx, periodWidthPx) => {
 
         const calloutWidthPx = props.pieCalloutWidthPx || 0;
 
@@ -859,8 +988,9 @@ Ren.DateValueChart_PieLabels = (() => {
 
     /**
      * Stacks the labels on one side of one pie in a column, each as near level with where its
-     * connector bends as the others let it be.  Where they cannot all be stacked in the plot's
-     * height, the smallest slices' are dropped.  Gets the labels kept, each with its centreY.
+     * connector bends as the others let it be, a crowd of them spread above and below their
+     * bends.  Where they cannot all be stacked in the plot's height, the smallest slices' are
+     * dropped.  Gets the labels kept, each with its centreY.
      */
     const stackColumn = (labels, plotHeightPx, result) => {
 
@@ -898,8 +1028,58 @@ Ren.DateValueChart_PieLabels = (() => {
 
         const getSpacing = (a, b) => (a.size.height + b.size.height) / 2 + CALLOUT_SPACING_PX;
 
-        // Pushed down clear of the label above, then back up clear of the plot's foot and the
-        // label below, then down clear of its top.
+        // Labels that would overlap are gathered into blocks, each as near level with its
+        // labels' bends as it can be, so that a crowd of them spreads up as well as down, rather
+        // than every label after the first being pushed down, further and further from its slice.
+        const blocks = [];
+
+        for (let i = 0; i < stacked.length; i++) {
+
+            const label = stacked[i];
+            let block = {
+                labels: [label],
+                height: label.size.height,
+                targetTopSum: label.elbowY - label.size.height / 2
+            };
+
+            while (blocks.length) {
+
+                const previous = blocks[blocks.length - 1];
+                const previousTop = previous.targetTopSum / previous.labels.length;
+                const top = block.targetTopSum / block.labels.length;
+
+                if (previousTop + previous.height + CALLOUT_SPACING_PX <= top) break;
+
+                const shift = previous.height + CALLOUT_SPACING_PX;
+
+                block = {
+                    labels: previous.labels.concat(block.labels),
+                    height: shift + block.height,
+                    targetTopSum: previous.targetTopSum + block.targetTopSum
+                        - shift * block.labels.length
+                };
+
+                blocks.pop();
+            }
+
+            blocks.push(block);
+        }
+
+        for (let b = 0; b < blocks.length; b++) {
+
+            let y = blocks[b].targetTopSum / blocks[b].labels.length;
+
+            for (let i = 0; i < blocks[b].labels.length; i++) {
+
+                const label = blocks[b].labels[i];
+
+                label.centreY = y + label.size.height / 2;
+                y += label.size.height + CALLOUT_SPACING_PX;
+            }
+        }
+
+        // Pushed down clear of the plot's top and the label above, then back up clear of the
+        // plot's foot and the label below, then down clear of its top.
         for (let i = 0; i < stacked.length; i++) {
 
             const label = stacked[i];
@@ -907,7 +1087,7 @@ Ren.DateValueChart_PieLabels = (() => {
                 ? label.size.height / 2
                 : stacked[i - 1].centreY + getSpacing(stacked[i - 1], label);
 
-            label.centreY = Math.max(label.elbowY, minY);
+            label.centreY = Math.max(label.centreY, minY);
         }
 
         const last = stacked[stacked.length - 1];
@@ -984,9 +1164,11 @@ Ren.DateValueChart_PieLabels = (() => {
 
             const box = placedBoxes[i];
 
-            if (box.bottom + LABEL_PADDING_PX <= top || box.top - LABEL_PADDING_PX >= bottom) {
-                continue;
-            }
+            // Only a label it would run into is in its way, not one stacked just above or below
+            // it in the same column, CALLOUT_SPACING_PX apart, as one nearer the pie's middle is
+            // further out from its centre, so would otherwise be taken to block the one beside
+            // it nearer the top or foot, leaving that label shortened or hidden.
+            if (box.bottom <= top || box.top >= bottom) continue;
 
             const nearSideX = direction > 0 ? box.left : box.right;
             const farSideX = direction > 0 ? box.right : box.left;

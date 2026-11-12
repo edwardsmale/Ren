@@ -258,6 +258,8 @@ Ren.FilterModule_HierarchyView = (s) => {
         const headingElement = reify("FilterModuleItemHeading")
             ._textContent(columnInfo.resolveHeading(topHeadingItem));
 
+        view.applyFilterHeadingTooltip(headingElement, leafColumn.columnIdOrHeading);
+
         const buildHeadingMenuItems = () => {
 
             const editHeadingItem = {

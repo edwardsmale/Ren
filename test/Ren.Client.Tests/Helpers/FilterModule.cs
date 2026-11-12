@@ -670,6 +670,27 @@ public static class FilterModule
         ChooseFromItemHeadingMenuAsync(ren, itemHeading, "#filter-module-view", viewMenuItemSelector);
 
     /// <summary>
+    /// Sets an item's heading tooltip through "Filter heading tooltip..." in its "View settings"
+    /// submenu.  An empty tooltip clears it.
+    /// </summary>
+    public static async Task SetFilterHeadingTooltipAsync(RenContext ren, string itemHeading, string filterHeadingTooltip)
+    {
+        await ShowItemHeadingMenuAsync(ren, itemHeading);
+        await ren.Root.MouseOverAsync("#filter-module-view");
+        await CompleteTextEditAsync(ren, "#filter-module-filter-heading-tooltip", filterHeadingTooltip);
+    }
+
+    /// <summary>
+    /// Gets the tooltip on an item's heading, or null where it has none.
+    /// </summary>
+    public static Task<string?> FilterHeadingTooltipAsync(RenContext ren, string itemHeading) =>
+        EvaluateAsync<string?>(ren, """
+            (finders, heading) => finders.findItem(heading)
+                ?.querySelector(".ren-filter-module__item-heading")
+                ?.getAttribute("title") ?? null
+            """, itemHeading);
+
+    /// <summary>
     /// Clicks "Flip sort order" on an item's heading menu.
     /// </summary>
     public static Task FlipSortOrderAsync(RenContext ren, string itemHeading) =>

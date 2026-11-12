@@ -14,6 +14,7 @@ Fix pie labels outside the pies disappearing when the pies are close together or
 Keep the build watcher running when a build fails or files are locked.
 Improve display of Boolean filters in filter summaries.
 Shade the bands of a subdivided bar or pie slice alternately a little darker and lighter, so neighbouring bands stand out from each other.
+Improve pie label positioning.
 
 ## 1.1.8 (2026-11-11)
 

@@ -147,6 +147,10 @@ Ren.FilterModule_Settings = (s) => {
     const showHeadingInBold = (columnIdOrHeading) =>
         columnOverrides[columnIdOrHeading]?.showHeadingInBold !== false;
 
+    // Gets the tooltip shown on hovering the item's heading, or "" for none.
+    const getFilterHeadingTooltip = (columnIdOrHeading) =>
+        columnOverrides[columnIdOrHeading]?.filterHeadingTooltip ?? "";
+
     // Gets how a hierarchy's tree is expanded when first shown, keyed on its leaf column (see
     // INITIAL_EXPANSION_OPTIONS).
     const getInitialExpansion = (leafColumnIdOrHeading) =>
@@ -745,6 +749,7 @@ Ren.FilterModule_Settings = (s) => {
         showHeadingInBold,
         setShowHeadingInBold,
         toggleShowHeadingInBold,
+        getFilterHeadingTooltip,
         getInitialExpansion,
         setInitialExpansion,
         getShowAsCheckbox,

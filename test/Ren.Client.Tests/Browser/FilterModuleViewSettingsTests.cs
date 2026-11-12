@@ -162,4 +162,20 @@ public class FilterModuleViewSettingsTests : BrowserTest
         await Expect(Ren.Root.Locator(".ren-filter-module__empty")).ToHaveCountAsync(0);
         Expect(await FilterModule.ItemExistsAsync(Ren, "Category")).ToBe(true);
     }
+
+    [TestMethod("FilterHeadingTooltip_SetThenCleared_ShowsThenRemovesTheHeadingsTooltip")]
+    public async Task FilterHeadingTooltip_SetThenCleared_ShowsThenRemovesTheHeadingsTooltip()
+    {
+        await OpenWithCategoryItemAsync("FilterModuleTest11");
+
+        Expect(await FilterModule.FilterHeadingTooltipAsync(Ren, "Category")).ToBe(null);
+
+        await FilterModule.SetFilterHeadingTooltipAsync(Ren, "Category", "Product category");
+
+        Expect(await FilterModule.FilterHeadingTooltipAsync(Ren, "Category")).ToBe("Product category");
+
+        await FilterModule.SetFilterHeadingTooltipAsync(Ren, "Category", "");
+
+        Expect(await FilterModule.FilterHeadingTooltipAsync(Ren, "Category")).ToBe(null);
+    }
 }

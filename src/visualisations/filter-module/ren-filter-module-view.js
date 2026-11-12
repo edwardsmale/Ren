@@ -215,6 +215,14 @@ Ren.FilterModule_View = (s) => {
         return removeButton;
     };
 
+    // Gives the heading any tooltip set through "Filter heading tooltip..." in its view settings.
+    const applyFilterHeadingTooltip = (headingElement, columnIdOrHeading) => {
+
+        const filterHeadingTooltip = itemSettings.getFilterHeadingTooltip(columnIdOrHeading);
+
+        if (filterHeadingTooltip) headingElement.title = filterHeadingTooltip;
+    };
+
     const buildHeadingRow = (headingElement, item, itemLinks) => {
 
         const headingRow = Ren.HtmlUtils.create("div")
@@ -627,6 +635,8 @@ Ren.FilterModule_View = (s) => {
             ._addClass("ren-filter-module__item-heading", "qa-ren-filter-module-item-heading")
             ._textContent(columnInfo.resolveHeading(item));
 
+        applyFilterHeadingTooltip(headingElement, item.columnIdOrHeading);
+
         const checkboxLabel = Ren.HtmlUtils.create("label")
             ._addClass("ren-filter-module__option", "ren-filter-module__checkbox-heading")
             ._append(input, headingElement);
@@ -768,6 +778,8 @@ Ren.FilterModule_View = (s) => {
         const headingElement = Ren.HtmlUtils.create("div")
             ._addClass("ren-filter-module__item-heading", "qa-ren-filter-module-item-heading")
             ._textContent(columnInfo.resolveHeading(item));
+
+        applyFilterHeadingTooltip(headingElement, item.columnIdOrHeading);
 
         const buildHeadingMenuItems = () => {
 
@@ -1210,6 +1222,7 @@ Ren.FilterModule_View = (s) => {
         render,
         syncCheckboxes,
         buildHeadingRow,
+        applyFilterHeadingTooltip,
         buildAllRow,
         buildCompareStrips,
         decorateItemForWidthResize,

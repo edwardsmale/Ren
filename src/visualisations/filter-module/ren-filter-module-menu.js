@@ -76,6 +76,20 @@ Ren.FilterModule_Menu = (s) => {
         });
     };
 
+    // Keyed on a hierarchy's leaf, as the rest of the item's appearance is.
+    const openFilterHeadingTooltipEditor = (columnIdOrHeading) => {
+
+        openOverrideTextEditor({
+            title: "Filter heading tooltip",
+            label: "Tooltip shown on hovering the heading",
+            columnIdOrHeading,
+            propertyName: "filterHeadingTooltip",
+            defaultText: "",
+            initialText: itemSettings.getFilterHeadingTooltip(columnIdOrHeading),
+            onChanged: () => view.render()
+        });
+    };
+
     const openAllLabelEditor = (item, allTextElement, optionCount) => {
 
         const defaultLabel = columnInfo.getDefaultAllLabel(optionCount);
@@ -340,6 +354,14 @@ Ren.FilterModule_Menu = (s) => {
                 id: "filter-module-show-heading-in-bold",
                 ticked: () => itemSettings.showHeadingInBold(leafColumnIdOrHeading),
                 action: () => itemSettings.toggleShowHeadingInBold(leafColumnIdOrHeading)
+            },
+            Ren.MENU_SEPARATOR,
+            {
+                text: "Filter heading tooltip...",
+                id: "filter-module-filter-heading-tooltip",
+                title: "Sets the tooltip shown on hovering the item's heading",
+                ticked: () => itemSettings.getFilterHeadingTooltip(leafColumnIdOrHeading) !== "",
+                action: () => openFilterHeadingTooltipEditor(leafColumnIdOrHeading)
             }
         ];
 

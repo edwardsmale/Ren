@@ -40,7 +40,12 @@ Ren.DateValueChart_Pies = (() => {
         const periodWidthPx = (props.piePeriodWidth ?? props.innerWidth) * scaleX;
         const widestRadiusPx = PIE_SPAN / 2 * Math.min(periodWidthPx, props.innerHeight * scaleY);
 
-        return Ren.DateValueChart_PieLabels.getRadiusPx(props, widestRadiusPx, periodWidthPx);
+        return Ren.DateValueChart_PieLabels.getRadiusPx(
+            props,
+            widestRadiusPx,
+            periodWidthPx,
+            props.innerHeight * scaleY
+        );
     };
 
     const round = (value) => Math.round(value * 100) / 100;

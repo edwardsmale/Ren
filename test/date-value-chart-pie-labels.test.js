@@ -344,6 +344,53 @@ describe("Ren.DateValueChart_PieLabels", () => {
         expect(PieLabels.isBoxInSlice(box, centre, wholeSlice, 0, 100)).toBe(true);
     });
 
+    describe("getRadiusPx fitting stacked labels", () => {
+
+        const twoDegrees = Math.PI / 90;
+
+        // Two-line labels, Outside, for slices of a pie in a 400px-high plot.
+        const fitProps = (angles) => {
+
+            const pie = {};
+            const pieLabelNodes = angles.map((angle, i) => ({
+                pie,
+                slice: { seriesIndex: i, share: 0.01, startAngle: angle, endAngle: angle },
+                lines: ["Name", "£1k"]
+            }));
+
+            return {
+                pieLabels: "outside",
+                series: angles.map(() => ({})),
+                pieLabelNodes
+            };
+        };
+
+        test("getRadiusPx_CrowdOfLabelsNearTop_PieShrunkAFraction", () => {
+
+            // Six slices just left of 12 o'clock, their labels needing far more height than
+            // their bends span, with no room above the pie for them to spread into.
+            const props = fitProps([1, 2, 3, 4, 5, 6].map(i => Math.PI * 2 - i * twoDegrees));
+            const radiusPx = PieLabels.getRadiusPx(props, 180, 1000, 400);
+
+            expect(radiusPx).toBeLessThan(180);
+            expect(radiusPx).toBeGreaterThanOrEqual(180 * 0.85 - 1e-9);
+        });
+
+        test("getRadiusPx_LabelsSpreadRound_NotShrunk", () => {
+
+            const props = fitProps([0.5, 1.5, 2.5, 3.5, 4.5, 5.5]);
+
+            expect(PieLabels.getRadiusPx(props, 180, 1000, 400)).toBe(180);
+        });
+
+        test("getRadiusPx_NoPlotHeight_NotShrunk", () => {
+
+            const props = fitProps([1, 2, 3, 4, 5, 6].map(i => Math.PI * 2 - i * twoDegrees));
+
+            expect(PieLabels.getRadiusPx(props, 180, 1000)).toBe(180);
+        });
+    });
+
     describe("getHuggingEdgeX", () => {
 
         // Two pies of radius 100, 300px apart, in a 600px-wide plot with 20px margins.
@@ -390,6 +437,16 @@ describe("Ren.DateValueChart_PieLabels", () => {
         test("getHuggingEdgeX_LabelPlacedAboveIt_Ignored", () => {
 
             const placed = [{ left: 250, right: 300, top: 0, bottom: 30 }];
+
+            expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 50), 340, -1, 100, placed))
+                .toBe(150 + Math.sqrt(112 * 112 - 90 * 90));
+        });
+
+        test("getHuggingEdgeX_LabelStackedJustBelowIt_Ignored", () => {
+
+            // Stacked 1px below the label, which spans 40 to 60, and further out, as one nearer
+            // the pie's middle is.
+            const placed = [{ left: 200, right: 340, top: 61, bottom: 81 }];
 
             expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 50), 340, -1, 100, placed))
                 .toBe(150 + Math.sqrt(112 * 112 - 90 * 90));
