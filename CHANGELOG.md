@@ -6,6 +6,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 
 ## Unreleased
 
+Retry minifying for a few seconds when another process briefly has the minified file open, rather than failing the build.
 Fix cross filter chips covering the focus mode button in popped-in windows, so it can't be clicked.
 Stop tracing browser tests on CI too, as it nearly doubled the tests' time there.  Set REN_TEST_TRACE=1 to trace them.
 
