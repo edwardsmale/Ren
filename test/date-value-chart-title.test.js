@@ -154,6 +154,33 @@ describe("Ren.DateValueChart_Title", () => {
                 .toBe("Category: Paper; Gel Pens");
         });
 
+        test("getSubtitle_FilterModuleYesOrBothCheckboxTicked_HeadingAlone", () => {
+
+            const filterModule = {
+                sourceDataGroupingSettingsGroup: "Mix",
+                columnOverrides: {
+                    "Is Core": {
+                        HeadingOverride: "Core Categories Only",
+                        showAsCheckbox: "YesOrBoth"
+                    }
+                }
+            };
+
+            spyOnFilters(
+                { "Is Core": { valueMap: new Map([["1", "1"]]), isNegated: false } },
+                [],
+                [filterModule]
+            );
+
+            Ren.DataSources.getTabularData.mockReturnValue({
+                columnResolver: { getColumnIndex: () => 0, getColumnHeading: () => "Is Core" },
+                ColumnModels: [{ ColumnFormat: Ren.SpreadsheetColumnFormatEnum.Boolean }]
+            });
+
+            expect(Title.getSubtitle({ chartSubtitle: "{filters}", visualisation }))
+                .toBe("Core Categories Only");
+        });
+
         test("getSubtitleParts_Filtered_OnlyValuesFlagged", () => {
 
             spyOnFilters({

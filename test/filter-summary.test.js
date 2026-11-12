@@ -2,7 +2,7 @@ describe("Ren.FilterSummary", () => {
 
     const Summary = Ren.FilterSummary;
 
-    const HEADINGS = ["Top-Level Category", "Sub Category", "Brand", "Sales"];
+    const HEADINGS = ["Top-Level Category", "Sub Category", "Brand", "Sales", "Core"];
 
     const tabularData = {
         Title: "Data",
@@ -14,7 +14,13 @@ describe("Ren.FilterSummary", () => {
                 return index === -1 ? null : index;
             },
             getColumnHeading: (index) => HEADINGS[index]
-        }
+        },
+        ColumnModels: HEADINGS.map(heading => ({
+            Heading: heading,
+            ColumnFormat: heading === "Core"
+                ? Ren.SpreadsheetColumnFormatEnum.Boolean
+                : Ren.SpreadsheetColumnFormatEnum.General
+        }))
     };
 
     const createColumnFilter = (values, isNegated) => ({
@@ -126,6 +132,42 @@ describe("Ren.FilterSummary", () => {
 
         const filters = createFilters({ Brand: createColumnFilter(["Acco"]) });
 
-        expect(Summary.getText(filters, tabularData, 6, { Brand: "Make" })).toBe("Make: Acco");
+        expect(Summary.getText(filters, tabularData, 6, { Brand: { heading: "Make" } }))
+            .toBe("Make: Acco");
+    });
+
+    test("getText_BooleanColumnFilter_ValuesReadAsYesAndNo", () => {
+
+        expect(Summary.getText(createFilters({ Core: createColumnFilter(["1"]) }), tabularData))
+            .toBe("Core: Yes");
+        expect(Summary.getText(createFilters({ Core: createColumnFilter([0]) }), tabularData))
+            .toBe("Core: No");
+    });
+
+    test("getText_YesOrBothCheckboxTicked_HeadingAlone", () => {
+
+        const filters = createFilters({ Core: createColumnFilter(["1"]) });
+        const itemSettings = {
+            Core: { heading: "Core Categories Only", showAsCheckbox: "YesOrBoth" }
+        };
+
+        expect(Summary.getText(filters, tabularData, 6, itemSettings))
+            .toBe("Core Categories Only");
+    });
+
+    test("getText_YesOrNoCheckboxTicked_NamesValue", () => {
+
+        const filters = createFilters({ Core: createColumnFilter(["1"]) });
+        const itemSettings = { Core: { heading: "Core only", showAsCheckbox: "YesOrNo" } };
+
+        expect(Summary.getText(filters, tabularData, 6, itemSettings)).toBe("Core only: Yes");
+    });
+
+    test("getText_NonBooleanColumnFilter_OneAndZeroKept", () => {
+
+        const filters = createFilters({ Brand: createColumnFilter(["1", "0"]) });
+        const itemSettings = { Brand: { showAsCheckbox: "YesOrBoth" } };
+
+        expect(Summary.getText(filters, tabularData, 6, itemSettings)).toBe("Brand: 1; 0");
     });
 });

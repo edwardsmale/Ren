@@ -5,7 +5,8 @@
  * branch reads as its own name.
  *
  * An entry is headed as the filter module setting it heads its item, where one is given, and
- * otherwise by its column's heading.
+ * otherwise by its column's heading.  A Boolean column's values read as Yes and No, and where its
+ * item is shown as a "Yes or both" checkbox, ticked, the entry is the heading alone.
  */
 Ren.FilterSummary = (() => {
 
@@ -22,6 +23,50 @@ Ren.FilterSummary = (() => {
     };
 
     const getValueLabel = (value) => String(Ren.ValueDisplayLabel(value ?? Ren.NullSentinel));
+
+    const isYesValue = (value) => {
+
+        const text = String(value).toLowerCase();
+
+        return text === "1" || text === "true";
+    };
+
+    const isNoValue = (value) => {
+
+        const text = String(value).toLowerCase();
+
+        return text === "0" || text === "false";
+    };
+
+    const getBooleanValueLabel = (value) => {
+
+        if (isYesValue(value)) return "Yes";
+
+        if (isNoValue(value)) return "No";
+
+        return getValueLabel(value);
+    };
+
+    const isBooleanColumn = (tabularData, column) => {
+
+        const columnIndex = tabularData.columnResolver?.getColumnIndex(column);
+
+        if (columnIndex == null) return false;
+
+        return tabularData.ColumnModels?.[columnIndex]?.ColumnFormat
+            === Ren.SpreadsheetColumnFormatEnum.Boolean;
+    };
+
+    // Gets a value indicating whether a Boolean column's filter lets its "Yes" rows alone through,
+    // which is what ticks a filter module's checkbox for it.
+    const isYesOnlyFilter = (columnFilter) => {
+
+        const values = Array.from(columnFilter.valueMap.values());
+
+        if (!values.length) return false;
+
+        return columnFilter.isNegated ? values.every(isNoValue) : values.every(isYesValue);
+    };
 
     const createPart = (text, isValue) => ({ text, isValue });
 
@@ -54,11 +99,19 @@ Ren.FilterSummary = (() => {
         return parts;
     };
 
-    const describeColumnFilter = (getHeading, column, columnFilter, maxValues) => {
+    const describeColumnFilter = (
+        getHeading, getShowAsCheckbox, tabularData, column, columnFilter, maxValues) => {
+
+        const isBoolean = isBooleanColumn(tabularData, column);
+
+        if (isBoolean && getShowAsCheckbox(column) === "YesOrBoth" && isYesOnlyFilter(columnFilter)) {
+            return [createPart(getHeading(column), false)];
+        }
 
         const labels = [];
+        const getLabel = isBoolean ? getBooleanValueLabel : getValueLabel;
 
-        columnFilter.valueMap.forEach((value) => labels.push(getValueLabel(value)));
+        columnFilter.valueMap.forEach((value) => labels.push(getLabel(value)));
 
         return describeValues(getHeading(column), labels, columnFilter.isNegated, maxValues);
     };
@@ -123,12 +176,13 @@ Ren.FilterSummary = (() => {
     };
 
     /**
-     * Gets the headings the filter modules filtering any of the settings groups give their items,
-     * keyed by column.  The first module to give a column one wins.
+     * Gets the settings the filter modules filtering any of the settings groups give their items
+     * that bear on the summary, as { heading, showAsCheckbox }, keyed by column.  The first module
+     * to give a column each setting wins.
      */
-    const getFilterModuleHeadings = (settingsGroups) => {
+    const getFilterModuleItemSettings = (settingsGroups) => {
 
-        const headings = {};
+        const itemSettings = {};
         const visualisations = Ren.VisualisationCollection.getVisualisations();
 
         for (let index = 0; index < visualisations.length; index++) {
@@ -145,26 +199,42 @@ Ren.FilterSummary = (() => {
             for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
 
                 const column = columns[columnIndex];
-                const heading = columnOverrides[column]?.HeadingOverride;
+                const override = columnOverrides[column];
+                const settings = itemSettings[column] ?? (itemSettings[column] = {});
 
-                if (heading && headings[column] === undefined) headings[column] = heading;
+                if (override?.HeadingOverride && settings.heading === undefined) {
+                    settings.heading = override.HeadingOverride;
+                }
+
+                if (override?.showAsCheckbox && settings.showAsCheckbox === undefined) {
+                    settings.showAsCheckbox = override.showAsCheckbox;
+                }
             }
         }
 
-        return headings;
+        return itemSettings;
     };
 
     // Gets each entry as its parts.
-    const getEntryParts = (filters, tabularData, maxValues, headings) => {
+    const getEntryParts = (filters, tabularData, maxValues, itemSettings) => {
 
         const entries = [];
 
         if (!filters || !tabularData) return entries;
 
-        const getHeading = (column) => headings?.[column] || getColumnHeading(tabularData, column);
+        const getHeading = (column) =>
+            itemSettings?.[column]?.heading || getColumnHeading(tabularData, column);
 
-        filters.columnFilters?.forEach((columnFilter, column) =>
-            entries.push(describeColumnFilter(getHeading, column, columnFilter, maxValues)));
+        const getShowAsCheckbox = (column) => itemSettings?.[column]?.showAsCheckbox ?? "Off";
+
+        filters.columnFilters?.forEach((columnFilter, column) => entries.push(describeColumnFilter(
+            getHeading,
+            getShowAsCheckbox,
+            tabularData,
+            column,
+            columnFilter,
+            maxValues
+        )));
 
         const comparePredicates = [];
         const predicates = filters.predicates ?? [];
@@ -202,19 +272,20 @@ Ren.FilterSummary = (() => {
     };
 
     /**
-     * Gets the filters' entries, each naming at most maxValues values where it is given.  Headings
-     * holds the headings to give columns in place of their own, keyed by column.
+     * Gets the filters' entries, each naming at most maxValues values where it is given.  Item
+     * settings holds, keyed by column, the filter module settings of getFilterModuleItemSettings:
+     * the heading to give a column in place of its own, and how it is shown as a checkbox.
      */
-    const getEntries = (filters, tabularData, maxValues, headings) =>
-        getEntryParts(filters, tabularData, maxValues, headings).map(joinParts);
+    const getEntries = (filters, tabularData, maxValues, itemSettings) =>
+        getEntryParts(filters, tabularData, maxValues, itemSettings).map(joinParts);
 
     /**
      * Gets the filters in words as parts, { text, isValue }, which flag the values named so that
      * they can be shown apart from the words around them.  Empty where nothing is filtered.
      */
-    const getParts = (filters, tabularData, maxValues, headings) => {
+    const getParts = (filters, tabularData, maxValues, itemSettings) => {
 
-        const entries = getEntryParts(filters, tabularData, maxValues, headings);
+        const entries = getEntryParts(filters, tabularData, maxValues, itemSettings);
         const parts = [];
 
         for (let index = 0; index < entries.length; index++) {
@@ -234,12 +305,12 @@ Ren.FilterSummary = (() => {
     /**
      * Gets the filters in words, or "" where nothing is filtered.
      */
-    const getText = (filters, tabularData, maxValues, headings) =>
-        joinParts(getParts(filters, tabularData, maxValues, headings));
+    const getText = (filters, tabularData, maxValues, itemSettings) =>
+        joinParts(getParts(filters, tabularData, maxValues, itemSettings));
 
     return {
         getEntries,
-        getFilterModuleHeadings,
+        getFilterModuleItemSettings,
         getParts,
         getText
     };

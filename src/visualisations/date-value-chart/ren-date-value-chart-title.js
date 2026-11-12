@@ -78,7 +78,7 @@ Ren.DateValueChart_Title = (() => {
             Ren.DateValueChart_DataPointGrid.getChartFilters(visualisation, tabularData),
             tabularData,
             maxValues,
-            Ren.FilterSummary.getFilterModuleHeadings(settingsGroups)
+            Ren.FilterSummary.getFilterModuleItemSettings(settingsGroups)
         );
     };
 
