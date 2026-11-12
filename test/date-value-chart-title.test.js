@@ -190,6 +190,7 @@ describe("Ren.DateValueChart_Title", () => {
             expect(Title.getSubtitleParts({ chartSubtitle: "In {filters}.", visualisation }))
                 .toEqual([
                     { text: "In ", isValue: false },
+                    { text: "", isValue: false, isFilterSymbol: true },
                     { text: "Brand: not ", isValue: false },
                     { text: "Acco", isValue: true },
                     { text: "; ", isValue: false },
@@ -247,6 +248,81 @@ describe("Ren.DateValueChart_Title", () => {
             expect(chip.querySelector("strong").textContent).toBe("South");
             expect(chip.title).toBe(crossFilter.title);
             expect(subtitle.querySelectorAll(".ren-cross-filter-chip").length).toBe(1);
+        });
+
+        test("render_FilteredByTwoColumns_FilterSymbolBetweenThem", () => {
+
+            spyOnFilters({
+                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
+            });
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartSubtitle: "{filters}", visualisation });
+
+            const subtitle = container.querySelector(".ren-chart-subtitle");
+            const separators = subtitle.querySelectorAll(".ren-chart-subtitle__separator");
+
+            expect(subtitle.textContent).not.toContain("|");
+            expect(separators.length).toBe(1);
+            expect(separators[0].querySelector(".ren-chart-subtitle__filter-icon")).not.toBeNull();
+        });
+
+        test("render_FilteredWithoutChips_FilterSymbolFirst", () => {
+
+            spyOnFilters({ Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false } });
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartSubtitle: "{filters}", visualisation });
+
+            const text = container.querySelector(".ren-chart-subtitle__text");
+
+            expect(text.firstChild.getAttribute("class")).toBe("ren-chart-subtitle__filter-icon");
+            expect(text.textContent).toBe("Brand: Acco");
+        });
+
+        test("render_CrossFiltered_NoFilterSymbolBeforeChip", () => {
+
+            spyOnFilters({ Region: { valueMap: new Map([["South", "South"]]), isNegated: false } });
+
+            jest.spyOn(Ren.VisualisationCrossFilterIndicators, "getCrossFilters").mockReturnValue([
+                { filter: { column: "Region", group: "Mix" }, text: "Region: South", title: "" }
+            ]);
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartSubtitle: "{filters}", visualisation });
+
+            const text = container.querySelector(".ren-chart-subtitle__text");
+
+            expect(text.firstChild.classList.contains("ren-cross-filter-chip")).toBe(true);
+            expect(text.querySelectorAll(".ren-chart-subtitle__filter-icon").length).toBe(0);
+        });
+
+        test("render_TwoCrossFilters_NoFilterSymbolBeforeSecondChip", () => {
+
+            spyOnFilters({
+                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
+            });
+
+            jest.spyOn(Ren.VisualisationCrossFilterIndicators, "getCrossFilters").mockReturnValue([
+                { filter: { column: "Region", group: "Mix" }, text: "Region: South", title: "" },
+                { filter: { column: "Brand", group: "Mix" }, text: "Brand: Acco", title: "" }
+            ]);
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartSubtitle: "{filters}", visualisation });
+
+            const subtitle = container.querySelector(".ren-chart-subtitle");
+            const separators = subtitle.querySelectorAll(".ren-chart-subtitle__separator");
+
+            expect(subtitle.querySelectorAll(".ren-cross-filter-chip").length).toBe(2);
+            expect(separators.length).toBe(1);
+            expect(separators[0].querySelector("svg")).toBeNull();
         });
 
         test("render_TitleAndSubtitle_SubtitleBeneathTitle", () => {

@@ -10,6 +10,9 @@ Show a chart's cross filters in its filters subtitle, first and as chips that cl
 Retry minifying for a few seconds when another process briefly has the minified file open, rather than failing the build.
 Fix cross filter chips covering the focus mode button in popped-in windows, so it can't be clicked.
 Stop tracing browser tests on CI too, as it nearly doubled the tests' time there.  Set REN_TEST_TRACE=1 to trace them.
+Leave a filter's heading out of a filter summary where each of its values holds a word of the heading, so "New / Returning" filtered to "New customers" reads "New customers".
+Separate the filters in a chart's filters subtitle with the filter symbol rather than a pipe, and lead it with the symbol where no cross filter chip does.
+Show cross filter chips without a background or border.
 
 ## 1.1.9 (2026-11-12)
 

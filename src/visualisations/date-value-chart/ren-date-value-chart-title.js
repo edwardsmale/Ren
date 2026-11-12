@@ -89,9 +89,17 @@ Ren.DateValueChart_Title = (() => {
             new Set(crossFilters.keys())
         );
 
-        return parts.map(part => part.column == null
+        const summaryParts = parts.map(part => part.column == null
             ? part
             : { text: part.text, isValue: part.isValue, crossFilter: crossFilters.get(part.column) });
+
+        // Led by the filter symbol, as a cross filter's chip is, where no chip leads.
+        if (summaryParts.length && !summaryParts[0].crossFilter) {
+
+            summaryParts.unshift({ text: "", isValue: false, isFilterSymbol: true });
+        }
+
+        return summaryParts;
     };
 
     /**
@@ -135,13 +143,63 @@ Ren.DateValueChart_Title = (() => {
     const getSubtitle = (props, maxValues) =>
         getSubtitleParts(props, maxValues).map(part => part.text).join("");
 
-    const appendParts = (parent, parts) => {
+    // The filter symbol, as a cross filter's chip shows.
+    const createFilterIcon = () => {
 
-        for (let index = 0; index < parts.length; index++) {
+        const icon = Ren.VisualisationCrossFilterIndicators.createFilterIcon(
+            SUBTITLE_CLASS_NAME + "__filter-icon"
+        );
+
+        Ren.Svg.setStyles(icon, {
+            "width": "0.625rem",
+            "height": "0.625rem",
+            "vertical-align": "-0.0625rem",
+            "fill": "currentColor"
+        });
+
+        return icon;
+    };
+
+    // The filter symbol leading the filters named, with room after it.
+    const createLeadingFilterIcon = () => {
+
+        const icon = createFilterIcon();
+
+        Ren.Svg.setStyles(icon, { "margin-right": "0.1875rem" });
+
+        return icon;
+    };
+
+    // The filter symbol between two filters, or only the room around it before a chip, which
+    // shows its own.
+    const createSeparator = (isBeforeChip) => {
+
+        const separator = document.createElement("span");
+
+        separator.className = SUBTITLE_CLASS_NAME + "__separator";
+        Ren.Svg.setStyles(separator, { "margin": "0 0.375rem" });
+
+        if (!isBeforeChip) separator.appendChild(createFilterIcon());
+
+        return separator;
+    };
+
+    // Appends the parts from start up to end.
+    const appendParts = (parent, parts, start = 0, end = parts.length) => {
+
+        for (let index = start; index < end; index++) {
 
             const part = parts[index];
 
-            if (part.isValue) {
+            if (part.isFilterSymbol) {
+
+                parent.appendChild(createLeadingFilterIcon());
+            }
+            else if (part.isSeparator) {
+
+                parent.appendChild(createSeparator(!!parts[index + 1]?.crossFilter));
+            }
+            else if (part.isValue) {
 
                 const valueElement = document.createElement("strong");
 
@@ -188,14 +246,14 @@ Ren.DateValueChart_Title = (() => {
 
                 const content = document.createDocumentFragment();
 
-                appendParts(content, parts.slice(index, end));
+                appendParts(content, parts, index, end);
                 textElement.appendChild(
                     Ren.VisualisationCrossFilterIndicators.createInlineChip(crossFilter, content)
                 );
             }
             else {
 
-                appendParts(textElement, parts.slice(index, end));
+                appendParts(textElement, parts, index, end);
             }
 
             index = end;

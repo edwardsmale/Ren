@@ -204,12 +204,15 @@ Ren.VisualisationCrossFilterIndicators = (() => {
         return filtersByElement;
     };
 
-    const createFilterIcon = () => {
+    /**
+     * Creates the filter symbol a chip shows, given the class name, or the chip's own.
+     */
+    const createFilterIcon = (className = "ren-cross-filter-chip__icon") => {
 
         const icon = document.createElementNS(SVG_NAMESPACE, "svg");
         const path = document.createElementNS(SVG_NAMESPACE, "path");
 
-        icon.setAttribute("class", "ren-cross-filter-chip__icon");
+        icon.setAttribute("class", className);
         icon.setAttribute("viewBox", "0 0 16 16");
         icon.setAttribute("aria-hidden", "true");
         path.setAttribute("d", "M2 3h12l-4.5 5.5V13l-3 1.5V8.5z");
@@ -399,6 +402,7 @@ Ren.VisualisationCrossFilterIndicators = (() => {
 
     return {
         addFilter,
+        createFilterIcon,
         createInlineChip,
         getCrossFilters,
         refresh

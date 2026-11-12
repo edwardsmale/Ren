@@ -7,10 +7,21 @@
  * An entry is headed as the filter module setting it heads its item, where one is given, and
  * otherwise by its column's heading.  A Boolean column's values read as Yes and No, and where its
  * item is shown as a "Yes or both" checkbox, ticked, the entry is the heading alone.
+ *
+ * An entry whose values each say what they are, by holding a word of its heading, names them
+ * without the heading: "New / Returning" filtered to "New customers" reads "New customers", where
+ * "Brand" filtered to "Acco" still reads "Brand: Acco".
  */
 Ren.FilterSummary = (() => {
 
     const VALUE_SEPARATOR = "; ";
+
+    // Words too common, or too often in a heading only to place it in a hierarchy, to tie a value
+    // to its heading.
+    const IGNORED_WORDS = new Set([
+        "a", "an", "and", "by", "for", "in", "is", "level", "non", "not", "of", "on", "one", "or",
+        "sub", "the", "to", "top", "with"
+    ]);
     const ENTRY_SEPARATOR = "  |  ";
 
     const getColumnHeading = (tabularData, column) => {
@@ -70,15 +81,42 @@ Ren.FilterSummary = (() => {
 
     const createPart = (text, isValue) => ({ text, isValue });
 
+    // The part between two entries, flagged so that it can be shown as a symbol rather than text.
+    const createSeparatorPart = () => ({ text: ENTRY_SEPARATOR, isValue: false, isSeparator: true });
+
     const joinParts = (parts) => parts.map(part => part.text).join("");
 
     // An entry, with the column it names where it names a column's values.
     const createEntry = (parts, column = null) => ({ parts, column });
 
-    // Names the values, counting those past maxValues rather than naming them.
+    // Gets the words of the text that can tie a value to a heading, in lower case and without a
+    // plural's "s", so that "Customer" and "customers" match.
+    const getWords = (text) => String(text)
+        .toLowerCase()
+        .split(/[^\p{L}\p{N}]+/u)
+        .filter(word => word && !IGNORED_WORDS.has(word))
+        .map(word => (word.length > 3 && word.endsWith("s") ? word.slice(0, -1) : word));
+
+    /**
+     * Gets a value indicating whether the values say what they are without the heading, each
+     * holding one of its words, as "New customers" does under "New / Returning".
+     */
+    const isSelfDescribing = (heading, labels) => {
+
+        const headingWords = new Set(getWords(heading));
+
+        if (!headingWords.size || !labels.length) return false;
+
+        return labels.every(label => getWords(label).some(word => headingWords.has(word)));
+    };
+
+    // Names the values, counting those past maxValues rather than naming them.  The heading is
+    // left out where the values say what they are.
     const describeValues = (heading, labels, isNegated, maxValues) => {
 
-        const parts = [createPart(`${heading}: ${isNegated ? "not " : ""}`, false)];
+        const prefix = (isSelfDescribing(heading, labels) ? "" : `${heading}: `)
+            + (isNegated ? "not " : "");
+        const parts = prefix ? [createPart(prefix, false)] : [];
 
         if (!labels.length) {
 
@@ -288,7 +326,8 @@ Ren.FilterSummary = (() => {
 
     /**
      * Gets the filters in words as parts, { text, isValue }, which flag the values named so that
-     * they can be shown apart from the words around them.  Empty where nothing is filtered.
+     * they can be shown apart from the words around them.  The part between two entries is also
+     * flagged isSeparator, so that it can be shown as a symbol.  Empty where nothing is filtered.
      *
      * The entries of the columns in leadingColumns, a set, where it is given, come first, and each
      * of their parts carries its column as column, so that they can be shown apart from the rest.
@@ -302,7 +341,7 @@ Ren.FilterSummary = (() => {
 
         for (let index = 0; index < ordered.length; index++) {
 
-            if (index) parts.push(createPart(ENTRY_SEPARATOR, false));
+            if (index) parts.push(createSeparatorPart());
 
             const entry = ordered[index];
             const entryParts = entry.parts;

@@ -91,6 +91,65 @@ describe("Ren.FilterSummary", () => {
             .toBe("Top-Level Category: not Gel Pens");
     });
 
+    test("getText_ValuesHoldAWordOfTheHeading_HeadingLeftOut", () => {
+
+        const filters = createFilters({
+            "New / Returning": createColumnFilter(["New customers"]),
+            "Amazon / Non-Amazon": createColumnFilter(["Amazon orders", "Non-Amazon orders"])
+        });
+
+        expect(Summary.getText(filters, tabularData))
+            .toBe("New customers  |  Amazon orders; Non-Amazon orders");
+    });
+
+    test("getText_PluralValueUnderSingularHeading_HeadingLeftOut", () => {
+
+        const filters = createFilters({ "Customer Type": createColumnFilter(["Trade customers"]) });
+
+        expect(Summary.getText(filters, tabularData)).toBe("Trade customers");
+    });
+
+    test("getText_NegatedSelfDescribingValues_NamesValuesLeftOut", () => {
+
+        const filters = createFilters({
+            "New / Returning": createColumnFilter(["New customers"], true)
+        });
+
+        expect(Summary.getText(filters, tabularData)).toBe("not New customers");
+    });
+
+    test("getText_SomeValuesDontHoldAWordOfTheHeading_HeadingKept", () => {
+
+        const filters = createFilters({
+            "New / Returning": createColumnFilter(["New customers", "Unknown"])
+        });
+
+        expect(Summary.getText(filters, tabularData))
+            .toBe("New / Returning: New customers; Unknown");
+    });
+
+    test("getText_ValueSharesOnlyAHierarchyWord_HeadingKept", () => {
+
+        const filters = createFilters({}, [{
+            type: "includeCombinations",
+            columns: ["Top-Level Category", "Sub Category"],
+            tuples: [["Top Sellers"]]
+        }]);
+
+        expect(Summary.getText(filters, tabularData)).toBe("Top-Level Category: Top Sellers");
+    });
+
+    test("getParts_SelfDescribingValues_NoHeadingPart", () => {
+
+        const filters = createFilters({
+            "New / Returning": createColumnFilter(["New customers"])
+        });
+
+        expect(Summary.getParts(filters, tabularData)).toEqual([
+            { text: "New customers", isValue: true }
+        ]);
+    });
+
     test("getText_MoreValuesThanMax_CountsTheRest", () => {
 
         const filters = createFilters({ Brand: createColumnFilter(["A", "B", "C", "D"]) });
@@ -181,7 +240,7 @@ describe("Ren.FilterSummary", () => {
         expect(Summary.getParts(filters, tabularData, 6, null, new Set(["Sales"]))).toEqual([
             { text: "Sales: ", isValue: false, column: "Sales" },
             { text: "10", isValue: true, column: "Sales" },
-            { text: "  |  ", isValue: false },
+            { text: "  |  ", isValue: false, isSeparator: true },
             { text: "Brand: ", isValue: false },
             { text: "Acco", isValue: true }
         ]);
