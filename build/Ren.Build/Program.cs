@@ -155,7 +155,7 @@ namespace Ren.Build
         public static void CopySchema(BuildIdentity identity, Publisher publisher)
         {
             Directory.CreateDirectory(Repo.Dist);
-            File.Copy(Path.Combine(Repo.Root, Repo.SchemaFileName), Path.Combine(Repo.Dist, Repo.SchemaFileName), overwrite: true);
+            Repo.CopyFile(Path.Combine(Repo.Root, Repo.SchemaFileName), Path.Combine(Repo.Dist, Repo.SchemaFileName));
             publisher.Publish(identity, Repo.SchemaFileName, hasSourceMap: false);
         }
     }
@@ -165,7 +165,8 @@ namespace Ren.Build
     /// src/, vendor/ and templates/, the styles for styles/ and the schema for itself.  When the
     /// version has changed since the last build (a commit, say, or the first change on top of
     /// one), it rebuilds everything instead, so that every built file and the manifest name one
-    /// version.  It keeps watching when a build fails.
+    /// version.  It keeps watching when a build fails, whatever the reason, and builds everything
+    /// again on the next change, as a failure can leave the built files from different versions.
     /// </summary>
     internal static class Watcher
     {
@@ -180,16 +181,23 @@ namespace Ren.Build
 
             async Task RunRecordingVersion(Func<BuildIdentity, Task> build)
             {
-                var identity = BuildIdentity.Get();
-
                 try
                 {
+                    var identity = BuildIdentity.Get();
+
                     await build(identity);
                     builtVersion = identity.Version;
                 }
-                catch (BuildException e)
+                catch (Exception e)
                 {
-                    Log.Error(e.Message);
+                    builtVersion = null;
+
+                    // A BuildException's message says what's wrong; anything else (a file another
+                    // process has locked, say) is unexpected, so says what it was too.
+                    var message = e is BuildException ? e.Message : $"{e.GetType().Name}: {e.Message}";
+
+                    Log.Error($"The build failed: {message}");
+                    Log.Info("The next change builds everything again");
                 }
             }
 
@@ -247,14 +255,14 @@ namespace Ren.Build
 
                 if (parts.Length == 0) continue;
 
-                if (BuildIdentity.Get().Version != builtVersion)
-                {
-                    await RunRecordingVersion(_ => Builder.BuildAsync(publisher));
-                    continue;
-                }
-
                 await RunRecordingVersion(async identity =>
                 {
+                    if (identity.Version != builtVersion)
+                    {
+                        await Builder.BuildAsync(publisher);
+                        return;
+                    }
+
                     var tasks = new List<Task>();
 
                     if (parts.Contains(Part.Scripts)) tasks.Add(Scripts.BuildAsync(identity, publisher));

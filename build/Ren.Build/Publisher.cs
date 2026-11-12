@@ -109,7 +109,7 @@ internal sealed class Publisher(IReadOnlyList<string> staticsDirectories)
 
                 foreach (var name in fileNames)
                 {
-                    File.Copy(Path.Combine(Repo.Dist, name), Path.Combine(directory, name), overwrite: true);
+                    Repo.CopyFile(Path.Combine(Repo.Dist, name), Path.Combine(directory, name));
                 }
 
                 Log.Info($"Copied {fileName} ({identity.Version}) to {directory}");

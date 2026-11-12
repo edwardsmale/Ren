@@ -11,6 +11,7 @@ Keep a Playwright trace of each failed browser test.
 Avoid chart jumping when filter summary appears.
 Update README.
 Fix pie labels outside the pies disappearing when the pies are close together or their charts narrow.
+Keep the build watcher running when a build fails or files are locked.
 
 ## 1.1.8 (2026-11-11)
 

@@ -41,7 +41,7 @@ internal static class Repo
 
     public static string ReadText(string path)
     {
-        var text = File.ReadAllText(path, Utf8);
+        var text = RetryWhileLocked(() => File.ReadAllText(path, Utf8));
 
         return text.Length > 0 && text[0] == '﻿' ? text.Substring(1) : text;
     }
@@ -49,8 +49,36 @@ internal static class Repo
     public static void WriteText(string path, string text)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, text, Utf8);
+        RetryWhileLocked(() => { File.WriteAllText(path, text, Utf8); return true; });
     }
+
+    public static void CopyFile(string sourcePath, string destinationPath) =>
+        RetryWhileLocked(() => { File.Copy(sourcePath, destinationPath, overwrite: true); return true; });
+
+    private const int LockedFileAttempts = 30;
+    private const int LockedFileRetryDelayMs = 100;
+
+    /// <summary>
+    /// Reads or writes a file, trying again for a few seconds while another process has it open,
+    /// as an editor or a virus scanner may for a moment, such as when VS Code opens the folder.
+    /// </summary>
+    private static T RetryWhileLocked<T>(Func<T> access)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return access();
+            }
+            catch (IOException e) when (IsLocked(e) && attempt < LockedFileAttempts)
+            {
+                Thread.Sleep(LockedFileRetryDelayMs);
+            }
+        }
+    }
+
+    // ERROR_SHARING_VIOLATION or ERROR_LOCK_VIOLATION.
+    private static bool IsLocked(IOException e) => (e.HResult & 0xFFFF) is 32 or 33;
 
     /// <summary>
     /// The path of the specified file relative to the repo, with forward slashes.
