@@ -203,7 +203,9 @@ grid's last row is usually its totals row (`.ren-data-grid__cell--group`).
 
 `.github/workflows/ci.yml` builds, runs the client tests on the normal and minified builds, then
 builds and tests the .NET package.  It runs on Windows, for the .NET Framework 4.8 tests, with
-Playwright's Chromium.  It runs on every push and pull request.  To run the same steps locally
+Playwright's Chromium.  It doesn't run on pushes or pull requests, only when started by hand from
+the Actions tab ("Run workflow").  The Publish workflow runs the same build and tests on each
+pushed `v*.*.*` tag, before it publishes.  To run the same steps locally
 (they stop at the first failure):
 
 ```

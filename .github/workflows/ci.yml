@@ -1,13 +1,12 @@
 # Builds the client, runs the client tests in Chromium, and again on the minified build, then
 # builds the .NET package and runs its tests on .NET Framework 4.8 and .NET 8.  It's on Windows
 # because the net48 tests need .NET Framework.  "dotnet run --project build/Ren.Build -- ci" runs
-# the same steps locally.
+# the same steps locally.  It only runs when started by hand from the Actions tab, since the
+# Publish workflow runs the same build and tests on each pushed release tag.
 name: CI
 
 on:
-  push:
-    branches: ['**']
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   build-and-test:
