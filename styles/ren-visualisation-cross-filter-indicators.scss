@@ -14,6 +14,13 @@
     pointer-events: none;
 }
 
+// Left of the focus mode button, which a popped in window moves left of its own button.
+.ren-report-popup-window--popped-in .ren-visualisation > .ren-visualisation__cross-filters
+{
+    right: 3.125rem;
+    max-width: calc(100% - 3.75rem);
+}
+
 .ren-cross-filter-chip
 {
     display: inline-flex;
