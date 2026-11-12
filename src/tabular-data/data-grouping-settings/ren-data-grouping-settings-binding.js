@@ -98,6 +98,8 @@ Ren.DataGroupingSettingsBinding = (config) => {
     const dateRangeChangedHandler = normaliseHandler(config.onDateRangeChanged, "dateRangeChanged");
     const hoveredDateChangedHandler =
         normaliseHandler(config.onHoveredDateChanged, "hoveredDateChanged");
+    const shownRangeChangedHandler =
+        normaliseHandler(config.onShownRangeChanged, "shownRangeChanged");
 
     const invoke = (entry, run) => {
 
@@ -212,6 +214,21 @@ Ren.DataGroupingSettingsBinding = (config) => {
                 dateRangeChangedHandler,
                 () => dateRangeChangedHandler.handler(range, rangeSignature, chartCount)
             );
+        });
+    }
+
+    if (shownRangeChangedHandler) {
+
+        // The dates a chart sharing this one's date range group has just been drawn over.
+        Ren.Messages.Events.chartShownRangeChanged.handle((
+            dateRangeGroup, shownRange, containingReportGuid, sourceVisualisationGuid) => {
+
+            if (visualisation.isDestroyed) return false;
+
+            if (sourceVisualisationGuid === visualisation.visualisationGuid) return;
+            if (!isOwnGroup(dateRangeGroup, containingReportGuid, getDateRangeGroup())) return;
+
+            invoke(shownRangeChangedHandler, () => shownRangeChangedHandler.handler(shownRange));
         });
     }
 

@@ -39,6 +39,17 @@ Ren.Messages = (() => {
                     + chartCount
             }
         ),
+        // Carries the dates a date/value chart has just been drawn over, resolved as
+        // { from, toExclusive } (either end null where open, or null for every date), with the
+        // column they were read from, for whatever narrows its figures to what the charts in that
+        // date range group show (see Ren.DateValueChart_DateRange.announceShownRange).
+        chartShownRangeChanged: createMessage(
+            ["dateRangeGroup", "shownRange", "containingReportGuid", "sourceVisualisationGuid"],
+            {
+                dedupeKey: (dateRangeGroup, _shownRange, containingReportGuid) =>
+                    dateRangeGroup + "|" + containingReportGuid
+            }
+        ),
         // Carries the date a chart's hover band stands at, or null once it is taken down, so that
         // the other charts in its date range group show the same date.
         chartHoveredDateChanged: createMessage(

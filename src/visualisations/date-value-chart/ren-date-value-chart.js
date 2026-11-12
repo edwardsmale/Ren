@@ -1387,17 +1387,38 @@ Ren.CreateDateValueChart = (() => {
 
         if (Ren.DateValueChart_MultiChart.isMultiChart(props)) {
 
-            return Ren.DateValueChart_MultiChart.render(
+            const multiChartResult = Ren.DateValueChart_MultiChart.render(
                 props,
                 (chartProps) => drawMultiChartItem(chartProps, visualisation),
                 data
             );
+
+            if (typeof multiChartResult !== "string") {
+                announceShownRange(visualisation, props, props.multiChartShownRange);
+            }
+
+            return multiChartResult;
         }
 
         Ren.DateValueChart_MultiChart.clear(props);
 
-        return Ren.DateValueChart_Render.renderDateValueChart(props, data);
+        const result = Ren.DateValueChart_Render.renderDateValueChart(props, data);
+
+        if (typeof result !== "string") {
+            announceShownRange(visualisation, props, props.isAllTime ? null : props.chartDateRange);
+        }
+
+        return result;
     };
+
+    // Tells whatever follows the chart's date range group (a filter module narrowing its figures
+    // to the charts' dates, say) which dates the chart has just been drawn over.
+    const announceShownRange = (visualisation, props, resolvedRange) =>
+        Ren.DateValueChart_DateRange.announceShownRange(
+            visualisation,
+            resolvedRange,
+            props.dateHeading
+        );
 
     const getContextMenuItems = (tabularData, contextMenu, visualisation, props) => {
 

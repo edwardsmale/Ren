@@ -944,8 +944,50 @@ Ren.FilterModule_Filtering = (s) => {
         }
     };
 
+    // The slot the shown-dates predicate is held in, out of the way of the page's own compare
+    // filters on the same column, whose slots count up from 0, so it is never ORed with one.
+    const SHOWN_DATES_SLOT = -1;
+
+    // Gets a predicate keeping the rows dated within what the source group's charts are drawn
+    // over (see s.shownRange), or null where the module doesn't follow them or they show every
+    // date.
+    const getShownDatesPredicate = () => {
+
+        const shownRange = s.shownRange;
+
+        if (!shownRange || tabularData.findColumnIndex(shownRange.dateHeading) < 0) return null;
+
+        const { from, toExclusive } = shownRange;
+        const predicate = { type: "compare", column: shownRange.dateHeading, slot: SHOWN_DATES_SLOT };
+
+        if (from != null && toExclusive != null) {
+
+            predicate.operator = "dateBetween";
+            predicate.value = from;
+            predicate.value2 = toExclusive;
+        }
+        else if (from != null) {
+
+            predicate.operator = "dateAfter";
+            predicate.value = from;
+        }
+        else if (toExclusive != null) {
+
+            predicate.operator = "dateBefore";
+            predicate.value = toExclusive;
+        }
+        else {
+
+            return null;
+        }
+
+        return predicate;
+    };
+
     // Gets the source's filters minus the item's own selection, or null when nothing is left to
-    // filter by.  ownCombinationKey is the key of the item's own predicate chain, or null.
+    // filter by.  ownCombinationKey is the key of the item's own predicate chain, or null.  Where
+    // the module follows its source group's charts' dates, they are one of those filters, so an
+    // option with no rows in them is pruned as one with none under a cross-filter is.
     const buildCrossFilterSetExcludingColumns = (ownColumnIds, ownCombinationKey) => {
 
         const settings = columnInfo.getSourceDataGroupingSettings();
@@ -1031,6 +1073,10 @@ Ren.FilterModule_Filtering = (s) => {
         for (let i = 0; i < groupingPredicates.length; i++) {
             predicates.push(groupingPredicates[i]);
         }
+
+        const shownDatesPredicate = getShownDatesPredicate();
+
+        if (shownDatesPredicate) predicates.push(shownDatesPredicate);
 
         const hasColumnValueFilters = Object.keys(columnValueFilters).length > 0;
 

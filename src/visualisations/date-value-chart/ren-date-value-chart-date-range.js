@@ -424,6 +424,59 @@ Ren.DateValueChart_DateRange = (() => {
         );
     };
 
+    // The dates last drawn by a chart in each date range group, by group and report context GUID,
+    // as { from, toExclusive, dateHeading }, or null where that chart drew every date.
+    const shownRanges = new Map();
+
+    /**
+     * Records the dates a chart has just been drawn over - { from, toExclusive } as resolved,
+     * either end null where open, or null for every date - and announces them where they differ
+     * from the last a chart in its date range group was drawn over.  Unlike notifyRangeChanged,
+     * which carries a range as it is stored for other charts to take up, this is what was drawn,
+     * so a multi-chart showing its latest periods by default announces those periods.
+     *
+     * The last chart drawn speaks for its group, which is right where the charts in it are kept
+     * showing the same dates, as a date range group's are.
+     */
+    const announceShownRange = (visualisation, resolvedRange, dateHeading) => {
+
+        if (!visualisation || !dateHeading) return;
+
+        const group = getDateRangeGroup(visualisation);
+        const key = group + "|" + visualisation.containingReportGuid;
+
+        const shownRange = resolvedRange
+            && (resolvedRange.from != null || resolvedRange.toExclusive != null)
+            ? {
+                from: resolvedRange.from ?? null,
+                toExclusive: resolvedRange.toExclusive ?? null,
+                dateHeading
+            }
+            : null;
+
+        const previous = shownRanges.get(key);
+
+        if (previous !== undefined && JSON.stringify(previous) === JSON.stringify(shownRange)) {
+            return;
+        }
+
+        shownRanges.set(key, shownRange);
+
+        Ren.Messages.Events.chartShownRangeChanged.notify(
+            group,
+            shownRange,
+            visualisation.containingReportGuid,
+            visualisation.visualisationGuid
+        );
+    };
+
+    /**
+     * Gets the dates a chart in a date range group was last drawn over, as announceShownRange
+     * records them, or null where none has been drawn or the last drew every date.
+     */
+    const getShownRange = (dateRangeGroup, containingReportGuid) =>
+        shownRanges.get(dateRangeGroup + "|" + containingReportGuid) ?? null;
+
     /**
      * Gets a cell's date as a yyyy-MM-dd string, or yyyy-MM-dd HH:mm:ss where it has a time, which
      * is the form every date here is compared in, or null where the value is not a date at all.
@@ -822,6 +875,7 @@ Ren.DateValueChart_DateRange = (() => {
 
     return {
         addPeriods,
+        announceShownRange,
         applyToChart,
         canHoldRange,
         catchUpWithDateRangeGroup,
@@ -841,6 +895,7 @@ Ren.DateValueChart_DateRange = (() => {
         getRange,
         getRangePeriod,
         getRangeSignature,
+        getShownRange,
         getUnitForPeriod,
         getZoomStackDepth,
         includes,

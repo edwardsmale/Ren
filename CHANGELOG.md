@@ -13,6 +13,7 @@ Stop tracing browser tests on CI too, as it nearly doubled the tests' time there
 Leave a filter's heading out of a filter summary where each of its values holds a word of the heading, so "New / Returning" filtered to "New customers" reads "New customers".
 Separate the filters in a chart's filters subtitle with the filter symbol rather than a pipe, and lead it with the symbol where no cross filter chip does.
 Show cross filter chips without a background or border.
+Add followChartDates to filter modules, so their options and counts cover only the dates their source group's charts show, following a multi-chart's slider.
 
 ## 1.1.9 (2026-11-12)
 

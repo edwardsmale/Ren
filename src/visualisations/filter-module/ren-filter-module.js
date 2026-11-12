@@ -20,6 +20,16 @@ Ren.CreateFilterModule = (tabularData, visualisation) => {
 
     Object.assign(s, Ren.FilterModule_Constants);
 
+    // The dates the source group's date/value charts were last drawn over, which the module's
+    // figures and options are narrowed to where it follows them (see
+    // Ren.FilterModule_Filtering's getShownDatesPredicate), or null for every date.
+    s.shownRange = visualisation.followChartDates
+        ? Ren.DateValueChart_DateRange.getShownRange(
+            s.sourceGroup,
+            visualisation.containingReportGuid
+        )
+        : null;
+
     // -1 when the source grid's data has no count column.
     s.countColumnIndex = tabularData.findColumnIndex(s.COUNT_COLUMN_HEADING);
 
@@ -221,7 +231,23 @@ Ren.CreateFilterModule = (tabularData, visualisation) => {
 
                 s.view.syncCheckboxes();
             }
-        }
+        },
+        dateRangeGroup: sourceGroup,
+        onShownRangeChanged: visualisation.followChartDates
+            ? {
+                action: "shownRange",
+                rank: 1,
+                handler: (shownRange) => {
+
+                    if (recreateIfDataReplaced()) return;
+
+                    s.shownRange = shownRange;
+                    s.counts.invalidateAllCounts();
+                    s.reuseDimensionsOnNextRender = true;
+                    s.view.render();
+                }
+            }
+            : null
     });
 
     return {

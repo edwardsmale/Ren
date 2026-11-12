@@ -575,6 +575,16 @@ Ren.DateValueChart_MultiChart = (() => {
             return `Date column '${props.dateHeading}' holds no dates to plot.`;
         }
 
+        // The dates the charts are drawn over between them, for whatever follows them.
+        props.multiChartShownRange = {
+            from: ranges[0].from,
+            toExclusive: Ren.DateValueChart_DateRange.addPeriods(
+                ranges[ranges.length - 1].from,
+                datePeriod,
+                1
+            )
+        };
+
         // A slider is left to Ren.DateValueChart_PeriodSlider.renderMultiChart, which keeps one
         // being dragged.
         const previous = container.querySelectorAll(

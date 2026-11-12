@@ -9,7 +9,11 @@ Ren.VisualisationTypes_FilterModule = {
 
         // "Columns" stacks the items top to bottom, wrapping into further columns; otherwise they
         // are laid side by side, wrapping into further rows.
-        itemFlow: "String"
+        itemFlow: "String",
+
+        // Narrows the figures and options to the dates the date/value charts of the source group
+        // are drawn over, such as the years a multi-chart's slider shows.
+        followChartDates: "Boolean"
     },
     synchronisedOptions: {
 
@@ -43,6 +47,10 @@ Ren.VisualisationTypes_FilterModule = {
             name: "showRightClickHint",
             transform: (showRightClickHint) =>
                 showRightClickHint === false ? false : undefined
+        },
+        {
+            name: "followChartDates",
+            transform: (followChartDates) => followChartDates === true ? true : undefined
         },
         {
             name: "itemFlow",
