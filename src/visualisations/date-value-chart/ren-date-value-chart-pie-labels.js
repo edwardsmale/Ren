@@ -57,12 +57,15 @@ Ren.DateValueChart_PieLabels = (() => {
     // Around, a connector bends this far out from the rim, and runs on level to the label's
     // column, which starts CALLOUT_GAP_PX from the rim.  The pies are shrunk to make room for
     // labels up to MAX_CALLOUT_WIDTH_PX wide, though to no less than MIN_RADIUS_SHARE of their
-    // size, a label too long for the room left being shortened.
+    // size, a label too long for the room left being shortened.  A label's value and share can't
+    // be shortened, so the pies are shrunk further, to as little as MIN_SHRUNK_RADIUS_SHARE of
+    // their size, where that's what it takes to leave room for them.
     const CALLOUT_ELBOW_PX = 8;
     const CALLOUT_GAP_PX = 18;
     const CALLOUT_TEXT_GAP_PX = 3;
     const MAX_CALLOUT_WIDTH_PX = 140;
     const MIN_RADIUS_SHARE = 0.85;
+    const MIN_SHRUNK_RADIUS_SHARE = 0.5;
     const CALLOUT_SPACING_PX = 1;
 
     const ELLIPSIS = "…";
@@ -284,6 +287,55 @@ Ren.DateValueChart_PieLabels = (() => {
         }
     };
 
+    const toCalloutWidthPx = (textWidthPx) =>
+        CALLOUT_GAP_PX + Math.ceil(Math.min(textWidthPx, MAX_CALLOUT_WIDTH_PX));
+
+    /**
+     * Gets the least room the pies are to leave either side for the labels stacked beside them:
+     * enough for the lines after each label's first, which can't be shortened.  They're measured
+     * as drawn, the first time they can be (not while the chart is hidden, say), and estimated
+     * until then.  A chart just drawn may not have its labels' font size yet, so each is measured
+     * in whatever it has, and scaled to the labels' own.
+     */
+    const getMinCalloutWidthPx = (props) => {
+
+        if (props.pieCalloutMinWidthPx == null && props.pieCalloutMinWidthEstimatePx) {
+
+            const labels = props.pieLabelNodes || [];
+            const fontSizePx = getFontSizePx(props);
+            let widestPx = 0;
+            let isMeasured = true;
+
+            for (let i = 0; i < labels.length && isMeasured; i++) {
+
+                const label = labels[i];
+
+                if (label.isSubdivision || label.lines.length < 2) continue;
+
+                // Shown for a moment, as a hidden label measures nothing.
+                const display = label.groupNode.style.display;
+
+                label.groupNode.style.display = "";
+
+                const drawnFontSizePx = parseFloat(getComputedStyle(label.textNode).fontSize);
+
+                for (let j = 1; j < label.lines.length && isMeasured; j++) {
+
+                    const widthPx = label.textNode.children[j]?.getComputedTextLength() || 0;
+
+                    isMeasured = widthPx > 0 && drawnFontSizePx > 0;
+                    widestPx = Math.max(widestPx, widthPx * fontSizePx / drawnFontSizePx);
+                }
+
+                label.groupNode.style.display = display;
+            }
+
+            if (isMeasured && widestPx > 0) props.pieCalloutMinWidthPx = toCalloutWidthPx(widestPx);
+        }
+
+        return props.pieCalloutMinWidthPx ?? props.pieCalloutMinWidthEstimatePx ?? 0;
+    };
+
     /** Rewrites a label's first line, leaving any below it, as when it is shortened. */
     const setFirstLine = (textNode, text) => {
 
@@ -316,6 +368,8 @@ Ren.DateValueChart_PieLabels = (() => {
         props.pieShareNodes = [];
         props.pieTotalNodes = [];
         props.pieCalloutWidthPx = 0;
+        props.pieCalloutMinWidthPx = null;
+        props.pieCalloutMinWidthEstimatePx = 0;
 
         const showLabels = areLabelsShown(props);
         const showTotals = areTotalsShown(props);
@@ -372,6 +426,7 @@ Ren.DateValueChart_PieLabels = (() => {
         const isStacked = showLabels && isStackedPlacement(getPlacement(props));
         const fontScale = getFontSizePx(props) / 12;
         let widestTextPx = 0;
+        let widestRestTextPx = 0;
 
         for (let pieIndex = 0; pieIndex < pies.length; pieIndex++) {
 
@@ -430,15 +485,21 @@ Ren.DateValueChart_PieLabels = (() => {
                 const textNode = Ren.Svg.append(groupNode, "text", { "class": LABEL_CLASS });
 
                 writeLines(textNode, lines);
-                groupNode.style.display = "none";
-                addTooltip(groupNode, props, slice);
 
                 if (isStacked) {
 
                     for (let j = 0; j < lines.length; j++) {
-                        widestTextPx = Math.max(widestTextPx, Ren.TextUtils.measureText(lines[j]));
+
+                        const widthPx = Ren.TextUtils.measureText(lines[j]);
+
+                        widestTextPx = Math.max(widestTextPx, widthPx);
+
+                        if (j > 0) widestRestTextPx = Math.max(widestRestTextPx, widthPx);
                     }
                 }
+
+                groupNode.style.display = "none";
+                addTooltip(groupNode, props, slice);
 
                 props.pieLabelNodes.push({
                     pie,
@@ -492,8 +553,13 @@ Ren.DateValueChart_PieLabels = (() => {
         // the pies are to leave either side for the labels stacked beside them.
         if ((isStacked || subdivisionLabels.length) && widestTextPx > 0) {
 
-            props.pieCalloutWidthPx = CALLOUT_GAP_PX
-                + Math.ceil(Math.min(widestTextPx * fontScale, MAX_CALLOUT_WIDTH_PX));
+            props.pieCalloutWidthPx = toCalloutWidthPx(widestTextPx * fontScale);
+
+            // The least room that leaves the lines after the first, which can't be shortened,
+            // estimated until they can be measured (see getMinCalloutWidthPx).
+            props.pieCalloutMinWidthEstimatePx = widestRestTextPx > 0
+                ? toCalloutWidthPx(widestRestTextPx * fontScale)
+                : 0;
         }
     };
 
@@ -508,7 +574,21 @@ Ren.DateValueChart_PieLabels = (() => {
         if (!calloutWidthPx) return widestRadiusPx;
 
         const roomyRadiusPx = periodWidthPx / 2 - calloutWidthPx - LABEL_PADDING_PX;
-        const smallestRadiusPx = widestRadiusPx * MIN_RADIUS_SHARE;
+        const minCalloutWidthPx = getMinCalloutWidthPx(props);
+        let smallestRadiusPx = widestRadiusPx * MIN_RADIUS_SHARE;
+
+        // Shrunk further where that's what it takes to leave room for the lines that can't be
+        // shortened, so that the labels aren't all dropped.
+        if (minCalloutWidthPx) {
+
+            smallestRadiusPx = Math.min(
+                smallestRadiusPx,
+                Math.max(
+                    periodWidthPx / 2 - minCalloutWidthPx - LABEL_PADDING_PX,
+                    widestRadiusPx * MIN_SHRUNK_RADIUS_SHARE
+                )
+            );
+        }
 
         return Math.min(widestRadiusPx, Math.max(roomyRadiusPx, smallestRadiusPx));
     };
@@ -862,10 +942,68 @@ Ren.DateValueChart_PieLabels = (() => {
     };
 
     /**
+     * Gets how far a label hugging its pie may run, as the x it must stop short of: the chart's
+     * edge, margin and all, or, where there is a pie beyond it that way, that pie's centre, and
+     * short of that pie's rim, by as much as a label is kept from its own, where the label is
+     * level with it.  It stops short too of any label already placed in its way, so that labels
+     * between two pies share the room there.
+     */
+    const getHuggingEdgeX = (props, label, textX, direction, radiusPx, placedBoxes) => {
+
+        const nearer = (a, b) => direction > 0 ? Math.min(a, b) : Math.max(a, b);
+        const top = label.centreY - label.size.height / 2;
+        const bottom = label.centreY + label.size.height / 2;
+        const clearancePx = radiusPx + OUTSIDE_LABEL_GAP_PX;
+        const ownX = label.pie.screenCentre.x;
+        const pies = props.pieLayout || [];
+
+        let edgeX = direction > 0
+            ? props.innerWidth * props.scaleX + (props.margin ? props.margin.right : 0)
+            : -(props.margin ? props.margin.left : 0);
+
+        for (let i = 0; i < pies.length; i++) {
+
+            const centre = pies[i].screenCentre;
+
+            if ((centre.x - ownX) * direction <= 0) continue;
+
+            edgeX = nearer(edgeX, centre.x);
+
+            const dy = Math.max(0, top - centre.y, centre.y - bottom);
+
+            if (dy < clearancePx) {
+
+                edgeX = nearer(
+                    edgeX,
+                    centre.x - direction * Math.sqrt(clearancePx * clearancePx - dy * dy)
+                );
+            }
+        }
+
+        for (let i = 0; i < placedBoxes.length; i++) {
+
+            const box = placedBoxes[i];
+
+            if (box.bottom + LABEL_PADDING_PX <= top || box.top - LABEL_PADDING_PX >= bottom) {
+                continue;
+            }
+
+            const nearSideX = direction > 0 ? box.left : box.right;
+            const farSideX = direction > 0 ? box.right : box.left;
+
+            if ((farSideX - textX) * direction > 0) edgeX = nearer(edgeX, nearSideX);
+        }
+
+        return edgeX;
+    };
+
+    /**
      * Places the labels stacked either side of each pie, on the side its slice is on, each joined
      * to the middle of its slice's rim by a connector running out from the pie, then level to the
-     * label.  Around, the labels are lined up in a column; otherwise each hugs the pie.  The box
-     * of each label placed is added to any placedBoxes passed.
+     * label.  Around, the labels are lined up in a column, each running no further than halfway
+     * to the next pie.  Otherwise each hugs the pie, and may run on towards the next pie as far
+     * as it is clear of it, the biggest slices' labels taking their room first.  The box of each
+     * label placed is added to any placedBoxes passed.
      */
     const layoutStacked = (props, labels, radiusPx, hugsPie, result, placedBoxes) => {
 
@@ -902,8 +1040,8 @@ Ren.DateValueChart_PieLabels = (() => {
             column[label.isRight ? "right" : "left"].push(label);
         }
 
-        // A label may run on into the chart's margin beside the outermost pies, but no further
-        // than halfway to a pie beside it.
+        // Around, a label may run on into the chart's margin beside the outermost pies, but no
+        // further than halfway to a pie beside it.
         const getEdgeX = (pie, direction) => {
 
             const centreX = pie.screenCentre.x;
@@ -918,6 +1056,10 @@ Ren.DateValueChart_PieLabels = (() => {
 
             return centreX + direction * periodWidthPx / 2;
         };
+
+        // Each column is stacked first, so that every label's height is known before any takes
+        // its room across.
+        const entries = [];
 
         columns.forEach((column, pie) => {
 
@@ -935,54 +1077,69 @@ Ren.DateValueChart_PieLabels = (() => {
                         ? getHuggingOffset(label, pie.screenCentre, radiusPx)
                         : radiusPx + CALLOUT_GAP_PX;
                     const columnX = pie.screenCentre.x + direction * offsetPx;
-                    const textX = columnX + direction * CALLOUT_TEXT_GAP_PX;
-                    const availableWidthPx =
-                        (getEdgeX(pie, direction) - textX) * direction - LABEL_PADDING_PX;
-                    const text = label.size.restWidth <= availableWidthPx
-                        ? fitText(label.lines[0], label.size.prefixLengths, availableWidthPx)
-                        : null;
 
-                    if (text === null) {
-
-                        result.hidden++;
-                        continue;
-                    }
-
-                    label.groupNode.style.display = "";
-                    setFirstLine(label.textNode, text);
-                    label.textNode.classList.remove(INSIDE_CLASS);
-                    placeText(label.textNode, textX, label.centreY);
-                    label.textNode.style.textAnchor = label.isRight ? "start" : "end";
-
-                    showConnector(label, [
-                        [label.rimX, label.rimY],
-                        [label.elbowX, label.elbowY],
-                        [columnX, label.centreY]
-                    ]);
-
-                    if (placedBoxes) {
-
-                        const widthPx = Math.min(label.size.width, availableWidthPx);
-                        const boxLeft = label.isRight ? textX : textX - widthPx;
-
-                        placedBoxes.push({
-                            left: boxLeft,
-                            right: boxLeft + widthPx,
-                            top: label.centreY - label.size.height / 2,
-                            bottom: label.centreY + label.size.height / 2
-                        });
-                    }
-
-                    if (label.isSubdivision) {
-                        result.subdivisions++;
-                    }
-                    else {
-
-                        result.outside++;
-                    }
+                    entries.push({
+                        label,
+                        pie,
+                        direction,
+                        columnX,
+                        textX: columnX + direction * CALLOUT_TEXT_GAP_PX
+                    });
                 }
             }
         });
+
+        if (hugsPie) entries.sort((a, b) => b.label.slice.share - a.label.slice.share);
+
+        const boxes = placedBoxes || [];
+
+        for (let i = 0; i < entries.length; i++) {
+
+            const { label, pie, direction, columnX, textX } = entries[i];
+            const edgeX = hugsPie
+                ? getHuggingEdgeX(props, label, textX, direction, radiusPx, boxes)
+                : getEdgeX(pie, direction);
+            const availableWidthPx = (edgeX - textX) * direction - LABEL_PADDING_PX;
+            const text = label.size.restWidth <= availableWidthPx
+                ? fitText(label.lines[0], label.size.prefixLengths, availableWidthPx)
+                : null;
+
+            if (text === null) {
+
+                result.hidden++;
+                continue;
+            }
+
+            label.groupNode.style.display = "";
+            setFirstLine(label.textNode, text);
+            label.textNode.classList.remove(INSIDE_CLASS);
+            placeText(label.textNode, textX, label.centreY);
+            label.textNode.style.textAnchor = label.isRight ? "start" : "end";
+
+            showConnector(label, [
+                [label.rimX, label.rimY],
+                [label.elbowX, label.elbowY],
+                [columnX, label.centreY]
+            ]);
+
+            const widthPx = Math.min(label.size.width, availableWidthPx);
+            const boxLeft = label.isRight ? textX : textX - widthPx;
+
+            boxes.push({
+                left: boxLeft,
+                right: boxLeft + widthPx,
+                top: label.centreY - label.size.height / 2,
+                bottom: label.centreY + label.size.height / 2
+            });
+
+            if (label.isSubdivision) {
+                result.subdivisions++;
+            }
+            else {
+
+                result.outside++;
+            }
+        }
     };
 
     /** Writes each pie's total in its hole, where it fits. */
@@ -1419,6 +1576,7 @@ Ren.DateValueChart_PieLabels = (() => {
         getLabelLines,
         isBoxInSlice,
         fitText,
+        getHuggingEdgeX,
         render,
         getRadiusPx,
         layout,

@@ -314,11 +314,85 @@ describe("Ren.DateValueChart_PieLabels", () => {
         expect(PieLabels.getRadiusPx({ pieCalloutWidthPx: 60 }, 100, 100)).toBe(85);
     });
 
+    test("getRadiusPx_ValuesNotFittingAtMinimumShare_ShrunkToFitThem", () => {
+
+        // Half the period, less the 80px the values need and 2px padding.
+        const props = { pieCalloutWidthPx: 160, pieCalloutMinWidthEstimatePx: 80, pieLabelNodes: [] };
+
+        expect(PieLabels.getRadiusPx(props, 100, 300)).toBe(68);
+    });
+
+    test("getRadiusPx_ValuesNotFittingAtAll_ShrunkToHalf", () => {
+
+        const props = { pieCalloutWidthPx: 160, pieCalloutMinWidthEstimatePx: 80, pieLabelNodes: [] };
+
+        expect(PieLabels.getRadiusPx(props, 100, 200)).toBe(50);
+    });
+
+    test("getRadiusPx_ValuesFittingAtMinimumShare_ShrunkNoFurther", () => {
+
+        const props = { pieCalloutWidthPx: 160, pieCalloutMinWidthEstimatePx: 80, pieLabelNodes: [] };
+
+        expect(PieLabels.getRadiusPx(props, 100, 400)).toBe(85);
+    });
+
     test("isBoxInSlice_WholePieWithoutHole_CentreAllowed", () => {
 
         const box = { left: -20, right: 20, top: -5, bottom: 5 };
         const wholeSlice = { startAngle: 0, endAngle: Math.PI * 2 };
 
         expect(PieLabels.isBoxInSlice(box, centre, wholeSlice, 0, 100)).toBe(true);
+    });
+
+    describe("getHuggingEdgeX", () => {
+
+        // Two pies of radius 100, 300px apart, in a 600px-wide plot with 20px margins.
+        const leftPie = { screenCentre: { x: 150, y: 150 } };
+        const rightPie = { screenCentre: { x: 450, y: 150 } };
+        const edgeProps = {
+            innerWidth: 600,
+            scaleX: 1,
+            margin: { left: 20, right: 20 },
+            pieLayout: [leftPie, rightPie]
+        };
+
+        const label = (pie, centreY) => ({ pie, centreY, size: { height: 20 } });
+
+        test("getHuggingEdgeX_LevelWithNeighbour_StopsShortOfItsRimNotHalfway", () => {
+
+            // 90px above the neighbour's centre, so kept 112px from it: 150 + √(112² - 90²).
+            const edgeX = PieLabels.getHuggingEdgeX(
+                edgeProps, label(rightPie, 50), 340, -1, 100, []);
+
+            expect(edgeX).toBeCloseTo(150 + Math.sqrt(112 * 112 - 90 * 90), 6);
+        });
+
+        test("getHuggingEdgeX_ClearOfNeighbour_StopsAtItsCentre", () => {
+
+            expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 20), 340, -1, 100, []))
+                .toBe(150);
+        });
+
+        test("getHuggingEdgeX_OutermostPie_RunsIntoMargin", () => {
+
+            expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 50), 560, 1, 100, []))
+                .toBe(620);
+        });
+
+        test("getHuggingEdgeX_LabelPlacedInTheWay_StopsAtIt", () => {
+
+            const placed = [{ left: 250, right: 300, top: 45, bottom: 55 }];
+
+            expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 50), 340, -1, 100, placed))
+                .toBe(300);
+        });
+
+        test("getHuggingEdgeX_LabelPlacedAboveIt_Ignored", () => {
+
+            const placed = [{ left: 250, right: 300, top: 0, bottom: 30 }];
+
+            expect(PieLabels.getHuggingEdgeX(edgeProps, label(rightPie, 50), 340, -1, 100, placed))
+                .toBe(150 + Math.sqrt(112 * 112 - 90 * 90));
+        });
     });
 });
