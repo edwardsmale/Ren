@@ -217,6 +217,38 @@ describe("Ren.DateValueChart_Title", () => {
             expect(values[1].textContent).toBe("Bic");
         });
 
+        test("render_CrossFiltered_CrossFilterFirstInChip", () => {
+
+            spyOnFilters({
+                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
+            });
+
+            const crossFilter = {
+                filter: { column: "Region", group: "Mix" },
+                text: "Region: South",
+                title: "Filtered from \"Sales by region\" to Region = South."
+            };
+
+            jest.spyOn(Ren.VisualisationCrossFilterIndicators, "getCrossFilters")
+                .mockReturnValue([crossFilter]);
+
+            const { container, svg } = createChart();
+
+            Title.render({ svg, chartSubtitle: "{filters}", visualisation });
+
+            const subtitle = container.querySelector(".ren-chart-subtitle");
+            const chip = subtitle.querySelector(".ren-cross-filter-chip--inline");
+
+            expect(Title.getSubtitle({ chartSubtitle: "{filters}", visualisation }))
+                .toBe("Region: South  |  Brand: Acco");
+            expect(chip.querySelector(".ren-cross-filter-chip__text").textContent)
+                .toBe("Region: South");
+            expect(chip.querySelector("strong").textContent).toBe("South");
+            expect(chip.title).toBe(crossFilter.title);
+            expect(subtitle.querySelectorAll(".ren-cross-filter-chip").length).toBe(1);
+        });
+
         test("render_TitleAndSubtitle_SubtitleBeneathTitle", () => {
 
             const { container, svg } = createChart();

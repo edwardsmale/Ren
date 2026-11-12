@@ -6,10 +6,18 @@
  * A filter is shown for as long as its column stays filtered, by whatever means, and goes once the
  * column is no longer filtered.  The visualisation the filter was set from isn't filtered by it,
  * so it shows no chip.
+ *
+ * A visualisation that names its filters in words, as a date/value chart's subtitle can, shows its
+ * cross filters there instead, as inline chips (see createInlineChip), and so has no chip of its
+ * own for them.
  */
 Ren.VisualisationCrossFilterIndicators = (() => {
 
     const CONTAINER_CLASS = "ren-visualisation__cross-filters";
+    const INLINE_CHIP_CLASS = "ren-cross-filter-chip--inline";
+
+    // The attribute naming the filter an inline chip shows, by its key.
+    const KEY_ATTRIBUTE = "data-ren-cross-filter";
 
     // The values a chip names before it counts the rest.
     const SHOWN_VALUE_COUNT = 1;
@@ -219,7 +227,8 @@ Ren.VisualisationCrossFilterIndicators = (() => {
         if (activeFilter.filter.onCleared) activeFilter.filter.onCleared();
     };
 
-    const createChip = (activeFilter) => {
+    // Names the filter with its own text, or with the content given.
+    const createChip = (activeFilter, content) => {
 
         const chip = document.createElement("span");
         const text = document.createElement("span");
@@ -229,7 +238,9 @@ Ren.VisualisationCrossFilterIndicators = (() => {
         chip.title = activeFilter.title;
 
         text.className = "ren-cross-filter-chip__text";
-        text.textContent = activeFilter.text;
+
+        if (content) text.appendChild(content);
+        else text.textContent = activeFilter.text;
 
         clearButton.type = "button";
         clearButton.className = "ren-cross-filter-chip__clear";
@@ -247,6 +258,54 @@ Ren.VisualisationCrossFilterIndicators = (() => {
         chip.appendChild(clearButton);
 
         return chip;
+    };
+
+    /**
+     * Gets the cross filters a visualisation is filtered by, as they are shown: each with its
+     * filter, whose column is the column filtered, its text and its title.
+     */
+    const getCrossFilters = (visualisation) => {
+
+        if (!visualisation || !filters.size) return [];
+
+        return getActiveFilters().filter(activeFilter => isFilteredBy(visualisation, activeFilter));
+    };
+
+    /**
+     * Creates a chip for a cross filter of getCrossFilters, to stand in a line of text naming it
+     * with the content given.  Its clear button shows while its visualisation is hovered.  The
+     * visualisation it stands in shows no other chip for the filter, once the chips are next
+     * refreshed, which creating it schedules.
+     */
+    const createInlineChip = (activeFilter, content) => {
+
+        const chip = createChip(activeFilter, content);
+
+        chip.classList.add(INLINE_CHIP_CLASS);
+        chip.setAttribute(KEY_ATTRIBUTE, getFilterKey(activeFilter.filter));
+
+        // Kept from the visualisation beneath, which may start a drag or selection on it.
+        chip.addEventListener("mousedown", event => event.stopPropagation());
+
+        // Takes away the chip the visualisation may already show for the filter.  A redraw, as
+        // when the filter is set, comes after the chips were last refreshed and doesn't refresh
+        // them itself.
+        scheduleRefresh();
+
+        return chip;
+    };
+
+    const isShownInline = (element, activeFilter) => {
+
+        const key = getFilterKey(activeFilter.filter);
+        const inlineChips = element.querySelectorAll("." + INLINE_CHIP_CLASS);
+
+        for (let index = 0; index < inlineChips.length; index++) {
+
+            if (inlineChips[index].getAttribute(KEY_ATTRIBUTE) === key) return true;
+        }
+
+        return false;
     };
 
     const getContainer = (element) => element.querySelector(":scope > ." + CONTAINER_CLASS);
@@ -290,6 +349,14 @@ Ren.VisualisationCrossFilterIndicators = (() => {
 
         const filtersByElement = getFiltersByElement(getActiveFilters());
 
+        filtersByElement.forEach((activeFilters, element) => {
+
+            const shownApart = activeFilters.filter(f => !isShownInline(element, f));
+
+            if (shownApart.length) filtersByElement.set(element, shownApart);
+            else filtersByElement.delete(element);
+        });
+
         Array.from(elementsShowingChips).forEach((element) => {
 
             if (!filtersByElement.has(element)) removeChips(element);
@@ -332,6 +399,8 @@ Ren.VisualisationCrossFilterIndicators = (() => {
 
     return {
         addFilter,
+        createInlineChip,
+        getCrossFilters,
         refresh
     };
 })();

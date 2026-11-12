@@ -149,4 +149,52 @@ describe("Ren.VisualisationCrossFilterIndicators", () => {
 
         expect(onCleared).toHaveBeenCalledTimes(1);
     });
+
+    test("getCrossFilters_FollowingVisualisation_GetsFilterButNotOnSource", () => {
+
+        addRegionFilter();
+
+        const crossFilters = Indicators.getCrossFilters(grid);
+
+        expect(crossFilters.length).toBe(1);
+        expect(crossFilters[0].filter.column).toBe("Region");
+        expect(Indicators.getCrossFilters(sourceChart)).toEqual([]);
+    });
+
+    test("refresh_ShownInlineInVisualisation_NoChipOfItsOwn", () => {
+
+        addRegionFilter();
+
+        const content = document.createTextNode("Region: South");
+        const inlineChip = Indicators.createInlineChip(Indicators.getCrossFilters(grid)[0], content);
+
+        grid.element.appendChild(inlineChip);
+        Indicators.refresh();
+
+        expect(grid.element.querySelector(".ren-visualisation__cross-filters")).toBeNull();
+        expect(inlineChip.classList.contains("ren-cross-filter-chip--inline")).toBe(true);
+        expect(inlineChip.textContent).toBe("Region: South×");
+
+        inlineChip.querySelector(".ren-cross-filter-chip__clear").click();
+
+        expect(settings.sortFilterGroup.removeColumnFilter).toHaveBeenCalledWith("Region");
+    });
+
+    test("createInlineChip_ChipAlreadyShown_TakenAwayOnceRefreshed", async () => {
+
+        addRegionFilter();
+
+        expect(getChipText(grid)).toBe("Region: South");
+
+        // As a chart's redraw draws its subtitle after the chips were refreshed.
+        grid.element.appendChild(Indicators.createInlineChip(
+            Indicators.getCrossFilters(grid)[0],
+            document.createTextNode("Region: South")
+        ));
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(grid.element.querySelector(".ren-visualisation__cross-filters")).toBeNull();
+    });
 });
+

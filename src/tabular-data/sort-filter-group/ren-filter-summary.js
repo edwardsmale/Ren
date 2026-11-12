@@ -72,6 +72,9 @@ Ren.FilterSummary = (() => {
 
     const joinParts = (parts) => parts.map(part => part.text).join("");
 
+    // An entry, with the column it names where it names a column's values.
+    const createEntry = (parts, column = null) => ({ parts, column });
+
     // Names the values, counting those past maxValues rather than naming them.
     const describeValues = (heading, labels, isNegated, maxValues) => {
 
@@ -169,7 +172,7 @@ Ren.FilterSummary = (() => {
                 parts.push(createPart(group.texts[index], true));
             }
 
-            entries.push(parts);
+            entries.push(createEntry(parts));
         });
 
         return entries;
@@ -215,7 +218,7 @@ Ren.FilterSummary = (() => {
         return itemSettings;
     };
 
-    // Gets each entry as its parts.
+    // Gets each entry, as { parts, column }.
     const getEntryParts = (filters, tabularData, maxValues, itemSettings) => {
 
         const entries = [];
@@ -227,13 +230,16 @@ Ren.FilterSummary = (() => {
 
         const getShowAsCheckbox = (column) => itemSettings?.[column]?.showAsCheckbox ?? "Off";
 
-        filters.columnFilters?.forEach((columnFilter, column) => entries.push(describeColumnFilter(
-            getHeading,
-            getShowAsCheckbox,
-            tabularData,
-            column,
-            columnFilter,
-            maxValues
+        filters.columnFilters?.forEach((columnFilter, column) => entries.push(createEntry(
+            describeColumnFilter(
+                getHeading,
+                getShowAsCheckbox,
+                tabularData,
+                column,
+                columnFilter,
+                maxValues
+            ),
+            column
         )));
 
         const comparePredicates = [];
@@ -250,7 +256,7 @@ Ren.FilterSummary = (() => {
 
                     const entry = describeCombinations(getHeading, predicate, maxValues);
 
-                    if (entry) entries.push(entry);
+                    if (entry) entries.push(createEntry(entry));
                     break;
                 }
 
@@ -259,11 +265,11 @@ Ren.FilterSummary = (() => {
                     break;
 
                 case "function":
-                    entries.push([createPart("Custom filter", false)]);
+                    entries.push(createEntry([createPart("Custom filter", false)]));
                     break;
 
                 case "includeRowIndexes":
-                    entries.push([createPart("Chosen rows", false)]);
+                    entries.push(createEntry([createPart("Chosen rows", false)]));
                     break;
             }
         }
@@ -277,25 +283,35 @@ Ren.FilterSummary = (() => {
      * the heading to give a column in place of its own, and how it is shown as a checkbox.
      */
     const getEntries = (filters, tabularData, maxValues, itemSettings) =>
-        getEntryParts(filters, tabularData, maxValues, itemSettings).map(joinParts);
+        getEntryParts(filters, tabularData, maxValues, itemSettings)
+            .map(entry => joinParts(entry.parts));
 
     /**
      * Gets the filters in words as parts, { text, isValue }, which flag the values named so that
      * they can be shown apart from the words around them.  Empty where nothing is filtered.
+     *
+     * The entries of the columns in leadingColumns, a set, where it is given, come first, and each
+     * of their parts carries its column as column, so that they can be shown apart from the rest.
      */
-    const getParts = (filters, tabularData, maxValues, itemSettings) => {
+    const getParts = (filters, tabularData, maxValues, itemSettings, leadingColumns) => {
 
         const entries = getEntryParts(filters, tabularData, maxValues, itemSettings);
+        const isLeading = (entry) => entry.column != null && !!leadingColumns?.has(entry.column);
+        const ordered = entries.filter(isLeading).concat(entries.filter(entry => !isLeading(entry)));
         const parts = [];
 
-        for (let index = 0; index < entries.length; index++) {
+        for (let index = 0; index < ordered.length; index++) {
 
             if (index) parts.push(createPart(ENTRY_SEPARATOR, false));
 
-            const entryParts = entries[index];
+            const entry = ordered[index];
+            const entryParts = entry.parts;
 
             for (let partIndex = 0; partIndex < entryParts.length; partIndex++) {
-                parts.push(entryParts[partIndex]);
+
+                parts.push(isLeading(entry)
+                    ? Object.assign({}, entryParts[partIndex], { column: entry.column })
+                    : entryParts[partIndex]);
             }
         }
 

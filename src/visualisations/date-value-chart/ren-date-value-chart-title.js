@@ -8,7 +8,9 @@
  *
  * The subtitle can name the filters in effect on the chart's rows: {filters} stands for them.  A
  * subtitle naming them is hidden while nothing is filtered, keeping its room so the plot doesn't
- * move as filters come and go.
+ * move as filters come and go.  The cross filters set from other charts come first, each as a chip
+ * that can clear it (see Ren.VisualisationCrossFilterIndicators), which the chart then doesn't show
+ * in its corner.
  */
 Ren.DateValueChart_Title = (() => {
 
@@ -54,7 +56,8 @@ Ren.DateValueChart_Title = (() => {
 
     /**
      * Gets the filters in effect on the chart's rows in words, as Ren.FilterSummary's parts, each
-     * headed as the filter module setting it heads its item.  Empty where none are in effect.
+     * headed as the filter module setting it heads its item.  Empty where none are in effect.  The
+     * cross filters come first, each of their parts carrying the cross filter as crossFilter.
      */
     const getFilterSummaryParts = (props, maxValues) => {
 
@@ -74,17 +77,26 @@ Ren.DateValueChart_Title = (() => {
 
         if (visualisation.filterGroup) settingsGroups.push(visualisation.filterGroup);
 
-        return Ren.FilterSummary.getParts(
+        const crossFilters = new Map(Ren.VisualisationCrossFilterIndicators
+            .getCrossFilters(visualisation)
+            .map(crossFilter => [crossFilter.filter.column, crossFilter]));
+
+        const parts = Ren.FilterSummary.getParts(
             Ren.DateValueChart_DataPointGrid.getChartFilters(visualisation, tabularData),
             tabularData,
             maxValues,
-            Ren.FilterSummary.getFilterModuleItemSettings(settingsGroups)
+            Ren.FilterSummary.getFilterModuleItemSettings(settingsGroups),
+            new Set(crossFilters.keys())
         );
+
+        return parts.map(part => part.column == null
+            ? part
+            : { text: part.text, isValue: part.isValue, crossFilter: crossFilters.get(part.column) });
     };
 
     /**
      * Gets the chart's subtitle as it is shown in parts, { text, isValue }, the values it names
-     * flagged; empty where it has none.  Each filter it names names at most maxValues values, six
+     * flagged, and those naming a cross filter carrying it as crossFilter; empty where it has none.  Each filter it names names at most maxValues values, six
      * by default.
      */
     const getSubtitleParts = (props, maxValues = SHOWN_FILTER_VALUE_COUNT) => {
@@ -123,7 +135,28 @@ Ren.DateValueChart_Title = (() => {
     const getSubtitle = (props, maxValues) =>
         getSubtitleParts(props, maxValues).map(part => part.text).join("");
 
-    // Takes the text in parts, { text, isValue }, its values in bold.
+    const appendParts = (parent, parts) => {
+
+        for (let index = 0; index < parts.length; index++) {
+
+            const part = parts[index];
+
+            if (part.isValue) {
+
+                const valueElement = document.createElement("strong");
+
+                valueElement.textContent = part.text;
+                parent.appendChild(valueElement);
+            }
+            else {
+
+                parent.appendChild(document.createTextNode(part.text));
+            }
+        }
+    };
+
+    // Takes the text in parts, { text, isValue, crossFilter }, its values in bold and each cross
+    // filter's run of parts in a chip.
     const createHeading = (className, parts, tooltip, ariaLevel, textStyles) => {
 
         const element = document.createElement("div");
@@ -144,21 +177,28 @@ Ren.DateValueChart_Title = (() => {
 
         textElement.className = className + "__text";
 
-        for (let index = 0; index < parts.length; index++) {
+        for (let index = 0; index < parts.length;) {
 
-            const part = parts[index];
+            const crossFilter = parts[index].crossFilter;
+            let end = index + 1;
 
-            if (part.isValue) {
+            while (end < parts.length && parts[end].crossFilter === crossFilter) end++;
 
-                const valueElement = document.createElement("strong");
+            if (crossFilter) {
 
-                valueElement.textContent = part.text;
-                textElement.appendChild(valueElement);
+                const content = document.createDocumentFragment();
+
+                appendParts(content, parts.slice(index, end));
+                textElement.appendChild(
+                    Ren.VisualisationCrossFilterIndicators.createInlineChip(crossFilter, content)
+                );
             }
             else {
 
-                textElement.appendChild(document.createTextNode(part.text));
+                appendParts(textElement, parts.slice(index, end));
             }
+
+            index = end;
         }
 
         Ren.Svg.setStyles(textElement, {

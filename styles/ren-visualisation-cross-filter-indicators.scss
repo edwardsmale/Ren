@@ -77,3 +77,51 @@
         }
     }
 }
+
+// A chip standing in a line of text naming the filters, as a date/value chart's subtitle does.  It
+// fits the line, and its clear button shows only while the visualisation is hovered, so that a
+// screenshot, a print or a shared screen shows the chip without it.  The button keeps its room
+// meanwhile, so the line doesn't move.
+.ren-cross-filter-chip--inline
+{
+    vertical-align: top;
+    max-width: none;
+    height: 1rem;
+    gap: 0.1875rem;
+    padding: 0 0.0625rem 0 0.3125rem;
+    border-radius: 0.5rem;
+    font-size: inherit;
+
+    .ren-cross-filter-chip__icon
+    {
+        width: 0.625rem;
+        height: 0.625rem;
+    }
+
+    .ren-cross-filter-chip__clear
+    {
+        width: 0.875rem;
+        height: 0.875rem;
+        font-size: 0.8125rem;
+        opacity: 0;
+        transition: opacity 0.15s;
+
+        &:focus-visible
+        {
+            opacity: 1;
+        }
+    }
+
+    .ren-visualisation:hover & .ren-cross-filter-chip__clear
+    {
+        opacity: 1;
+    }
+
+    @media print
+    {
+        .ren-cross-filter-chip__clear
+        {
+            visibility: hidden;
+        }
+    }
+}

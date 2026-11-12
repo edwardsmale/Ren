@@ -170,4 +170,20 @@ describe("Ren.FilterSummary", () => {
 
         expect(Summary.getText(filters, tabularData, 6, itemSettings)).toBe("Brand: 1; 0");
     });
+
+    test("getParts_LeadingColumns_TheirEntriesFirstAndMarked", () => {
+
+        const filters = createFilters({
+            Brand: createColumnFilter(["Acco"]),
+            Sales: createColumnFilter(["10"])
+        });
+
+        expect(Summary.getParts(filters, tabularData, 6, null, new Set(["Sales"]))).toEqual([
+            { text: "Sales: ", isValue: false, column: "Sales" },
+            { text: "10", isValue: true, column: "Sales" },
+            { text: "  |  ", isValue: false },
+            { text: "Brand: ", isValue: false },
+            { text: "Acco", isValue: true }
+        ]);
+    });
 });
