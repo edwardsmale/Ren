@@ -71,8 +71,11 @@ checked against hashes in `build/Ren.Build/Tools.cs`.  Set `REN_TOOLS` to keep t
 - `ren.css`: `styles/`, compiled with Dart Sass and prefixed with Lightning CSS.
 - Minified versions of each (`ren.min.js`, `ren.esm.min.js`, `ren.min.css`), from esbuild.
 - A source map for each file, and a copy of the schema.
-- `ren.manifest.json`: the build's version and commit, whether it's a release, and SHA-256 hashes
-  of the files (with line endings normalised to LF).
+- `ren.manifest.json`: the build's version and commit, whether it's a release, its branch, and
+  SHA-256 hashes of the files (with line endings normalised to LF).  A development build's branch
+  is the one checked out, and a release's is the one whose work it released (see "Releasing"), so
+  a site can keep things that go with a branch of Ren under its name, and move them to the
+  version that releases it.
 
 Each file starts with a licence comment naming the version.  The templates register themselves
 through `Ren.Extensions`, so a page doesn't need template elements of its own (but its own still
@@ -249,6 +252,12 @@ gets a Ren that's missing something an earlier release had.
    This dates the version's CHANGELOG section, sets `VERSION`, runs CI (undoing both if it fails),
    commits "Ren 1.1.1", and tags it `v1.1.1`.  It doesn't push or publish anything.  If there's
    already a "## 1.1.1 (not released yet)" section, it dates that, and "Unreleased" must be empty.
+
+   The commit records the branch the release is for in a `Ren-Branch` trailer, which goes into
+   the release's manifest.  Branches are fast-forwarded into main, so there's no merge commit to
+   tell from: it's the one local branch main has merged since the last release.  If there's more
+   than one, say which with `--branch`, as in `release 1.1.1 --branch Reporting_TileGroupHeadings`.
+   Work done on main itself has no branch.
 3. Push main and the tag:
 
    ```

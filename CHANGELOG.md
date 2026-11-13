@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Add the released branch to ren.manifest.json, for settings file versioning code to use.
+
 ## 1.1.10 (2026-11-12)
 
 Show a chart's cross filters in its filters subtitle, first and as chips that clear them on hover, rather than again in its corner.

@@ -5,9 +5,16 @@ namespace Ren.Build;
 /// working tree is clean, and a development build otherwise.  A development build's version says
 /// which commit it was built from, and whether the tree had changes on top of it, as semver build
 /// metadata: 1.1.0+dev.4f2a9c1.dirty.
+///
+/// Its branch is, for a development build, the branch checked out, and for a release, the branch
+/// whose work it released, which the release commit's Ren-Branch trailer records (see
+/// Releaser.cs).  It lets a site keep things of its own that go with a branch of Ren under the
+/// branch's name, and carry them over to the version that releases it.
 /// </summary>
-internal sealed record BuildIdentity(string Version, string? Commit, bool IsRelease)
+internal sealed record BuildIdentity(string Version, string? Commit, bool IsRelease, string? Branch)
 {
+    public const string BranchTrailer = "Ren-Branch";
+
     public static BuildIdentity Get()
     {
         var version = Repo.ReadVersion();
@@ -20,6 +27,10 @@ internal sealed record BuildIdentity(string Version, string? Commit, bool IsRele
             ? version
             : version + "+dev." + (commit != null ? commit.Substring(0, 7) : "unknown") + (isDirty ? ".dirty" : "");
 
-        return new BuildIdentity(fullVersion, commit, isRelease);
+        var branch = isRelease
+            ? Git.TryRun("log", "-1", $"--format=%(trailers:key={BranchTrailer},valueonly)", "HEAD")
+            : GitBranch.Read(Repo.Root).Branch;
+
+        return new BuildIdentity(fullVersion, commit, isRelease, string.IsNullOrEmpty(branch) ? null : branch);
     }
 }
