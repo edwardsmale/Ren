@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.1.13 (2026-11-14)
 
 In publish.yml only run client tests against minified statics, to speed up releases.
 
