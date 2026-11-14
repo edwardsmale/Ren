@@ -133,7 +133,7 @@ Ren.Log = (() => {
     };
 
     const error = (eventType, logGroup, topic, itemGuid, data) => log(Ren.LogLevelEnum.Error, eventType, logGroup, topic, itemGuid, data);
-    const warning = (eventType, logGroup, topic, itemGuid, data) => log(Ren.LogLevelEnum.Warning, eventType, logGroup, topic, itemGuid, data);
+    const warning = (eventType, logGroup, topic, itemGuid, data) => log(Ren.LogLevelEnum.Warn, eventType, logGroup, topic, itemGuid, data);
     const info = (eventType, logGroup, topic, itemGuid, data) => log(Ren.LogLevelEnum.Info, eventType, logGroup, topic, itemGuid, data);
     const debug = (eventType, logGroup, topic, itemGuid, data) => log(Ren.LogLevelEnum.Debug, eventType, logGroup, topic, itemGuid, data);
 

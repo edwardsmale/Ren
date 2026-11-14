@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Fix embedded reports' scripts not finding their elements when the report was already loaded.
+Fix Ren.Log.warning logging entries with no log level, as it used Ren.LogLevelEnum.Warning rather than Warn.
 
 ## 1.1.11 (2026-11-13)
 

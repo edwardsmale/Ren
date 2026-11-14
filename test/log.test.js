@@ -67,3 +67,30 @@ test("processLogQueue_LoggingEnabledWithMapper_PostsMappedEntry", () => {
     expect(entries[0].pageGuid).toBe(Ren.UserContext.getPageGuid());
     expect(entries[0].data).toEqual({ status: 500 });
 });
+
+test("logHelpers_EachLevel_QueuesDefinedLogLevel", () => {
+
+    const entries = [];
+
+    Ren.Extensions.registerLogEntryMapper((entry) => {
+
+        entries.push(entry);
+
+        return {};
+    });
+
+    Ren.configure({ loggingEnabled: true });
+    Ren.Log.error("E");
+    Ren.Log.warning("W");
+    Ren.Log.info("I");
+    Ren.Log.debug("D");
+    Ren.Log.processLogQueue();
+
+    expect(entries.map(e => e.logLevel)).toEqual([
+        Ren.LogLevelEnum.Error,
+        Ren.LogLevelEnum.Warn,
+        Ren.LogLevelEnum.Info,
+        Ren.LogLevelEnum.Debug
+    ]);
+    expect(entries.every(e => typeof e.logLevel === "number")).toBe(true);
+});
