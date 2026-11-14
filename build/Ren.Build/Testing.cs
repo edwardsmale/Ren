@@ -29,13 +29,14 @@ internal static class Testing
 
     /// <summary>
     /// Runs everything CI runs, stopping at the first failure: the build, the client tests, the
-    /// client tests again on the minified build, then the .NET package's build and tests.
+    /// client tests again on the minified build, then the .NET package's build and tests.  With
+    /// minifiedOnly, the client tests run just once, on the minified build, as Publish does.
     /// </summary>
-    public static async Task RunCiAsync(Publisher publisher)
+    public static async Task RunCiAsync(Publisher publisher, bool minifiedOnly = false)
     {
         await Builder.BuildAsync(publisher);
-        await RunClientTestsAsync(minified: false, []);
-        await RunClientTestsAsync(minified: true, ["--no-build"]);
+        if (!minifiedOnly) await RunClientTestsAsync(minified: false, []);
+        await RunClientTestsAsync(minified: true, minifiedOnly ? [] : ["--no-build"]);
         await Step.RunAsync("Building the .NET package", "dotnet", ["build", DotnetSolution, "-c", "Release"]);
         await TestStep.RunAsync("Running the .NET package's tests", [DotnetSolution, "-c", "Release", "--no-build"]);
 

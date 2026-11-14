@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+In publish.yml only run client tests against minified statics, to speed up releases.
+
 ## 1.1.12 (2026-11-14)
 
 Fix embedded reports' scripts not finding their elements when the report was already loaded.

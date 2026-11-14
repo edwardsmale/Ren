@@ -15,7 +15,8 @@ using Ren.Build;
 //   test [--minified] [<dotnet test arguments>]
 //                             Builds, then runs the client tests (on the minified build, with
 //                             --minified).  Arguments such as --filter go to dotnet test.
-//   ci                        Builds and runs every test, as CI does.
+//   ci [--minified]           Builds and runs every test, as CI does (running the client tests
+//                             only on the minified build, with --minified, as Publish does).
 //   serve [<port>]            Serves the repo at http://localhost:8080/ (or the port given).
 //   release <version> [--branch <branch>]
 //                             Releases the version (see Releaser.cs), recording the branch it
@@ -60,7 +61,7 @@ try
             break;
 
         case "ci":
-            await Testing.RunCiAsync(publisher);
+            await Testing.RunCiAsync(publisher, commandArgs.Contains("--minified"));
             break;
 
         case "serve":
