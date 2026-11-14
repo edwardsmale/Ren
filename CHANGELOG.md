@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Fix embedded reports' scripts not finding their elements when the report was already loaded.
+
 ## 1.1.11 (2026-11-13)
 
 Add the released branch to ren.manifest.json, for settings file versioning code to use.

@@ -89,7 +89,9 @@ Ren.CreateEmbeddedReport = (_tabularData, visualisation) => {
 
         if (inPageResponse) {
 
-            withResponse(inPageResponse);
+            // Not until the element is returned and put in the document, as a fetched response
+            // is, so that the report's scripts can find their elements by ID.
+            queueMicrotask(() => withResponse(inPageResponse));
         }
         else {
 
