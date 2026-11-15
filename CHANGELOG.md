@@ -6,7 +6,8 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 
 ## Unreleased
 
-Also omit groupByColumnIndexes from client-side date/value charts' saved settings, which 1.1.14 missed.
+Omit groupByColumnIndexes from client-side date/value charts' saved settings.
+Prevent lock errors upon building a release while the ren-watch and ren-serve VS Code tasks are running.
 
 ## 1.1.14 (2026-11-15)
 

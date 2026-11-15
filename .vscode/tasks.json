@@ -15,7 +15,7 @@
             "detail": "As ren-build, then again whenever a source file changes.",
             "type": "process",
             "command": "dotnet",
-            "args": ["run", "--project", "build/Ren.Build", "--", "watch", "--statics", "${env:REN_STATICS}"],
+            "args": ["run", "--project", "build/Ren.Build", "-c", "Background", "--", "watch", "--statics", "${env:REN_STATICS}"],
             "isBackground": true,
             "problemMatcher": [],
             "runOptions": { "runOn": "folderOpen" }
@@ -34,7 +34,7 @@
             "detail": "Serves the repo at http://localhost:8080/, for the examples and test fixtures.",
             "type": "process",
             "command": "dotnet",
-            "args": ["run", "--project", "build/Ren.Build", "--", "serve"],
+            "args": ["run", "--project", "build/Ren.Build", "-c", "Background", "--", "serve"],
             "isBackground": true,
             "problemMatcher": []
         }

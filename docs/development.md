@@ -107,6 +107,11 @@ replace them with the package's).  The build says when it skips one.
 `ren-watch` and `ren-build` copy each build into the folders in `REN_STATICS`.  Set it from
 PowerShell or cmd, not a Unix shell, which removes the backslashes.  The paths must be absolute.
 
+`ren-watch` and `ren-serve` keep running, so they run Ren.Build in its own "Background"
+configuration (`build/Ren.Build/bin/Background/`).  Otherwise their `Ren.Build.exe` would be the
+one `dotnet run --project build/Ren.Build` builds into, and a release (or any other command) run
+while they're up would fail to build it, as the file is locked.
+
 ## Testing
 
 ```
