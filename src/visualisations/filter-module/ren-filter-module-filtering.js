@@ -958,7 +958,11 @@ Ren.FilterModule_Filtering = (s) => {
         if (!shownRange || tabularData.findColumnIndex(shownRange.dateHeading) < 0) return null;
 
         const { from, toExclusive } = shownRange;
-        const predicate = { type: "compare", column: shownRange.dateHeading, slot: SHOWN_DATES_SLOT };
+        const predicate = {
+            type: "compare",
+            column: shownRange.dateHeading,
+            slot: SHOWN_DATES_SLOT
+        };
 
         if (from != null && toExclusive != null) {
 

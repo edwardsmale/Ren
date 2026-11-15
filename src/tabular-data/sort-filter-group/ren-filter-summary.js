@@ -82,7 +82,11 @@ Ren.FilterSummary = (() => {
     const createPart = (text, isValue) => ({ text, isValue });
 
     // The part between two entries, flagged so that it can be shown as a symbol rather than text.
-    const createSeparatorPart = () => ({ text: ENTRY_SEPARATOR, isValue: false, isSeparator: true });
+    const createSeparatorPart = () => ({
+        text: ENTRY_SEPARATOR,
+        isValue: false,
+        isSeparator: true
+    });
 
     const joinParts = (parts) => parts.map(part => part.text).join("");
 

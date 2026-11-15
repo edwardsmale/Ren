@@ -1,13 +1,13 @@
 /**
  * Subdivides a date/value chart's bars and pie slices by a further column, each value of it a band
- * of the bar or slice, in a subtly lighter or darker shade of the series' colour, with narrow grooves
- * between them.  Neighbouring bands take shades from opposite ends of the range, so each stands out
- * from those beside it.  The bars and slices are drawn as ever, with the bands and grooves over
- * them, so their colours, tooltips and menus carry on working and the bands always fill them
- * exactly.  A band's shade is a translucent wash of black or white over its bar or slice, so it
- * follows the colour drawn beneath it, however that is filtered, highlighted or faded.  A band's
- * size is its share of the bar or slice, which for an aggregation that doesn't add up, such as an
- * average, is only a share of the bands' total.
+ * of the bar or slice, in a subtly lighter or darker shade of the series' colour, with narrow
+ * grooves between them.  Neighbouring bands take shades from opposite ends of the range, so each
+ * stands out from those beside it.  The bars and slices are drawn as ever, with the bands and
+ * grooves over them, so their colours, tooltips and menus carry on working and the bands always
+ * fill them exactly.  A band's shade is a translucent wash of black or white over its bar or slice,
+ * so it follows the colour drawn beneath it, however that is filtered, highlighted or faded.  A
+ * band's size is its share of the bar or slice, which for an aggregation that doesn't add up, such
+ * as an average, is only a share of the bands' total.
  *
  * Bands are left out where a transform has changed what a bar's height means, and for an "Other"
  * series, as it has no rows of its own.
@@ -1051,11 +1051,11 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
     };
 
     /**
-     * Gets the rules styling every band, groove and label.  A band is filled only with its shade,
-     * or kept transparent, even against the rules that colour a selected bar's paths, which would
-     * hide the bands of a selected bar.  The grooves are given shades of their series' colour by buildColourStyles, and until
-     * then are translucent black and white.  A bar's grooves run level, so are kept sharp on whole
-     * pixels.
+     * Gets the rules styling every band, groove and label. A band is filled only with its shade, or
+     * kept transparent, even against the rules that colour a selected bar's paths, which would hide
+     * the bands of a selected bar.  The grooves are given shades of their series' colour by
+     * buildColourStyles, and until then are translucent black and white. A bar's grooves run level,
+     * so are kept sharp on whole pixels.
      */
     const buildStyles = (props) => {
 

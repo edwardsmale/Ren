@@ -149,7 +149,7 @@ Ren.AddDataGridQuickLinks = (
 
             // In this case, the 'convert to popup' button is visible.
             left = Math.min(dimensions.dataGridWidth, container.clientWidth) -
-                138 - 
+                138 -
                 convertToPopupButtonWidth;
         }
 

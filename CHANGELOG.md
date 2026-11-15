@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Fix columns-and-rows data with no rows failing to load, as its columns were lost.
+
 ## 1.1.16 (2026-11-15)
 
 Omit groupByColumnIndexes from older date/value charts' saved settings.

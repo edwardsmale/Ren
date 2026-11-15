@@ -91,7 +91,11 @@ Ren.DateValueChart_Title = (() => {
 
         const summaryParts = parts.map(part => part.column == null
             ? part
-            : { text: part.text, isValue: part.isValue, crossFilter: crossFilters.get(part.column) });
+            : {
+                text: part.text,
+                isValue: part.isValue,
+                crossFilter: crossFilters.get(part.column)
+            });
 
         // Led by the filter symbol, as a cross filter's chip is, where no chip leads.
         if (summaryParts.length && !summaryParts[0].crossFilter) {
@@ -104,8 +108,8 @@ Ren.DateValueChart_Title = (() => {
 
     /**
      * Gets the chart's subtitle as it is shown in parts, { text, isValue }, the values it names
-     * flagged, and those naming a cross filter carrying it as crossFilter; empty where it has none.  Each filter it names names at most maxValues values, six
-     * by default.
+     * flagged, and those naming a cross filter carrying it as crossFilter; empty where it has none.
+     * Each filter it names names at most maxValues values, six by default.
      */
     const getSubtitleParts = (props, maxValues = SHOWN_FILTER_VALUE_COUNT) => {
 

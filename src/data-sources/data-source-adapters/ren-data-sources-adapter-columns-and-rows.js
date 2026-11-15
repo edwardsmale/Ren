@@ -50,7 +50,8 @@ Ren.DataSourcesAdapter_ColumnsAndRows = (() => {
             arrayOfObjects,
             dataSourceUri,
             tabularDataTitle,
-            columns.hints
+            columns.hints,
+            names
         );
     };
 

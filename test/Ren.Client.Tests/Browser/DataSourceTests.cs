@@ -55,6 +55,33 @@ public class DataSourceTests : BrowserTest
         Expect(text).ToContain("12");
     }
 
+    [TestMethod("Columns and rows data: with no rows is read as its columns with no rows")]
+    public async Task ColumnsAndRowsWithNoRowsIsReadAsItsColumnsWithNoRows()
+    {
+        await Ren.OpenAsync("data-sources/columns-and-rows-empty.html");
+
+        await Page.WaitForFunctionAsync("() => window.Ren.DataSources.getDataSources().length > 0");
+
+        var table = await Page.EvaluateAsync<string>("""
+            () => {
+
+                const tabularData =
+                    window.Ren.DataSources.getDataSources()[0].tabularDataSet.TabularDatas[0];
+                const columnIds = [];
+
+                for (let i = 0; i < tabularData.ColumnModels.length; i++) {
+                    columnIds.push(tabularData.ColumnModels[i].ColumnId);
+                }
+
+                return columnIds.join(",") + " / " + tabularData.RowModels.length;
+            }
+            """);
+
+        Expect(table).ToBe("__Count,Product,Quantity,OrderDate / 0");
+        await Expect(Ren.Root.Locator(".qa-ren-data-source-error-message")).ToHaveCountAsync(0);
+        await Expect(Page.Locator(".ren-popup-message--Error")).ToHaveCountAsync(0);
+    }
+
     [TestMethod("Columns and rows data: with column hints takes their headings and types")]
     public async Task ColumnsAndRowsWithColumnHintsTakesTheirHeadingsAndTypes()
     {

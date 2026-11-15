@@ -46,16 +46,24 @@ Ren.DataSourcesAdapter_ArrayOfObjects = (() => {
 
     /**
      * Converts an array of objects to a Ren tabular data set collection.  The column hints, by
-     * column name, are optional.
+     * column name, are optional, as are the column names, which give an empty array its columns.
+     * Without them an empty array has none, so gives null.
      */
-    const adaptArrayOfObjects = (arrayOfObjects, dataSourceUri, tabularDataTitle, columnHints) => {
+    const adaptArrayOfObjects = (
+        arrayOfObjects,
+        dataSourceUri,
+        tabularDataTitle,
+        columnHints,
+        columnNames) => {
 
         if (!Array.isArray(arrayOfObjects)) return null;
-        if (arrayOfObjects.length === 0) return null;
+        if (arrayOfObjects.length === 0 && !columnNames) return null;
 
-        validateArrayOfObjects(arrayOfObjects);
+        if (arrayOfObjects.length > 0) validateArrayOfObjects(arrayOfObjects);
 
-        const columnHeadings = Object.keys(arrayOfObjects[0]);
+        const columnHeadings = arrayOfObjects.length > 0
+            ? Object.keys(arrayOfObjects[0])
+            : columnNames.slice();
 
         if (columnHints) validateColumnHints(columnHints, columnHeadings);
 
