@@ -164,6 +164,88 @@ Ren.DateValueChart_GroupingEntries = (() => {
         insertEntry(settings, 0, entry);
     };
 
+    /**
+     * Gets a value indicating whether an entry's column indexes can be rebuilt from its column
+     * names: whether it names every column it indexes.
+     */
+    const canRebuildColumnIndexes = (entry) => {
+
+        const indexes = entry.groupByColumnIndexes;
+        const names = entry.groupByColumns;
+
+        if (!Array.isArray(indexes) || !Array.isArray(names)) return false;
+        if (indexes.length !== names.length) return false;
+
+        for (let i = 0; i < names.length; i++) {
+
+            if (typeof names[i] !== "string" || names[i] === "") return false;
+        }
+
+        return true;
+    };
+
+    /**
+     * Gets a copy of the settings as they are saved: without the column indexes of the entries
+     * that name their columns, as a column added to the query shifts every index after it.  An
+     * entry grouping by nothing is saved as naming no columns.  Settings written before the
+     * columns were named keep their indexes, which are all they have.  The indexes are rebuilt from
+     * the names as the chart is drawn (see resolveColumnIndexes).
+     */
+    const getSettingsToSave = (settings) => {
+
+        const settingsToSave = Ren.ObjectUtils.clone(settings);
+        const entries = getEntries(settingsToSave);
+
+        if (!entries) return settingsToSave;
+
+        for (let i = 0; i < entries.length; i++) {
+
+            const entry = entries[i];
+
+            if (Array.isArray(entry.groupByColumnIndexes) &&
+                entry.groupByColumnIndexes.length === 0 &&
+                entry.groupByColumns === undefined) {
+
+                entry.groupByColumns = [];
+            }
+
+            if (canRebuildColumnIndexes(entry)) delete entry.groupByColumnIndexes;
+        }
+
+        return settingsToSave;
+    };
+
+    /**
+     * Sets the column indexes of each entry that names its columns to where those columns now
+     * are, as the saved settings hold the names alone (see getSettingsToSave).  An entry naming a
+     * column no longer in the data is left as it is, for its reader to drop.
+     */
+    const resolveColumnIndexes = (settings, columnResolver) => {
+
+        const entries = getEntries(settings);
+
+        if (!entries || !columnResolver) return;
+
+        for (let i = 0; i < entries.length; i++) {
+
+            const names = entries[i].groupByColumns;
+
+            if (!Array.isArray(names)) continue;
+
+            const indexes = new Array(names.length);
+            let isResolved = true;
+
+            for (let j = 0; j < names.length; j++) {
+
+                indexes[j] = columnResolver.getColumnIndex(names[j]);
+
+                if (indexes[j] == null) { isResolved = false; break; }
+            }
+
+            if (isResolved) entries[i].groupByColumnIndexes = indexes;
+        }
+    };
+
     return {
         NO_DATE_HEADING,
         NO_DATE_VALUE,
@@ -173,6 +255,8 @@ Ren.DateValueChart_GroupingEntries = (() => {
         insertEntry,
         removeEntry,
         getDateColumnKey,
-        setDateColumn
+        setDateColumn,
+        getSettingsToSave,
+        resolveColumnIndexes
     };
 })();

@@ -493,7 +493,12 @@ Ren.VisualisationTypes_DateValueChart = {
 
         "markerLabelFormatFunction",
 
-        "chartDataGroupingSettings"
+        // Saved with its columns by name alone, the indexes rebuilt as the chart is drawn.
+        {
+            name: "chartDataGroupingSettings",
+            transform: (chartDataGroupingSettings) =>
+                Ren.DateValueChart_GroupingEntries.getSettingsToSave(chartDataGroupingSettings)
+        }
     ],
     defaultOptions: {
         visualisationWidth: "38rem",

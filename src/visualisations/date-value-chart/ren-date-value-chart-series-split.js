@@ -57,7 +57,8 @@ Ren.DateValueChart_SeriesSplit = (() => {
 
             const entry = entries[i];
 
-            if (!entry.groupByColumnIndexes || entry.groupByColumnIndexes.length === 0) continue;
+            // Saved settings name the column alone, until its index is rebuilt from the name.
+            if (!entry.groupByColumnIndexes?.length && !entry.groupByColumns?.length) continue;
 
             if (Ren.DateValueChart_GroupingEntries.isDateEntry(entry)) continue;
 
@@ -98,7 +99,7 @@ Ren.DateValueChart_SeriesSplit = (() => {
             return columnResolver.getColumnIdOrHeading(columnIndex) ?? namedColumn;
         }
 
-        const savedIndex = entry.groupByColumnIndexes[0];
+        const savedIndex = entry.groupByColumnIndexes?.[0];
 
         if (savedIndex == null || !columnResolver) return null;
 
@@ -120,7 +121,7 @@ Ren.DateValueChart_SeriesSplit = (() => {
             return columnResolver.getColumnIndex(entry.groupByColumns[0]);
         }
 
-        return entry.groupByColumnIndexes[0];
+        return entry.groupByColumnIndexes?.[0] ?? null;
     };
 
     /**

@@ -124,4 +124,106 @@ describe("Ren.DateValueChart_SeriesSplit", () => {
         expect(detected.dateHeading).toBe("Date");
         expect(detected.valueHeadings).toEqual(["Sales"]);
     });
+    describe("saved column indexes", () => {
+
+        const GroupingEntries = Ren.DateValueChart_GroupingEntries;
+
+        // Resolves columns by name to where they sit in the given query columns.
+        const createColumnResolver = (columns) => ({
+            getColumnIndex: (column) => {
+                const columnIndex = columns.indexOf(column);
+                return columnIndex === -1 ? null : columnIndex;
+            },
+            getColumnIdOrHeading: (columnIndex) => columns[columnIndex] ?? null
+        });
+
+        const createSettings = () => ({
+            groupings: {
+                entries: [
+                    {
+                        groupByColumnIndexes: [1],
+                        groupByColumns: ["Date"],
+                        groupByCalcFunctions: [{ name: "date-month-start" }],
+                        columns: { Sales: { aggregationType: "Sum" } }
+                    },
+                    { groupByColumnIndexes: [3], groupByColumns: ["Region"] },
+                    { groupByColumnIndexes: [] }
+                ]
+            }
+        });
+
+        test("getSettingsToSave_NamedColumns_IndexesLeftOut", () => {
+
+            const entries = GroupingEntries.getSettingsToSave(createSettings()).groupings.entries;
+
+            expect(entries[0].groupByColumnIndexes).toBeUndefined();
+            expect(entries[0].groupByColumns).toEqual(["Date"]);
+            expect(entries[1].groupByColumnIndexes).toBeUndefined();
+            expect(entries[1].groupByColumns).toEqual(["Region"]);
+            expect(entries[2]).toEqual({ groupByColumns: [] });
+        });
+
+        test("getSettingsToSave_ChartSettings_LeftWithTheirIndexes", () => {
+
+            const settings = createSettings();
+
+            GroupingEntries.getSettingsToSave(settings);
+
+            expect(settings.groupings.entries[1].groupByColumnIndexes).toEqual([3]);
+        });
+
+        test("getSettingsToSave_IndexWithoutName_Kept", () => {
+
+            const settings = { groupings: { entries: [{ groupByColumnIndexes: [3] }] } };
+
+            const entries = GroupingEntries.getSettingsToSave(settings).groupings.entries;
+
+            expect(entries[0].groupByColumnIndexes).toEqual([3]);
+        });
+
+        test("persistedProperties_ChartDataGroupingSettings_SavedWithoutIndexes", () => {
+
+            const transform = Ren.VisualisationTypes_DateValueChart.persistedProperties
+                .find(property => property.name === "chartDataGroupingSettings").transform;
+
+            const entries = transform(createSettings()).groupings.entries;
+
+            expect(entries[1].groupByColumnIndexes).toBeUndefined();
+        });
+
+        test("resolveColumnIndexes_ColumnAddedToQuery_IndexesFollowTheNames", () => {
+
+            const settings = GroupingEntries.getSettingsToSave(createSettings());
+
+            GroupingEntries.resolveColumnIndexes(
+                settings,
+                createColumnResolver(["Id", "Date", "Sales", "Added", "Region"])
+            );
+
+            const entries = settings.groupings.entries;
+
+            expect(entries[0].groupByColumnIndexes).toEqual([1]);
+            expect(entries[1].groupByColumnIndexes).toEqual([4]);
+            expect(entries[2].groupByColumnIndexes).toEqual([]);
+        });
+
+        test("splitColumn_SavedByNameAlone_FoundByName", () => {
+
+            const settings = GroupingEntries.getSettingsToSave(createSettings());
+            const columnResolver = createColumnResolver(["Id", "Date", "Sales", "Added", "Region"]);
+
+            expect(SeriesSplit.getSplitColumnKey(settings, columnResolver)).toBe("Region");
+            expect(SeriesSplit.getSplitColumnIndex(settings, columnResolver)).toBe(4);
+        });
+
+        test("splitColumn_NamedColumnGone_NotSplit", () => {
+
+            const settings = GroupingEntries.getSettingsToSave(createSettings());
+            const columnResolver = createColumnResolver(["Id", "Date", "Sales"]);
+
+            GroupingEntries.resolveColumnIndexes(settings, columnResolver);
+
+            expect(SeriesSplit.getSplitColumnKey(settings, columnResolver)).toBeNull();
+        });
+    });
 });

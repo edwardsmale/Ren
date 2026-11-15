@@ -185,6 +185,12 @@ Ren.DateValueChart_GroupingApplyer = (() => {
         chartDataGroupingSettings, dateHeading, valueHeadings, columnResolver, paras, columnFormats
     ) => {
 
+        // The saved settings name their columns alone, so the indexes are rebuilt from the names.
+        Ren.DateValueChart_GroupingEntries.resolveColumnIndexes(
+            chartDataGroupingSettings,
+            columnResolver
+        );
+
         const aggregationEntry =
             Ren.DateValueChart_GroupingEntries.getAggregationEntry(chartDataGroupingSettings);
 
