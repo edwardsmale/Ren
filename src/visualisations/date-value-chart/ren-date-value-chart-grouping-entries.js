@@ -216,17 +216,68 @@ Ren.DateValueChart_GroupingEntries = (() => {
     };
 
     /**
+     * Names the columns of an entry written before the columns were named, which has their indexes
+     * alone, so that it is saved by name from then on (see getSettingsToSave).  The date entry is
+     * named after the date column the chart is drawn by, as its index is not read and may be
+     * stale; any other entry after the columns its indexes give, which are those it is drawn by.
+     */
+    const nameIndexedColumns = (entry, columnResolver, dateHeading) => {
+
+        const indexes = entry.groupByColumnIndexes;
+
+        if (!Array.isArray(indexes)) return;
+
+        // Names that are all there are followed instead, the indexes rebuilt from them.
+        const existingNames = entry.groupByColumns;
+
+        if (Array.isArray(existingNames) &&
+            existingNames.every(name => typeof name === "string" && name !== "")) {
+
+            return;
+        }
+
+        if (isDateEntry(entry)) {
+
+            const dateColumnIndex = dateHeading == null || dateHeading === NO_DATE_HEADING
+                ? null
+                : columnResolver.getColumnIndex(dateHeading);
+
+            const dateColumnKey = dateColumnIndex == null
+                ? null
+                : columnResolver.getColumnIdOrHeading(dateColumnIndex);
+
+            if (dateColumnKey) entry.groupByColumns = [dateColumnKey];
+
+            return;
+        }
+
+        const names = new Array(indexes.length);
+
+        for (let i = 0; i < indexes.length; i++) {
+
+            names[i] = indexes[i] == null ? null : columnResolver.getColumnIdOrHeading(indexes[i]);
+
+            if (typeof names[i] !== "string" || names[i] === "") return;
+        }
+
+        entry.groupByColumns = names;
+    };
+
+    /**
      * Sets the column indexes of each entry that names its columns to where those columns now
      * are, as the saved settings hold the names alone (see getSettingsToSave).  An entry naming a
-     * column no longer in the data is left as it is, for its reader to drop.
+     * column no longer in the data is left as it is, for its reader to drop.  dateHeading is the
+     * date column the chart is drawn by, which names a date entry that has its index alone.
      */
-    const resolveColumnIndexes = (settings, columnResolver) => {
+    const resolveColumnIndexes = (settings, columnResolver, dateHeading) => {
 
         const entries = getEntries(settings);
 
         if (!entries || !columnResolver) return;
 
         for (let i = 0; i < entries.length; i++) {
+
+            nameIndexedColumns(entries[i], columnResolver, dateHeading);
 
             const names = entries[i].groupByColumns;
 

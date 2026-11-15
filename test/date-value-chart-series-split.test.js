@@ -225,5 +225,72 @@ describe("Ren.DateValueChart_SeriesSplit", () => {
 
             expect(SeriesSplit.getSplitColumnKey(settings, columnResolver)).toBeNull();
         });
+
+        test("resolveColumnIndexes_IndexesAlone_ColumnsNamedSoSavedWithoutIndexes", () => {
+
+            const settings = {
+                groupings: {
+                    entries: [
+                        {
+                            groupByColumnIndexes: [1],
+                            groupByCalcFunctions: [{ name: "date-month-start" }],
+                            columns: { Sales: { aggregationType: "Sum" } }
+                        },
+                        { groupByColumnIndexes: [4] },
+                        { groupByColumnIndexes: [] }
+                    ]
+                }
+            };
+
+            GroupingEntries.resolveColumnIndexes(
+                settings,
+                createColumnResolver(["Id", "Date", "Sales", "Added", "Amazon / Non-Amazon"]),
+                "Date"
+            );
+
+            const entries = settings.groupings.entries;
+
+            expect(entries[0].groupByColumns).toEqual(["Date"]);
+            expect(entries[1].groupByColumns).toEqual(["Amazon / Non-Amazon"]);
+            expect(entries[1].groupByColumnIndexes).toEqual([4]);
+            expect(entries[2].groupByColumns).toEqual([]);
+
+            const savedEntries = GroupingEntries.getSettingsToSave(settings).groupings.entries;
+
+            for (let i = 0; i < savedEntries.length; i++) {
+                expect(savedEntries[i].groupByColumnIndexes).toBeUndefined();
+            }
+        });
+
+        test("resolveColumnIndexes_DateIndexStale_NamedAfterTheDateColumnDrawn", () => {
+
+            const settings = {
+                groupings: {
+                    entries: [
+                        { groupByColumnIndexes: [0], groupByCalcFunctions: [{ name: "date-day-start" }] },
+                        { groupByColumnIndexes: [] }
+                    ]
+                }
+            };
+
+            GroupingEntries.resolveColumnIndexes(
+                settings,
+                createColumnResolver(["__Count", "Date", "Searches"]),
+                "Date"
+            );
+
+            expect(settings.groupings.entries[0].groupByColumns).toEqual(["Date"]);
+            expect(settings.groupings.entries[0].groupByColumnIndexes).toEqual([1]);
+        });
+
+        test("resolveColumnIndexes_IndexOutsideData_LeftUnnamed", () => {
+
+            const settings = { groupings: { entries: [{ groupByColumnIndexes: [9] }] } };
+
+            GroupingEntries.resolveColumnIndexes(settings, createColumnResolver(["Id", "Date"]));
+
+            expect(settings.groupings.entries[0].groupByColumns).toBeUndefined();
+            expect(settings.groupings.entries[0].groupByColumnIndexes).toEqual([9]);
+        });
     });
 });
