@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Also omit groupByColumnIndexes from client-side date/value charts' saved settings, which 1.1.14 missed.
+
 ## 1.1.14 (2026-11-15)
 
 Omit date/value charts' groupByColumnIndexes from saved settings, as they are rebuilt from the column names.

@@ -24,4 +24,29 @@ describe("Ren.VisualisationsTransformer", () => {
 
         expect(transformed.hasOwnProperty("containingReportUrl")).toBe(false);
     });
+
+    test("transform_ChartDataGroupingSettings_SavedWithoutNamedColumnIndexes", () => {
+
+        const chartDataGroupingSettings = {
+            groupings: {
+                entries: [
+                    { groupByColumnIndexes: [3], groupByColumns: ["Amazon / Non-Amazon"] },
+                    { groupByColumnIndexes: [] }
+                ]
+            }
+        };
+
+        const transformed = transform({
+            visualisationTypeName: "DateValueChart",
+            chartDataGroupingSettings
+        });
+
+        expect(transformed.chartDataGroupingSettings.groupings.entries).toEqual([
+            { groupByColumns: ["Amazon / Non-Amazon"] },
+            { groupByColumns: [] }
+        ]);
+
+        // The chart keeps its indexes.
+        expect(chartDataGroupingSettings.groupings.entries[0].groupByColumnIndexes).toEqual([3]);
+    });
 });

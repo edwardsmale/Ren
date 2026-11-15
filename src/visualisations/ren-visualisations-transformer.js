@@ -211,6 +211,14 @@ Ren.VisualisationsTransformer = (() => {
                     .withoutFilterNegations(transformedVisualisation.dateMarkers);
             }
 
+            // A date/value chart's grouping columns are saved by name alone, the indexes rebuilt as
+            // the chart is drawn, as a column added to the query shifts every index after it.
+            if (transformedVisualisation.chartDataGroupingSettings) {
+
+                transformedVisualisation.chartDataGroupingSettings = Ren.DateValueChart_GroupingEntries
+                    .getSettingsToSave(transformedVisualisation.chartDataGroupingSettings);
+            }
+
             Ren.ChartEnumSettings.writeEnumKeys(transformedVisualisation);
 
             // Turning off a chart's last calendar marker period leaves null behind.
