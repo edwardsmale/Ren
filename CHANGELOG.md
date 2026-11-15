@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Omit date/value charts' groupByColumnIndexes from saved settings, as they are rebuilt from the column names.
+Omit visualisations' containingReportUrl from saved settings, as the saved value is not used.
 
 ## 1.1.13 (2026-11-14)
 

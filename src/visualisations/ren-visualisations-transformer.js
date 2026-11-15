@@ -133,6 +133,10 @@ Ren.VisualisationsTransformer = (() => {
             delete transformedVisualisation.container;
             delete transformedVisualisation.containingReport;
             delete transformedVisualisation.containingReportGuid;
+
+            // Read from the report context whenever the visualisation is created, and saving it
+            // would churn the file with whichever query string the report had when saved.
+            delete transformedVisualisation.containingReportUrl;
             delete transformedVisualisation.createdByActuizer;
             delete transformedVisualisation.element;
             delete transformedVisualisation.hasDimensions;
