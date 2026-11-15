@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.1.15 (2026-11-15)
 
 Omit groupByColumnIndexes from client-side date/value charts' saved settings.
 Prevent lock errors upon building a release while the ren-watch and ren-serve VS Code tasks are running.
