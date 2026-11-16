@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Render large grids faster by caching the results of parsing HTML from cell values.
+
 ## 1.1.17 (2026-11-15)
 
 Fix columns-and-rows data with no rows failing to load, as its columns were lost.

@@ -747,14 +747,23 @@ Ren.TextUtils = (() => {
     // A "<" that doesn't start a tag (as in "< 3") is text, as the browser reads it.
     const htmlhasTextRegex = /(^|>)(?:[^<]|<(?![a-z!/?]))*?(?:[^<\s]|<(?![a-z!/?]))/i;
 
+    const extractedTextCache = new Map();
+
     const extractTextFromHtml = (input) => {
 
         // Simple short-circuit if the string doesn't contain any text outside of its tags.
 
         if (!htmlhasTextRegex.test(input)) return "";
 
+        let text = extractedTextCache.get(input);
+        if (text !== undefined) return text;
+
         div.innerHTML = input;
-        return div.textContent || "";
+        text = div.textContent || "";
+
+        if (extractedTextCache.size >= 10000) extractedTextCache.clear();
+        extractedTextCache.set(input, text);
+        return text;
     };
 
     const htmlEncode = (input) => {

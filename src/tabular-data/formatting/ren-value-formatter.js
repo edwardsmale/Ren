@@ -202,16 +202,35 @@ Ren.ValueFormatter = (() => {
         return null;
     };
 
-    const addExternalLinkClassToExternalLinks = htmlValue => {
+    /**
+     * Gets a function that caches the results of the specified string-to-string function, which
+     * must depend on nothing but its argument.  Parsing HTML is costly and the values a column
+     * holds repeat, so most cells are rewritten from the cache.
+     */
+    const cacheHtmlRewrite = (rewrite) => {
 
-        if (!htmlValue || typeof htmlValue !== "string" || htmlValue.charAt(0) !== "<" || htmlValue.indexOf("_blank") === -1) {
-            return htmlValue;
-        }
+        const cache = new Map();
 
-        addExternalLinkClassToExternalLinks._div ??= document.createElement("div");
-        const div = addExternalLinkClassToExternalLinks._div;
-        div.innerHTML = htmlValue;
-        const links = div.querySelectorAll("a[target='_blank']");
+        return (html) => {
+
+            let result = cache.get(html);
+            if (result !== undefined) return result;
+
+            result = rewrite(html);
+
+            if (cache.size >= 10000) cache.clear();
+            cache.set(html, result);
+            return result;
+        };
+    };
+
+    const linkDiv = document.createElement("div");
+
+    // Marks the links that open in a new window, so that they show an external-link icon.
+    const markExternalLinks = cacheHtmlRewrite(htmlValue => {
+
+        linkDiv.innerHTML = htmlValue;
+        const links = linkDiv.querySelectorAll("a[target='_blank']");
 
         for (let i = 0; i < links.length; i++) {
 
@@ -219,8 +238,25 @@ Ren.ValueFormatter = (() => {
                 links[i].classList.add("ren-external-link");
             }
         }
-        return div.innerHTML;
+        return linkDiv.innerHTML;
+    });
+
+    const addExternalLinkClassToExternalLinks = htmlValue => {
+
+        if (!htmlValue || typeof htmlValue !== "string" || htmlValue.charAt(0) !== "<" || htmlValue.indexOf("_blank") === -1) {
+            return htmlValue;
+        }
+
+        return markExternalLinks(htmlValue);
     };
+
+    // Marks a format function's own "#VALUE!" span as a cell error.
+    const markCellError = cacheHtmlRewrite(html => {
+
+        const error = Ren.HtmlUtils.create(html);
+        error.classList.add("ren-data-grid__cell-error");
+        return error.outerHTML;
+    });
 
     const formatDate_dd_MMM_yyyy = date => {
 
@@ -331,9 +367,7 @@ Ren.ValueFormatter = (() => {
         }
         else if (typeof formattedValue === "string" && formattedValue.endsWith("#VALUE!</span>")) {
 
-            const error = Ren.HtmlUtils.create(formattedValue);
-            error.classList.add("ren-data-grid__cell-error");
-            formattedValue = error.outerHTML;
+            formattedValue = markCellError(formattedValue);
         }
 
         formattedValue = addExternalLinkClassToExternalLinks(formattedValue);
