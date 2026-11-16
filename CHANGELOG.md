@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Render large grids faster by caching the results of parsing HTML from cell values.
+Keep scrolling through large grids fast by removing rows far out of view from the page.
 
 ## 1.1.17 (2026-11-15)
 

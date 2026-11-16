@@ -27,6 +27,20 @@ Ren.DataGridRenderedCellsCache = (tabularData) => {
         row[columnIndex] = cell;
     };
 
+    /**
+     * Removes a row's cells from the DOM and forgets them, so that they are rendered afresh if the
+     * row comes back into view.
+     */
+    const removeRow = (rowIndexIncHeadings) => {
+
+        const row = renderedCells[rowIndexIncHeadings];
+        if (!row) return;
+
+        for (let c = 0; c < row.length; c++) row[c]?.remove();
+
+        renderedCells[rowIndexIncHeadings] = undefined;
+    };
+
     const removeGroupRows = () => {
 
         if (renderedCells.length > tabularData.ActualRowCount) {
@@ -37,6 +51,7 @@ Ren.DataGridRenderedCellsCache = (tabularData) => {
     return {
         get,
         add,
+        removeRow,
         removeGroupRows
     };
 };

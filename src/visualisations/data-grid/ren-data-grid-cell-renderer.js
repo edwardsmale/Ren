@@ -87,6 +87,7 @@ Ren.DataGridCellRenderer = (
     };
 
     const rowHeadingsRendered = new Set();
+    const rowHeadingElements = new Map();
 
     /**
      * Renders the row headings for all rows except the heading rows.
@@ -107,6 +108,7 @@ Ren.DataGridCellRenderer = (
             fragment.appendChild(rowHeading);
 
             rowHeadingsRendered.add(r);
+            rowHeadingElements.set(r, rowHeading);
         }
 
         if (fragment.childNodes.length > 0) {
@@ -255,8 +257,61 @@ Ren.DataGridCellRenderer = (
         return rowIndexesIncHeadings;
     };
 
+    // How far (in rows) beyond those rendered as in view a row has to be before it is removed, so
+    // that scrolling back and forth a little doesn't keep removing and re-rendering rows.
+    const outOfViewRowMargin = 100;
+
     /**
-     * Renders any rows that are currently in view and have not been rendered yet.
+     * Removes the rows that are well out of view from the DOM, so that the page doesn't keep
+     * growing (and restyling it keep getting slower) as the grid is scrolled.  The heading rows
+     * and the frozen rows are always kept.
+     */
+    const removeRowsOutOfView = () => {
+
+        const rowYs = dataGroupingSettings.rowYs;
+        const { startRowY, stopRowY } = cachedRowIndexesInView;
+        const keepFromY = startRowY - outOfViewRowMargin;
+        const keepToY = stopRowY + outOfViewRowMargin;
+        const totalsRowIndexIncHeadings =
+            dataGroupingSettings.groupings.totalsRowIndex() + tabularData.HeadingCount;
+
+        const rowIndexesIncHeadingsToRemove = [];
+
+        rowIndexesIncHeadingsRendered.forEach(r => {
+
+            if (r < tabularData.HeadingCount || r === totalsRowIndexIncHeadings) return;
+
+            const rowY = rowYs[r];
+
+            if (rowY === undefined || rowY < freezePanesCoords.y + 1) return;
+            if (rowY >= keepFromY && rowY < keepToY) return;
+
+            rowIndexesIncHeadingsToRemove.push(r);
+        });
+
+        for (let i = 0; i < rowIndexesIncHeadingsToRemove.length; i++) {
+
+            const r = rowIndexesIncHeadingsToRemove[i];
+
+            rowIndexesIncHeadingsRendered.delete(r);
+            renderedCellsCache.removeRow(r);
+
+            rowHeadingElements.get(r)?.remove();
+            rowHeadingElements.delete(r);
+            rowHeadingsRendered.delete(r);
+
+            if (r - tabularData.HeadingCount >= tabularData.DataRowCount) {
+
+                dataGridSections.frozenLeftSection
+                    .querySelector(".ren-data-grid__group-ctrls.ren-r-" + r)
+                    ?.remove();
+            }
+        }
+    };
+
+    /**
+     * Renders any rows that are currently in view and have not been rendered yet, first removing
+     * any that are well out of view.
      */
     const renderNewlyVisibleRows = () => {
 
@@ -266,6 +321,8 @@ Ren.DataGridCellRenderer = (
             .filter(r => !rowIndexesIncHeadingsRendered.has(r));
 
         if (rowIndexesIncHeadingsToRender.length === 0) return;
+
+        removeRowsOutOfView();
 
         renderRowHeadings(rowIndexesIncHeadingsToRender);
 
@@ -291,7 +348,11 @@ Ren.DataGridCellRenderer = (
             if (visualisation.isDestroyed) return false;
 
             for (let i = 0; i < rowIndexesIncHeadingsToRender.length; i++) {
-                rowIndexesIncHeadingsRendered.add(rowIndexesIncHeadingsToRender[i]);
+
+                // Not where the row has been removed again since, being out of view by now.
+                if (rowHeadingsRendered.has(rowIndexesIncHeadingsToRender[i])) {
+                    rowIndexesIncHeadingsRendered.add(rowIndexesIncHeadingsToRender[i]);
+                }
             }
         }, true);
     };
