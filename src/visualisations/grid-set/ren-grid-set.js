@@ -30,7 +30,7 @@ Ren.CreateGridSet = (tabularDataSet, visualisation) => {
 
     gridSetViewport.addEventListener("scroll", () => {
 
-        dataGrids[activeDataGridIndex].onDataGridScroll({
+        dataGrids[activeDataGridIndex].onViewportScroll({
             x: gridSetViewport.scrollLeft,
             y: gridSetViewport.scrollTop
         });

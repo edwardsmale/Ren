@@ -297,6 +297,23 @@ Ren.DataGridDimensionManager = (
             dgs.width = dataGridWidthPx;
             dgs.height = dataGridHeightPx;
         }
+
+        // A grid too tall to scroll through is given the most scrollable height, and its rows,
+        // positioned at their true heights, are clipped to it (see Ren.DataGrid's verticalScroll).
+        const dgs = dataGridSections.dataGrid.style;
+        const maxScrollableHeight = Ren.DataGridConstants.maxScrollableHeight;
+
+        if (dims.dataGridHeight > maxScrollableHeight) {
+
+            dgs.height = maxScrollableHeight + "px";
+            dgs.overflowY = "clip";
+        }
+        else if (dgs.overflowY) {
+
+            dgs.overflowY = "";
+            // Left unset where the grid's height isn't (see above).
+            if (dgs.height === maxScrollableHeight + "px") dgs.height = "";
+        }
     };
 
     /**

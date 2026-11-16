@@ -31,7 +31,8 @@ Ren.DataGridTotalsRowPositioner = (
 
         if (totalsRowPosition === Ren.DataGridTotalsRowPositionEnum.TopFixed) {
 
-            totalsRowTop = Ren.DataGridConstants.rowHeight * tabularData.HeadingCount + dataGridScrollPos.y;
+            totalsRowTop = Ren.DataGridConstants.rowHeight * tabularData.HeadingCount +
+                dataGridScrollPos.y - dataGridScrollPos.rowTopBase;
 
             if (gridState.showRowAndColumnHeadings) {
                 totalsRowTop += Ren.DataGridConstants.rowHeight;
@@ -48,7 +49,7 @@ Ren.DataGridTotalsRowPositioner = (
 
                 // We only need to act to position the totals row if the grid is taller than the
                 // viewport.
-                totalsRowTop = dataGridScrollPos.y + viewportHeight;
+                totalsRowTop = dataGridScrollPos.y - dataGridScrollPos.rowTopBase + viewportHeight;
 
                 // Position totals row as the last visible row.  Subtract 2 for thicker border.
                 totalsRowTop -= Ren.DataGridConstants.rowHeight + 2;

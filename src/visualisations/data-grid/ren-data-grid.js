@@ -110,7 +110,10 @@ Ren.CreateDataGrid = (
         Ren.Messages.Events.columnVisibilityChanged.notify();
     };
 
-    const dataGridScrollPos = { x: 0, y: 0 };
+    // rowTopBase is taken from the tops of the rows below any frozen ones, keeping the numbers
+    // positioning them far down a tall grid small enough for the browser to hold exactly (see
+    // verticalScroll).  0 unless the grid's scroll is scaled.
+    const dataGridScrollPos = { x: 0, y: 0, rowTopBase: 0 };
 
     const freezePanesCoords = {
         x: tabularData.FreezePanesColumnIndex,
@@ -188,30 +191,113 @@ Ren.CreateDataGrid = (
         gridState
     );
 
+    /**
+     * How the viewport's scrollTop maps to dataGridScrollPos.y, which is always the true distance
+     * scrolled down the rows.  The same, unless the grid is taller than maxScrollableHeight, when
+     * it scrolls only that far (see the dimension manager) and scale stretches the scroll position
+     * across its rows.  The main section is then moved up by the difference, as the frozen left
+     * section is moved, so its rows keep their true positions but are drawn near the viewport.
+     *
+     * Chrome holds CSS lengths as 32-bit floats, which can't express every pixel past 2^24, so a
+     * scaled grid's scroll position is kept to whole pixels and its rows are positioned relative
+     * to rowTopBase, a whole number of rowTopBaseStep near it.
+     */
+    const rowTopBaseStep = 1000000;
+    const verticalScroll = {
+        scale: 1,
+        scrollTop: 0, // The scrollTop last set, to recognise the scroll event it causes.
+        maxY: 0, // The furthest a scaled grid scrolls, with the bottom of its rows in view.
+        toScrollTop: (y) => verticalScroll.scale === 1 ? y : Math.round(y / verticalScroll.scale)
+    };
+
+    const updateVerticalScrollScale = () => {
+
+        const maxScrollableHeight = Ren.DataGridConstants.maxScrollableHeight;
+        const viewportHeight = containerViewport.clientHeight;
+        // How far the rows would scroll were the grid not clipped.  The grid's height counts a
+        // row more than the rows below the column headings take up, which only fills when they're
+        // shown.  The rows also start however far down the grid the main section sits (below the
+        // variation links), and the last row's cells, rowHeight + 2 high to overlap their
+        // neighbours' borders, overhang it by 2px.
+        const rowHeight = Ren.DataGridConstants.rowHeight;
+        const columnHeadingHeight = visualisation.showRowAndColumnHeadings ? rowHeight : 0;
+        const mainSection = dataGridSections.dataGridMainSection;
+        const mainSectionOffset = mainSection.offsetTop - (parseFloat(mainSection.style.top) || 0);
+        const contentHeight = dimensions.dataGridHeight - rowHeight + columnHeadingHeight +
+            mainSectionOffset + 2;
+
+        const scale = dimensions.dataGridHeight > maxScrollableHeight
+            ? (contentHeight - viewportHeight) / (maxScrollableHeight - viewportHeight)
+            : 1;
+
+        verticalScroll.maxY = contentHeight - viewportHeight;
+
+        if (scale === verticalScroll.scale) return;
+
+        verticalScroll.scale = scale;
+        scrollDataGridTo({ x: dataGridScrollPos.x, y: dataGridScrollPos.y });
+    };
+
     // Repositions the frozen left and top sections so that they appear to stand still.
     const onDataGridScroll = (scrollPos) => {
 
+        const scaled = verticalScroll.scale !== 1;
+        const y = scaled ? Math.round(scrollPos.y) : scrollPos.y;
+        const rowTopBase = scaled ? Math.floor(y / rowTopBaseStep) * rowTopBaseStep : 0;
+
         dataGridScrollPos.x = scrollPos.x;
-        dataGridScrollPos.y = scrollPos.y;
+        dataGridScrollPos.y = y;
 
         dataGridRenderer.renderNewlyVisibleRows();
 
+        // The rows' tops are rewritten at once, as they'd be out of step with the sections' tops
+        // until the next repaint.
+        if (rowTopBase !== dataGridScrollPos.rowTopBase) {
+
+            dataGridScrollPos.rowTopBase = rowTopBase;
+            dataGridStyleUpdater.updateDataGridStyles();
+        }
+
+        const scrollTop = verticalScroll.toScrollTop(y);
+        verticalScroll.scrollTop = scrollTop;
+
         containerViewport.scrollLeft = dataGridScrollPos.x;
-        containerViewport.scrollTop = dataGridScrollPos.y;
+        containerViewport.scrollTop = scrollTop;
+
+        dataGridSections.dataGridMainSection.style.top =
+            scaled ? (scrollTop - y + rowTopBase) + "px" : "";
 
         dataGridSections.frozenTopSection.style.left = -scrollPos.x + "px";
-        dataGridSections.frozenLeftSection.style.top = -scrollPos.y + "px";
+        dataGridSections.frozenLeftSection.style.top = -(y - rowTopBase) + "px";
 
         totalsRowPositioner.positionTotalsRow(); // Done in scroll event handler to avoid lagging.
 
         Ren.Messages.Requests.repaint.notify();
     };
 
-    _dataGrid.onDataGridScroll = onDataGridScroll;
+    /**
+     * Handles the viewport being scrolled.  A scaled grid keeps its scroll position when the
+     * viewport reports the scrollTop it was given, which can't express every position, or
+     * scrolling sideways would move it up or down a little.
+     */
+    const onViewportScroll = (viewportScrollPos) => {
+
+        const scrollTop = viewportScrollPos.y;
+
+        const y = verticalScroll.scale === 1
+            ? scrollTop
+            : Math.abs(scrollTop - verticalScroll.scrollTop) < 1
+                ? dataGridScrollPos.y
+                : scrollTop * verticalScroll.scale;
+
+        onDataGridScroll({ x: viewportScrollPos.x, y });
+    };
+
+    _dataGrid.onViewportScroll = onViewportScroll;
 
     const scrollDataGridTo = (scrollPos) => {
 
-        const maxScrollY = Math.max(0,
+        const maxScrollY = verticalScroll.scale !== 1 ? verticalScroll.maxY : Math.max(0,
             dimensions.dataGridHeight +
             dimensions.frozenHeight -
             dataGridSections.frozenLeftSection_Viewport.clientHeight -
@@ -242,7 +328,6 @@ Ren.CreateDataGrid = (
     Ren.Messages.Requests.qaDataGridScroll.handle((scrollTop) => {
 
         if (visualisation.isDestroyed) return false;
-        containerViewport.scrollTop = scrollTop;
 
         scrollDataGridTo({
             x: dataGridScrollPos.x,
@@ -269,7 +354,7 @@ Ren.CreateDataGrid = (
 
         // Restores the scroll position the grid had when its gridset tab was last viewed.
         containerViewport.scrollLeft = dataGridScrollPos.x;
-        containerViewport.scrollTop = dataGridScrollPos.y;
+        containerViewport.scrollTop = verticalScroll.toScrollTop(dataGridScrollPos.y);
     };
 
     _dataGrid.show = show;
@@ -334,7 +419,8 @@ Ren.CreateDataGrid = (
         dataGridGuid,
         gridState,
         dataGridColumnLeftPositions,
-        dataGridRenderer.getRowIndexesIncHeadingsInView
+        dataGridRenderer.getRowIndexesIncHeadingsInView,
+        (rowY) => rowY < freezePanesCoords.y + 1 ? 0 : dataGridScrollPos.rowTopBase
     );
 
     Ren.DataGridTooltips(
@@ -450,6 +536,28 @@ Ren.CreateDataGrid = (
     });
 
     dataGridSections.frozenLeftSection.addEventListener("wheel", onFrozenLeftSectionMouseWheel);
+
+    // Scrolls a scaled grid by the wheel's distance down its rows, which the viewport would
+    // otherwise multiply by the scale.  Left to the viewport when the wheel also scrolls sideways
+    // or zooms.
+    dataGridSections.dataGrid.addEventListener("wheel", (e) => {
+
+        if (verticalScroll.scale === 1 || e.deltaX !== 0 || e.ctrlKey) return;
+        if (dataGridSections.frozenLeftSection.contains(e.target)) return;
+
+        e.preventDefault();
+
+        const deltaY = e.deltaMode === WheelEvent.DOM_DELTA_PIXEL
+            ? e.deltaY
+            : e.deltaMode === WheelEvent.DOM_DELTA_LINE
+                ? e.deltaY * Ren.DataGridConstants.rowHeight
+                : e.deltaY * containerViewport.clientHeight;
+
+        scrollDataGridTo({
+            x: dataGridScrollPos.x,
+            y: Math.max(dataGridScrollPos.y + deltaY, 0)
+        });
+    }, { passive: false });
 
     sortFilterGroup.onChanged(() => {
 
@@ -610,7 +718,10 @@ Ren.CreateDataGrid = (
     Ren.Messages.Events.dataGridDimensionsUpdated.handle((guid) => {
 
         if (visualisation.isDestroyed) return false;
-        if (guid === dataGridGuid) dataGridSections.resizeFrozenSectionsToMatchViewport();
+        if (guid !== dataGridGuid) return;
+
+        dataGridSections.resizeFrozenSectionsToMatchViewport();
+        updateVerticalScrollScale();
     });
 
     // Shown behind initialrepaint's deferred first rows, and sized to them, as the first repaint

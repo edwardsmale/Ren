@@ -9,7 +9,8 @@ Ren.DataGridStyleUpdater = (
     dataGridGuid,
     gridState,
     dataGridColumnLeftPositions,
-    getRowIndexesIncHeadingsInView) => {
+    getRowIndexesIncHeadingsInView,
+    getRowTopBase) => { // Taken from a row's top, given its rowY (see Ren.DataGrid's rowTopBase).
 
     const rowHeight = Ren.DataGridConstants.rowHeight; // The height of a datagrid row.
     const rowHeadingWidth = gridState.rowHeadingWidth; // The width of the row headings on the left.
@@ -139,7 +140,7 @@ Ren.DataGridStyleUpdater = (
 
             const top = Math.round(rowHeight * rowY + columnHeadingHeight);
 
-            styles.push(".ren-r-" + r + " {top:" + top + "px;}");
+            styles.push(".ren-r-" + r + " {top:" + (top - getRowTopBase(rowY)) + "px;}");
             styles.push(
                 ".ren-data-grid__row-heading.ren-r-" + r + "::before{content:'" + rowY + "'}"
             );
