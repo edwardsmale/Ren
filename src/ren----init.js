@@ -2,6 +2,15 @@
 // than assigned as an undeclared name, so that ren.js still runs in strict mode or as a module.
 window.Ren = {};
 
+// Properties set on Ren while a report is in use, declared here so that Ren has them all from the
+// start.  Adding a property to Ren later changes its shape, which throws away all the optimised
+// code that reads anything from Ren: it was the commonest deoptimisation in the tests, on the
+// first right-click (see "Object shapes and inline caches" in docs/development.md).
+Ren.LastRightClickPosition = undefined;
+Ren.isGeneratingPreview = false;
+Ren.isGeneratingFullPreview = false;
+Ren.isGeneratingDownload = false;
+
 /**
  * Calls the callback once the document has been parsed: on DOMContentLoaded, or, when ren.js is
  * loaded after that has fired (injected, lazy-loaded or added by a single-page app), as soon as the

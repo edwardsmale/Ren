@@ -207,6 +207,19 @@ the page has an uncaught error (unless the test calls `AllowPageErrors()`).  It 
 confirm popup.  Note that grid column headings show their `title`, so their text is empty, and a
 grid's last row is usually its totals row (`.ren-data-grid__cell--group`).
 
+## Object shapes
+
+V8 runs a property access fastest when every object reaching it has the same shape (the same
+properties, added in the same order): the access is then *monomorphic*.  With 2 to 4 shapes it's
+*polymorphic*, and with more *megamorphic*, which is several times slower, and optimised code
+that meets a shape it wasn't optimised for is thrown away (a "wrong map" deoptimisation).
+
+So make the objects reaching an access in one place, or give them the same properties in the
+same order, setting `undefined` rather than leaving one out.  An object used as a dictionary,
+with keys added and deleted, is better as a `Map`.  Don't add a property to `Ren` once the page
+is running (declare it in `ren----init.js` instead): changing `Ren`'s shape throws away all the
+optimised code that reads from it, reported as "dependent prototype chain changed".
+
 ## CI
 
 `.github/workflows/ci.yml` builds, runs the client tests on the normal and minified builds, then
