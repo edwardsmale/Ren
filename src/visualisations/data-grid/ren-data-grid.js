@@ -238,6 +238,28 @@ Ren.CreateDataGrid = (
         scrollDataGridTo({ x: dataGridScrollPos.x, y: dataGridScrollPos.y });
     };
 
+    let scrollRepaintFrame = 0;
+
+    /**
+     * Records and positions the rows a scroll rendered, once a frame, before the frame is painted.
+     * Done for this grid alone, as a repaint request restyles and remeasures every grid on the
+     * page, and a scroll changes neither this grid's dimensions nor any other grid.
+     */
+    const scheduleScrollRepaint = () => {
+
+        if (scrollRepaintFrame) return;
+
+        scrollRepaintFrame = requestAnimationFrame(() => {
+
+            scrollRepaintFrame = 0;
+
+            if (visualisation.isDestroyed) return;
+
+            dataGridRenderer.recordRenderedRows();
+            dataGridStyleUpdater.updateDataGridStyles();
+        });
+    };
+
     // Repositions the frozen left and top sections so that they appear to stand still.
     const onDataGridScroll = (scrollPos) => {
 
@@ -272,7 +294,7 @@ Ren.CreateDataGrid = (
 
         totalsRowPositioner.positionTotalsRow(); // Done in scroll event handler to avoid lagging.
 
-        Ren.Messages.Requests.repaint.notify();
+        scheduleScrollRepaint();
     };
 
     /**
@@ -748,6 +770,10 @@ Ren.CreateDataGrid = (
         dataGridStyleUpdater.updateDataGridStyles();
     });
 
+    // The follow-up passes of the last repaint, which a later repaint replaces rather than adds to,
+    // so that a run of repaints (as while the window is resized) doesn't pile them up.
+    let repaintFollowUpTimeouts = [];
+
     Ren.Messages.Requests.repaint.handle(() => {
 
         if (visualisation.isDestroyed) return false;
@@ -755,14 +781,20 @@ Ren.CreateDataGrid = (
         dimensionManager.updateDimensions();
         dataGridStyleUpdater.updateDataGridStyles();
 
-        Ren.FnUtils.defer(() => {
+        for (let i = 0; i < repaintFollowUpTimeouts.length; i++) {
+            clearTimeout(repaintFollowUpTimeouts[i]);
+        }
+
+        const followUp = () => {
 
             if (visualisation.isDestroyed) return;
 
             dimensionManager.updateDimensions();
             dataGridStyleUpdater.updateDataGridStyles();
             totalsRowPositioner.positionTotalsRow();
-        }, 50, 500);
+        };
+
+        repaintFollowUpTimeouts = [setTimeout(followUp, 50), setTimeout(followUp, 500)];
     });
 
     Ren.Messages.Events.columnResized.handle(() => {

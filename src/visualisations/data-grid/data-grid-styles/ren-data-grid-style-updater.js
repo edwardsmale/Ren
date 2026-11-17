@@ -78,7 +78,8 @@ Ren.DataGridStyleUpdater = (
             }
         }
 
-        const rowIndexesIncHeadings = getRowIndexesIncHeadingsInView();
+        // A copy, as the renderer caches the array it returns and the totals row is added to it.
+        const rowIndexesIncHeadings = getRowIndexesIncHeadingsInView().slice();
 
         if (tabularData.HasTotals || tabularData.HasCounts) {
             rowIndexesIncHeadings.push(tabularData.DataRowCount + 1);

@@ -343,19 +343,38 @@ Ren.DataGridCellRenderer = (
 
         dataGridCellSelection.addRowHeadingContextMenus(rowIndexesIncHeadingsToRender);
 
-        Ren.Messages.Requests.repaint.handle(() => {
-
-            if (visualisation.isDestroyed) return false;
-
-            for (let i = 0; i < rowIndexesIncHeadingsToRender.length; i++) {
-
-                // Not where the row has been removed again since, being out of view by now.
-                if (rowHeadingsRendered.has(rowIndexesIncHeadingsToRender[i])) {
-                    rowIndexesIncHeadingsRendered.add(rowIndexesIncHeadingsToRender[i]);
-                }
-            }
-        }, true);
+        Ren.ArrayUtils.pushAll(rowIndexesIncHeadingsToRecord, rowIndexesIncHeadingsToRender);
     };
+
+    // Rows rendered but not yet recorded in rowIndexesIncHeadingsRendered, which they are on the
+    // next repaint, or the next frame after a scroll (see recordRenderedRows).
+    let rowIndexesIncHeadingsToRecord = [];
+
+    /**
+     * Records the rows rendered since this was last called in rowIndexesIncHeadingsRendered.
+     */
+    const recordRenderedRows = () => {
+
+        if (rowIndexesIncHeadingsToRecord.length === 0) return;
+
+        const rowIndexesIncHeadings = rowIndexesIncHeadingsToRecord;
+        rowIndexesIncHeadingsToRecord = [];
+
+        for (let i = 0; i < rowIndexesIncHeadings.length; i++) {
+
+            // Not where the row has been removed again since, being out of view by now.
+            if (rowHeadingsRendered.has(rowIndexesIncHeadings[i])) {
+                rowIndexesIncHeadingsRendered.add(rowIndexesIncHeadings[i]);
+            }
+        }
+    };
+
+    Ren.Messages.Requests.repaint.handle(() => {
+
+        if (visualisation.isDestroyed) return false;
+
+        recordRenderedRows();
+    });
 
     /**
      * Gets the aggregation indicator for each of a grouping's columns, in columnIndexes order.
@@ -1327,6 +1346,7 @@ Ren.DataGridCellRenderer = (
         clearCache,
         getRowIndexesIncHeadingsInView,
         initialrepaint,
+        recordRenderedRows,
         removeRenderedGroupRows,
         renderAnyNewlyVisibleColumns,
         renderColumn,
