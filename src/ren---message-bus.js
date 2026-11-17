@@ -86,11 +86,52 @@ Ren.MessageBus = (() => {
         sweepListenersIfNotDispatching();
     };
 
-    const removeExistingMessages = messageTypeId => {
+    // The queued message waiting under each message type and dedupe key (undefined for a message
+    // type without parameters, whose every notify supersedes the last), so that a later notify
+    // finds the one it supersedes without scanning the queue.  A message leaves this when its
+    // dispatch starts, after which nothing supersedes it.
+    const pendingMessages = new Map();
 
-        for (let i = messageQueue.length - 1; i >= 0; i--) {
+    /**
+     * Marks the waiting message as superseded rather than splicing it out, which would shift the
+     * indexes sendQueuedMessages is working through; it is skipped when its turn comes, and
+     * cleared from the queue with the rest of its batch.
+     */
+    const supersedePendingMessage = (messageTypeId, dedupeKey) => {
 
-            if (messageQueue[i].messageTypeId === messageTypeId) messageQueue.splice(i, 1);
+        const byKey = pendingMessages.get(messageTypeId);
+
+        if (!byKey) return;
+
+        const pending = byKey.get(dedupeKey);
+
+        if (!pending) return;
+
+        pending.isSuperseded = true;
+        byKey.delete(dedupeKey);
+    };
+
+    const trackPendingMessage = (messageObj, dedupeKey) => {
+
+        let byKey = pendingMessages.get(messageObj.messageTypeId);
+
+        if (!byKey) {
+
+            byKey = new Map();
+            pendingMessages.set(messageObj.messageTypeId, byKey);
+        }
+
+        messageObj.isTracked = true;
+        byKey.set(dedupeKey, messageObj);
+    };
+
+    const untrackPendingMessage = messageObj => {
+
+        const byKey = pendingMessages.get(messageObj.messageTypeId);
+
+        if (byKey && byKey.get(messageObj.dedupeKey) === messageObj) {
+
+            byKey.delete(messageObj.dedupeKey);
         }
     };
 
@@ -210,7 +251,7 @@ Ren.MessageBus = (() => {
                 messageTypeId,
                 notify: function () {
 
-                    removeExistingMessages(messageTypeId);
+                    supersedePendingMessage(messageTypeId, undefined);
                     checkArguments(messageTypeId, arguments.length, 0);
 
                     if (options.isImmediate) {
@@ -226,13 +267,14 @@ Ren.MessageBus = (() => {
                     // The error is captured but not formatted here: reading .stack is what costs,
                     // and it is only ever read if a listener throws.
                     messageObj.notifyError = new Error();
+                    trackPendingMessage(messageObj, undefined);
                     messageQueue.push(messageObj);
 
                     startInterval();
                 },
                 notifyImmediately: function () {
 
-                    removeExistingMessages(messageTypeId);
+                    supersedePendingMessage(messageTypeId, undefined);
                     checkArguments(messageTypeId, arguments.length, 0);
 
                     invokeListeners(messageTypeId, null);
@@ -257,21 +299,10 @@ Ren.MessageBus = (() => {
 
                     if (dedupeKeyFn) {
 
-                        // The key is stored on the queued message, so the existing messages it is
-                        // compared against never have to recompute theirs.
-                        const dedupeKey = dedupeKeyFn.apply(null, messageObj.args);
-                        messageObj.dedupeKey = dedupeKey;
+                        // Stored on the message, so that it can be untracked when dispatched.
+                        messageObj.dedupeKey = dedupeKeyFn.apply(null, messageObj.args);
 
-                        for (let i = messageQueue.length - 1; i >= 0; i--) {
-
-                            const existing = messageQueue[i];
-
-                            if (existing.messageTypeId === messageTypeId &&
-                                existing.dedupeKey === dedupeKey) {
-
-                                messageQueue.splice(i, 1);
-                            }
-                        }
+                        supersedePendingMessage(messageTypeId, messageObj.dedupeKey);
                     }
 
                     if (options.removeIf) messageObj.removeIf = options.removeIf;
@@ -283,6 +314,9 @@ Ren.MessageBus = (() => {
                     }
 
                     messageObj.notifyError = new Error();
+
+                    if (dedupeKeyFn) trackPendingMessage(messageObj, messageObj.dedupeKey);
+
                     messageQueue.push(messageObj);
                     startInterval();
                 },
@@ -378,7 +412,12 @@ Ren.MessageBus = (() => {
 
             for (let i = 0; i < len; i++) {
 
-                const { messageTypeId, args, removeIf, notifyError } = messageQueue[i];
+                const messageObj = messageQueue[i];
+
+                if (messageObj.isSuperseded) continue;
+                if (messageObj.isTracked) untrackPendingMessage(messageObj);
+
+                const { messageTypeId, args, removeIf, notifyError } = messageObj;
                 const bucket = listenerBuckets.get(messageTypeId);
 
                 if (!bucket) continue;

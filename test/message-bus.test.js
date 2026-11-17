@@ -47,6 +47,68 @@ describe("Ren.MessageBus", () => {
         expect(removeIf).toHaveBeenCalledTimes(1);
     });
 
+    test("Notify_SameDedupeKey_OnlyLastSentInItsPlace", () => {
+
+        const messageType = Ren.MessageBus.createMessageType(["key", "value"], {
+            dedupeKey: key => key
+        });
+
+        const received = [];
+
+        handle(messageType, (key, value) => { received.push(key + value); });
+
+        messageType.notify("a", 1);
+        messageType.notify("b", 1);
+        messageType.notify("a", 2);
+        Ren.MessageBus.sendQueuedMessages();
+
+        expect(received).toEqual(["b1", "a2"]);
+    });
+
+    test("Notify_NoParameters_OnlyLastSent", () => {
+
+        const messageType = Ren.MessageBus.createMessageType();
+        const listener = jest.fn();
+
+        handle(messageType, listener);
+
+        messageType.notify();
+        messageType.notify();
+        messageType.notify();
+        Ren.MessageBus.sendQueuedMessages();
+
+        expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    test("Notify_SameKeyAsMessageAlreadySentInBatch_LaterMessagesStillSent", () => {
+
+        const deduped = Ren.MessageBus.createMessageType(["key"], { dedupeKey: key => key });
+        const other = Ren.MessageBus.createMessageType(["value"]);
+
+        const received = [];
+        let isRenotified = false;
+
+        handle(deduped, key => { received.push(key); });
+
+        handle(other, value => {
+
+            received.push(value);
+
+            if (!isRenotified) {
+
+                isRenotified = true;
+                deduped.notify("a");
+            }
+        });
+
+        deduped.notify("a");
+        other.notify(1);
+        other.notify(2);
+        Ren.MessageBus.sendQueuedMessages();
+
+        expect(received).toEqual(["a", 1, 2, "a"]);
+    });
+
     test("Notify_FromListenerDuringBatch_SentInSameBatchWithoutStartingTimer", () => {
 
         const first = Ren.MessageBus.createMessageType();
