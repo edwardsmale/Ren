@@ -12,8 +12,8 @@
  * when it calls undimVisualisation or is seen to redraw; anything still dimmed once the page has
  * been quiet for a moment comes back then.
  *
- * The dim fades in only after a short delay, so a change answered within a frame or two never
- * visibly dims anything.
+ * The dim fades in only after half a second, so a change answered within that never visibly dims
+ * anything.
  */
 Ren.VisualisationFilterDim = (() => {
 
@@ -30,7 +30,7 @@ Ren.VisualisationFilterDim = (() => {
     const STYLES = [
         ".ren-visualisation { transition: opacity 0.15s ease-out }",
         ".ren-visualisation--filter-pending { opacity: 0.75;" +
-            " transition: opacity 0.2s ease-out 0.12s }"
+            " transition: opacity 0.2s ease-out 0.5s }"
     ];
 
     // The dims currently on: the element each is applied to, against the visualisation elements it
