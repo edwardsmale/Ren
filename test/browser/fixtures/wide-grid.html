@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Wide grid - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body>
+    <!-- 80 columns, far wider than the window, so only those near the view have cells.  The last
+         column of the 15th row holds "Needle", and no other cell does. -->
+    <ren-grid fetch-uri="/test/browser/fixtures/wide-grid.json" data-format="columns-and-rows" show-row-and-column-headings />
+</body>
+</html>

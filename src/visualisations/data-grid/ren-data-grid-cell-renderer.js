@@ -1237,15 +1237,27 @@ Ren.DataGridCellRenderer = (
     // every row rendered, which the browser restyles on every frame of a scroll.
     const columnRenderMargin = 500;
 
+    // A grid no wider than this has all its columns rendered, as it did before only those near
+    // the view were, since its cells are few enough to restyle quickly.  This keeps every column's
+    // cells of most grids in the page, for anything reading the page's HTML, however narrow the
+    // window.  (Ren's Find searches the data rather than the page, so finds cells either way.)
+    const allColumnsRenderedMaxWidth = 3000;
+
     /**
      * Gets a value indicating whether a column is within the given number of pixels of the view.
-     * Frozen columns, which never scroll out of view, always are.
+     * Frozen columns, which never scroll out of view, always are, as are the columns of a grid no
+     * wider than allColumnsRenderedMaxWidth.
      */
     const isColumnNearView = (columnIndex, margin) => {
 
         if (columnIndex < freezePanesCoords.x) return true;
 
-        const left = dataGridColumnLeftPositions.columnLeftPositions[columnIndex];
+        const columnLeftPositions = dataGridColumnLeftPositions.columnLeftPositions;
+        const gridWidth = columnLeftPositions[tabularData.ColumnCount];
+
+        if (gridWidth === undefined || gridWidth <= allColumnsRenderedMaxWidth) return true;
+
+        const left = columnLeftPositions[columnIndex];
 
         if (left === undefined) return true;
 
@@ -1327,6 +1339,39 @@ Ren.DataGridCellRenderer = (
 
     Ren.Messages.Events.columnVisibilityChanged.handle(renderAnyNewlyVisibleColumns);
     Ren.Messages.Events.columnResized.handle(renderAnyNewlyVisibleColumns);
+
+    // Each of these can bring columns near the view without a scroll: a repaint follows a resize
+    // of the window, and the others move columns.  Ren.DataGridColumnLeftPositions, created
+    // before this, has updated the left positions by then, and moves them again after a move.
+    Ren.Messages.Requests.repaint.handle(() => {
+
+        if (visualisation.isDestroyed) return false;
+
+        renderAnyNewlyVisibleColumns();
+    });
+
+    Ren.Messages.Events.columnsMoved.handle(() => {
+
+        if (visualisation.isDestroyed) return false;
+
+        renderAnyNewlyVisibleColumns();
+
+        Ren.FnUtils.defer(() => {
+
+            if (!visualisation.isDestroyed) renderAnyNewlyVisibleColumns();
+        }, 300);
+    });
+
+    Ren.Messages.Events.gridStateChanged.handle((changedGridState) => {
+
+        if (visualisation.isDestroyed) return false;
+        if (!changedGridState || changedGridState.gridStateGroup !== gridState.gridStateGroup) return;
+
+        Ren.FnUtils.defer(() => {
+
+            if (!visualisation.isDestroyed) renderAnyNewlyVisibleColumns();
+        });
+    });
 
     /**
      * Renders the cells of the specified column.

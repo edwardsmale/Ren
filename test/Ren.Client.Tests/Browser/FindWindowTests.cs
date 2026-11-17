@@ -315,4 +315,30 @@ public class FindWindowTests : BrowserTest
         await Expect(FindWindow).Not.ToHaveClassAsync(FilterRowsActive);
         await ExpectNamesAsync(AllNames);
     }
+
+    // A grid far wider than the window has cells only for the columns near the view, so the
+    // cell found has to be drawn as the grid scrolls to it.
+    [TestMethod("Find Next: in a wide grid, scrolls to and draws a cell in a far column")]
+    public async Task FindNextInAWideGridScrollsToAndDrawsACellInAFarColumn()
+    {
+        await Ren.OpenAsync("wide-grid.html");
+
+        var needleCell = Ren.Root.Locator(".ren-data-grid__cell").Filter(new() { HasText = "Needle" });
+
+        await Expect(Ren.Root.Locator(".ren-data-grid__cell").Filter(new() { HasText = "R1C1" }).First).ToBeVisibleAsync();
+        await Expect(needleCell).ToHaveCountAsync(0);
+
+        // As PressControlFAsync, but on a grid outside any report.
+        var viewport = Ren.Root.Locator(".ren-grid-set__viewport").First;
+        await viewport.DispatchEventAsync("mousedown", new { bubbles = true });
+        await viewport.DispatchEventAsync("mouseup", new { bubbles = true });
+        await Page.Keyboard.PressAsync("Control+f");
+        await Ren.Root.Locator(Input).First.WaitForAsync(new() { State = WaitForSelectorState.Attached });
+
+        await FindNextAsync("Needle");
+
+        await Poll(() => Ren.Root.SelectedTextAsync()).ToBe("Needle");
+        await Expect(needleCell).ToHaveCountAsync(1);
+        await Expect(needleCell).ToBeInViewportAsync();
+    }
 }

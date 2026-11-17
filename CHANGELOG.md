@@ -9,7 +9,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 Scroll grids more smoothly, as scrolling one no longer restyles every grid on the page.
 Scroll very large grids faster by finding the rows in view without checking every row.
 Draw grouped grids faster, as each data row is now drawn once rather than once per grouping.
-Scroll grids with many columns much faster, as only the columns near the view are drawn.
+Scroll very wide grids much faster, as only the columns near the view are drawn.
 
 ## 1.1.18 (2026-11-16)
 
