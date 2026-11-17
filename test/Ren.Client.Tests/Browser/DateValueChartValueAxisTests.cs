@@ -22,6 +22,8 @@ public class DateValueChartValueAxisTests : BrowserTest
 
     private async Task DragHandleDownAsync(string handleSelector, double deltaY)
     {
+        await DateValueChart.ShowDragHandlesAsync(Ren);
+
         var handle = Ren.Root.Locator(handleSelector).First;
 
         await handle.ScrollIntoViewIfNeededAsync();
@@ -42,6 +44,7 @@ public class DateValueChartValueAxisTests : BrowserTest
     private async Task<double> AxisValueAtHandleAsync(string axisSelector, string handleSelector)
     {
         await Ren.Root.Locator(axisSelector).First.WaitForAsync(new() { State = WaitForSelectorState.Attached });
+        await DateValueChart.ShowDragHandlesAsync(Ren);
         await Ren.Root.Locator(handleSelector).First.WaitForAsync(new() { State = WaitForSelectorState.Attached });
 
         return await Page.EvaluateAsync<double>("""
@@ -112,5 +115,24 @@ public class DateValueChartValueAxisTests : BrowserTest
 
         await ExpectAxisReadsAsync(LeftAxis, SearchesPeakHandle, 19, 1);
         await ExpectAxisReadsAsync(RightAxis, PublishedHandle, 1, 0.1);
+    }
+
+    [TestMethod("a chart's drag handles are drawn once the pointer comes over it")]
+    public async Task AChartsDragHandlesAreDrawnOnceThePointerComesOverIt()
+    {
+        await Page.Mouse.MoveAsync(0, 0);
+        await Ren.OpenAsync(BothOnRightAxisFixture);
+        await Ren.Root.Locator(LeftAxis).First.WaitForAsync(new() { State = WaitForSelectorState.Attached });
+
+        var valueHandles = Ren.Root.Locator(".ren-value-resize-handle");
+        var widthHandles = Ren.Root.Locator(".ren-bar-resize-handle");
+
+        await Expect(valueHandles).ToHaveCountAsync(0);
+        await Expect(widthHandles).ToHaveCountAsync(0);
+
+        await DateValueChart.ShowDragHandlesAsync(Ren);
+
+        await Expect(valueHandles.First).ToBeAttachedAsync();
+        await Expect(widthHandles.First).ToBeAttachedAsync();
     }
 }

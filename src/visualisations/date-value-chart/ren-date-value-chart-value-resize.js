@@ -146,7 +146,9 @@ Ren.DateValueChart_ValueResize = (() => {
      */
     const addHandles = (chartGroup, data, mainValueFn, crossValueFn, xScale, yScale, axisName, props, visualisation, config) => {
 
-        data.forEach((d, index) => {
+        // Placed now, against the scales as they're drawn, but only made once the pointer is over
+        // the chart (see DateValueChart_DeferredHandles).
+        const handles = data.map((d, index) => {
 
             const dataValue = mainValueFn(d);
             const xValue = crossValueFn(d);
@@ -159,18 +161,26 @@ Ren.DateValueChart_ValueResize = (() => {
                 heightPx: config.handleHeight
             };
 
-            const handle = Ren.Svg.append(chartGroup, "rect", {
-                "class": `ren-value-resize-handle ${config.handleClass}`,
-                "width": handleWidth,
-                "height": config.handleHeight,
-                "fill": handleColor,
-                "data-index": index,
-                "data-value": dataValue,
-                "data-axis-name": axisName,
-                "transform": `translate(${position.leftPx},${position.topPx})`
-            });
+            return { index, dataValue, handleWidth, position };
+        });
 
-            attachValueDrag(handle, position, dataValue, axisName, yScale, props, visualisation);
+        Ren.DateValueChart_DeferredHandles.add(props, chartGroup, (handlesGroup) => {
+
+            handles.forEach(({ index, dataValue, handleWidth, position }) => {
+
+                const handle = Ren.Svg.append(handlesGroup, "rect", {
+                    "class": `ren-value-resize-handle ${config.handleClass}`,
+                    "width": handleWidth,
+                    "height": config.handleHeight,
+                    "fill": handleColor,
+                    "data-index": index,
+                    "data-value": dataValue,
+                    "data-axis-name": axisName,
+                    "transform": `translate(${position.leftPx},${position.topPx})`
+                });
+
+                attachValueDrag(handle, position, dataValue, axisName, yScale, props, visualisation);
+            });
         });
     };
 

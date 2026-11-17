@@ -46,6 +46,12 @@ public static class DateValueChart
     private static Task<int> ChartCountAsync(RenContext ren) => ren.Root.Locator(ChartSelector).CountAsync();
 
     /// <summary>
+    /// Moves the pointer over the first chart, which is when a chart is given its drag handles.
+    /// </summary>
+    public static Task ShowDragHandlesAsync(RenContext ren) =>
+        ren.Root.Locator(ChartSelector).First.HoverAsync();
+
+    /// <summary>
     /// Opens a menu of the chart by right-clicking a part of it, again while no menu shows, as a
     /// part right-clicked while the chart is drawn again is gone before it can open one.
     /// </summary>

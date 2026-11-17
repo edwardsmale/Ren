@@ -958,6 +958,7 @@ Ren.DateValueChart_Render = (() => {
                         // Dropping a handle sets the narrowing every bar is drawn with, from how
                         // far it moved the edge of its own bar.
                         const appendWidthHandle = (
+                            handlesGroup,
                             side,
                             barIndex,
                             barWidth,
@@ -968,7 +969,7 @@ Ren.DateValueChart_Render = (() => {
                             const leftPx = edgeX - handleSize / 2;
                             let movedPx = 0;
 
-                            const handle = Ren.Svg.append(barGroup, "rect", {
+                            const handle = Ren.Svg.append(handlesGroup, "rect", {
                                 "class": `ren-bar-resize-handle ren-bar-resize-handle--${side}`
                                     + ` ren-series-${seriesNum}`,
                                 "width": handleSize,
@@ -1026,6 +1027,10 @@ Ren.DateValueChart_Render = (() => {
                             });
                         };
 
+                        // Placed now, but only made once the pointer is over the chart (see
+                        // DateValueChart_DeferredHandles).
+                        const widthHandles = [];
+
                         for (let barIndex = 0; barIndex < seriesBars.length; barIndex++) {
 
                             const bar = seriesBars[barIndex];
@@ -1041,24 +1046,18 @@ Ren.DateValueChart_Render = (() => {
                             const barTop = yScale.getPixel(seriesMainValueFn(barDatum));
                             const barHeight = yScale.getPixel(0) - barTop;
 
-                            appendWidthHandle(
-                                "left",
-                                barIndex,
-                                barWidth,
-                                barCenterX - barWidth / 2,
-                                barTop,
-                                barHeight
-                            );
-
-                            appendWidthHandle(
-                                "right",
-                                barIndex,
-                                barWidth,
-                                barCenterX + barWidth / 2,
-                                barTop,
-                                barHeight
+                            widthHandles.push(
+                                ["left", barIndex, barWidth, barCenterX - barWidth / 2, barTop, barHeight],
+                                ["right", barIndex, barWidth, barCenterX + barWidth / 2, barTop, barHeight]
                             );
                         }
+
+                        Ren.DateValueChart_DeferredHandles.add(props, barGroup, (handlesGroup) => {
+
+                            for (let i = 0; i < widthHandles.length; i++) {
+                                appendWidthHandle(handlesGroup, ...widthHandles[i]);
+                            }
+                        });
                     }
 
                     Ren.DateValueChart_LastPeriodEstimate.renderForSeries({

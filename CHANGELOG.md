@@ -10,6 +10,7 @@ Fix the message bus sometimes losing events passed between parts of a report.
 Fix large grids being slow when the page has no format functions script element.
 Update date/value charts faster after a filter change, by reusing their legend layouts.
 Redraw date/value charts faster, as each is no longer styled twice.
+Redraw date/value charts faster, as drag handles are only added once the pointer is over a chart.
 
 ## 1.1.19 (2026-11-17)
 
