@@ -418,7 +418,8 @@ Ren.CreateDataGrid = (
         dataGridScrollPos,
         freezePanesCoords,
         contextMenu,
-        contextMenuItems
+        contextMenuItems,
+        dataGridColumnLeftPositions
     );
 
     const dataGridColumnDrag = Ren.DataGridColumnDrag(

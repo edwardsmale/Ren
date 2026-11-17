@@ -11,7 +11,8 @@ Ren.DataGridCellRenderer = (
     dataGridScrollPos,
     freezePanesCoords,
     contextMenu,
-    contextMenuItems) => {
+    contextMenuItems,
+    dataGridColumnLeftPositions) => {
 
     let cachedRowIndexesInView = null;
 
@@ -323,6 +324,9 @@ Ren.DataGridCellRenderer = (
      */
     const renderNewlyVisibleRows = () => {
 
+        // First, as the view may have moved sideways, and new rows are given the columns near it.
+        renderAnyNewlyVisibleColumns();
+
         const rowIndexesIncHeadingsInView = getRowIndexesIncHeadingsInView();
 
         const rowIndexesIncHeadingsToRender = rowIndexesIncHeadingsInView
@@ -334,10 +338,17 @@ Ren.DataGridCellRenderer = (
 
         renderRowHeadings(rowIndexesIncHeadingsToRender);
 
-        renderCells(
-            rowIndexesIncHeadingsToRender,
-            gridState.visibleColumnIndexes()
-        );
+        const visibleColumnIndexes = gridState.visibleColumnIndexes();
+        const columnIndexesToRender = [];
+
+        for (let i = 0; i < visibleColumnIndexes.length; i++) {
+
+            if (columnIndexesRendered.has(visibleColumnIndexes[i])) {
+                columnIndexesToRender.push(visibleColumnIndexes[i]);
+            }
+        }
+
+        renderCells(rowIndexesIncHeadingsToRender, columnIndexesToRender);
 
         Ren.GroupCtrls.renderGroupCtrls(
             rowIndexesIncHeadingsToRender,
@@ -1220,9 +1231,53 @@ Ren.DataGridCellRenderer = (
         });
     };
 
+    // A column's cells are rendered once it is within this many pixels of the view, and removed
+    // once it is more than three times as far, so that scrolling a little sideways and back
+    // neither renders nor removes any.  A wide grid would otherwise have cells for every column in
+    // every row rendered, which the browser restyles on every frame of a scroll.
+    const columnRenderMargin = 500;
+
     /**
-     * Renders the cells of any visible columns which have not been rendered yet, and forgets any
-     * columns that have just been hidden so that they are rendered afresh if shown again.
+     * Gets a value indicating whether a column is within the given number of pixels of the view.
+     * Frozen columns, which never scroll out of view, always are.
+     */
+    const isColumnNearView = (columnIndex, margin) => {
+
+        if (columnIndex < freezePanesCoords.x) return true;
+
+        const left = dataGridColumnLeftPositions.columnLeftPositions[columnIndex];
+
+        if (left === undefined) return true;
+
+        const right = left + gridState.getColumnWidth(columnIndex);
+
+        return right >= dataGridScrollPos.x - margin &&
+            left <= dataGridScrollPos.x + window.innerWidth + margin;
+    };
+
+    /**
+     * Removes a column's cells from the rows rendered, other than the heading rows, so that they
+     * are rendered afresh if the column comes back near the view.
+     */
+    const removeColumnCells = (columnIndex) => {
+
+        rowIndexesIncHeadingsRendered.forEach((r) => {
+
+            if (r >= tabularData.HeadingCount) renderedCellsCache.removeCell(r, columnIndex);
+        });
+
+        for (let i = 0; i < rowIndexesIncHeadingsToRecord.length; i++) {
+
+            const r = rowIndexesIncHeadingsToRecord[i];
+
+            if (r >= tabularData.HeadingCount) renderedCellsCache.removeCell(r, columnIndex);
+        }
+    };
+
+    /**
+     * Renders the cells of any visible columns near the view which have not been rendered yet,
+     * forgets any columns that have just been hidden so that they are rendered afresh if shown
+     * again, and removes the cells of any that are now far out of view.
      */
     const renderAnyNewlyVisibleColumns = () => {
 
@@ -1235,6 +1290,8 @@ Ren.DataGridCellRenderer = (
 
             if (isVisible && !isRendered) {
 
+                if (!isColumnNearView(columnIndex, columnRenderMargin)) continue;
+
                 newlyVisibleColumnIndexes.push(columnIndex);
                 columnIndexesRendered.add(columnIndex);
             }
@@ -1244,20 +1301,24 @@ Ren.DataGridCellRenderer = (
                 // rows scrolled into view while it was hidden have none.
                 columnIndexesRendered.delete(columnIndex);
             }
+            else if (isRendered && !isColumnNearView(columnIndex, columnRenderMargin * 3)) {
+
+                columnIndexesRendered.delete(columnIndex);
+                removeColumnCells(columnIndex);
+            }
         }
 
         if (newlyVisibleColumnIndexes.length === 0) return;
 
-        // In-view rows are included as rowIndexesIncHeadingsRendered is filled on a deferred
-        // repaint, so may not yet record a row whose cells are already on screen.
+        // The rows with cells: those recorded as rendered, and those rendered since, which are
+        // recorded on the next repaint.  Rows yet to be rendered are given the column then.
         const rowIndexesIncHeadingsToRender = Array.from(rowIndexesIncHeadingsRendered);
-        const rowIndexesIncHeadingsInView = getRowIndexesIncHeadingsInView();
 
-        for (let i = 0; i < rowIndexesIncHeadingsInView.length; i++) {
+        for (let i = 0; i < rowIndexesIncHeadingsToRecord.length; i++) {
 
-            if (!rowIndexesIncHeadingsRendered.has(rowIndexesIncHeadingsInView[i])) {
+            if (!rowIndexesIncHeadingsRendered.has(rowIndexesIncHeadingsToRecord[i])) {
 
-                rowIndexesIncHeadingsToRender.push(rowIndexesIncHeadingsInView[i]);
+                rowIndexesIncHeadingsToRender.push(rowIndexesIncHeadingsToRecord[i]);
             }
         }
 
