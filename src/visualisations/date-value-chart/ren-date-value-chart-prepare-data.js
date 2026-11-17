@@ -179,20 +179,9 @@ Ren.CreateDateValueChart_PrepareData = (() => {
             }
         }
 
-        // A manual insertion sort, for speed.
-        for (let i = 1; i < result.length; i++) {
-
-            let j = i;
-            const temp = result[i];
-
-            while (j > 0 && result[j - 1][dateHeading] > temp[dateHeading]) {
-
-                result[j] = result[j - 1];
-                j--;
-            }
-
-            result[j] = temp;
-        }
+        // Binned rows needn't arrive in date order, so an insertion sort could make thousands of
+        // passes over them.  Rows of the same date keep their order, as the sort is stable.
+        result.sort((a, b) => a[dateHeading] - b[dateHeading]);
 
         return result;
     };

@@ -12,6 +12,7 @@ Update date/value charts faster after a filter change, by reusing their legend l
 Redraw date/value charts faster, as each is no longer styled twice.
 Redraw date/value charts faster, as drag handles are only added once the pointer is over a chart.
 After a filter change, redraw the visualisations in view first, showing each as it's done.
+Update date/value charts faster when their points come out of date order.
 
 ## 1.1.19 (2026-11-17)
 
