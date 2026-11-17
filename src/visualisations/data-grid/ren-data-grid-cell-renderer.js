@@ -583,25 +583,63 @@ Ren.DataGridCellRenderer = (
 
         const dataRowsGrouping = dataGroupingSettings.groupings.entries[0];
 
+        // The columns whose cell style functions have had the stats they read populated, which
+        // takes parsing the functions, so is done once per column rather than once per row.
+        const statsPopulatedColumnIndexes = new Set();
+
         /**
-         * Gets the background colour a data row's cell is styled with, or null where it has none.
+         * Sets backgrounds[i] to the background colour the data row's cell in columnIndexes[i] is
+         * styled with, or null where it has none.  The row's data and style are made once for all
+         * the columns.
          */
-        const getDataRowBackground = (rowIndex, columnIndex) => {
+        const getDataRowBackgrounds = (rowIndex, columnIndexes, backgrounds) => {
 
-            const cellStyleFunctions = columnCellStyleFunctions[columnIndex];
+            let rowData = null;
+            let rowStyle = null;
 
-            if (!cellStyleFunctions && !columnRowStyleFunctions) return null;
+            for (let i = 0; i < columnIndexes.length; i++) {
 
-            const rowData = createRowData(rowIndex);
-            const rowStyle = getDataRowStyle(rowData, dataRowsGrouping);
+                const columnIndex = columnIndexes[i];
+                const cellStyleFunctions = columnCellStyleFunctions[columnIndex];
+
+                if (!cellStyleFunctions && !columnRowStyleFunctions) {
+
+                    backgrounds[i] = null;
+                    continue;
+                }
+
+                if (!rowData) {
+
+                    rowData = createRowData(rowIndex);
+                    rowStyle = getDataRowStyle(rowData, dataRowsGrouping);
+                }
+
+                backgrounds[i] = getDataRowCellBackground(
+                    rowData,
+                    rowStyle,
+                    columnIndex,
+                    cellStyleFunctions
+                );
+            }
+        };
+
+        /**
+         * Gets the background colour of a data row's cell, given the row's data and style.
+         */
+        const getDataRowCellBackground = (rowData, rowStyle, columnIndex, cellStyleFunctions) => {
 
             if (!cellStyleFunctions) return cellStyles.getBackgroundColour(rowStyle);
 
-            dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
-                cellStyleFunctions,
-                columnIndex,
-                dataRowsGrouping
-            );
+            if (!statsPopulatedColumnIndexes.has(columnIndex)) {
+
+                dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
+                    cellStyleFunctions,
+                    columnIndex,
+                    dataRowsGrouping
+                );
+
+                statsPopulatedColumnIndexes.add(columnIndex);
+            }
 
             const calculatedValue = applyCalcFunctions(
                 tabularData.CompressionDictionary.decompressValue(
@@ -942,7 +980,8 @@ Ren.DataGridCellRenderer = (
                                 grouping,
                                 group,
                                 columnIndex,
-                                getDataRowBackground
+                                getDataRowBackgrounds,
+                                groupingColumnMergesDataRowBackgrounds
                             )
                             : null;
 

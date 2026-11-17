@@ -10,6 +10,7 @@ Scroll grids more smoothly, as scrolling one no longer restyles every grid on th
 Scroll very large grids faster by finding the rows in view without checking every row.
 Draw grouped grids faster, as each data row is now drawn once rather than once per grouping.
 Scroll very wide grids much faster, as only the columns near the view are drawn.
+Draw group rows that mix their data rows' backgrounds faster, especially in several columns.
 
 ## 1.1.18 (2026-11-16)
 

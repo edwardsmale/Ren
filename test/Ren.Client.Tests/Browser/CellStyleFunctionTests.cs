@@ -131,6 +131,26 @@ public class CellStyleFunctionTests : BrowserTest
         await ExpectCellStyleAsync("Sales", GroupARow, "background-color", Purple);
     }
 
+    // A group's mixes are made for every column its grouping mixes in one pass over its data rows,
+    // so with Product mixed too, which comes first, Sales's mix is made alongside Product's.
+    // Product's data rows have no backgrounds, so its group row cells keep their own.
+    [TestMethod("A group row mixing two columns' data row backgrounds: mixes each column's own")]
+    public async Task AGroupRowMixingTwoColumnsDataRowBackgroundsMixesEachColumnsOwn()
+    {
+        await Ren.OpenAsync(Fixture);
+        await ExpectCellStyleAsync("Sales", GroupARow, "background-color", Purple);
+        var productBackground = await CellStyleAsync("Product", GroupARow, "background-color");
+
+        await Ren.Report.RightClickCellAsync("Product", GroupBRow);
+        await Ren.Root.MouseOverAsync(".qa-ren-styling-menu-item");
+        await Ren.Root.ClickAsync("#style-merge-data-row-backgrounds");
+
+        await ExpectCellStyleAsync("Sales", GroupARow, "background-color", Purple);
+        await ExpectCellStyleAsync("Sales", GroupBRow, "background-color", HalfRed);
+        await ExpectCellStyleAsync("Sales", GroupDRow, "background-color", Red);
+        await ExpectCellStyleAsync("Product", GroupARow, "background-color", productBackground);
+    }
+
     [TestMethod("The Mix data rows' backgrounds menu item: isn't offered on a data row's cell")]
     public async Task TheMixMenuItemIsntOfferedOnADataRowsCell()
     {
