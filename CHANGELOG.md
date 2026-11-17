@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Fix the message bus sometimes losing events passed between parts of a report.
+Fix large grids being slow when the page has no format functions script element.
 
 ## 1.1.19 (2026-11-17)
 

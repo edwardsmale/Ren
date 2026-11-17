@@ -163,13 +163,25 @@ Ren.FormatFunctions = (() => {
         return null;
     };
 
+    // Whether the page has been searched for the source element in the code running now.
+    let isSourceElementLookedFor = false;
+
     const initialiseFormatFunctions = () => {
+
+        // Left uninitialised rather than caching the emptiness, so that the functions are picked up
+        // if the element arrives later.  But looked for again only once the code running now has
+        // finished, as a page without the element (one hosting Ren without its own functions) would
+        // otherwise be searched for every value formatted.
+        if (isSourceElementLookedFor) return;
 
         const sourceElement = document.querySelector(".format-function-source-code");
 
-        // Left uninitialised rather than caching the emptiness, so that the functions are picked up
-        // if the element arrives later.
-        if (!sourceElement) return;
+        if (!sourceElement) {
+
+            isSourceElementLookedFor = true;
+            queueMicrotask(() => { isSourceElementLookedFor = false; });
+            return;
+        }
 
         const formatFunctionsSource = JSON.parse(sourceElement.innerHTML);
 

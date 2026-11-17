@@ -30,13 +30,25 @@ Ren.HtmlTemplateFunctions = (() => {
     const registeredHtmlTemplateFunctions = {};
     let initialised = false;
 
+    // Whether the page has been searched for the source element in the code running now.
+    let isSourceElementLookedFor = false;
+
     const initialiseHtmlTemplateFunctions = () => {
+
+        // Left uninitialised rather than caching the emptiness, so that the templates are picked up
+        // if the element arrives later.  But looked for again only once the code running now has
+        // finished, as a page without the element would otherwise be searched for every template
+        // rendered.
+        if (isSourceElementLookedFor) return;
 
         const sourceElement = document.querySelector(".html-template-function-source-code");
 
-        // Left uninitialised rather than caching the emptiness, so that the templates are picked up
-        // if the element arrives later.
-        if (!sourceElement) return;
+        if (!sourceElement) {
+
+            isSourceElementLookedFor = true;
+            queueMicrotask(() => { isSourceElementLookedFor = false; });
+            return;
+        }
 
         const htmlTemplateFunctionsSource = JSON.parse(sourceElement.innerHTML);
 
