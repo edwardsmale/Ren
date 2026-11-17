@@ -584,7 +584,6 @@ Ren.CreateDataGrid = (
     sortFilterGroup.onChanged(() => {
 
         dataGridRenderer.clearCache();
-        dataGroupingSettings.updateRowYIndexes();
 
         dataGridRenderer.removeRenderedGroupRows();
 

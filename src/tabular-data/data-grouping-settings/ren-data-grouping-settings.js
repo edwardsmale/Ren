@@ -426,6 +426,7 @@ Ren.DataGroupingSettings = (
         getColIndex,
         getColX,
         rowYs,
+        rowYIndexes,
         tracksRowDisplay,
         setActiveRowCount,
         setAggregateWithRespectToColumn,

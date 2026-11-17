@@ -109,6 +109,9 @@ Ren.SortFilterGroup_Applyer = (tabularData, dataGroupingSettings, expandedGroups
 
         doApplySettings(tabularData, dataGroupingSettings);
 
+        // Before the callbacks, as a grid reads the rows in view from it to render them.
+        dataGroupingSettings.updateRowYIndexes();
+
         Ren.Messages.Events.columnsMoved.notify();
 
         // Copy callbacks in case the array is modified during iteration

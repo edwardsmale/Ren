@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Scroll grids more smoothly, as scrolling one no longer restyles every grid on the page.
+Scroll very large grids faster by finding the rows in view without checking every row.
 
 ## 1.1.18 (2026-11-16)
 

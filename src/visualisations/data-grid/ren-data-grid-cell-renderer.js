@@ -231,13 +231,21 @@ Ren.DataGridCellRenderer = (
             return cachedRowIndexesInView.rowIndexesIncHeadings;
         }
 
-        const rowYs = dataGroupingSettings.rowYs;
+        const rowYIndexes = dataGroupingSettings.rowYIndexes;
 
         const rowIndexesIncHeadings = tabularData.HasSubheadings ? [0, 1] : [0];
 
-        for (let r = tabularData.HeadingCount; r < rowYs.length; r++) {
+        // Read from the inverse of rowYs, as scanning rowYs would visit every row.  Each row shown
+        // has a y of its own, so this finds the same rows.  The heading rows' ys are below
+        // HeadingCount, so are left out here as they are added above.
+        const fromY = Math.max(startRowY, tabularData.HeadingCount);
+        const toY = Math.min(stopRowY, rowYIndexes.length);
 
-            if (rowYs[r] >= startRowY && rowYs[r] < stopRowY) rowIndexesIncHeadings.push(r);
+        for (let y = fromY; y < toY; y++) {
+
+            const r = rowYIndexes[y];
+
+            if (r !== undefined) rowIndexesIncHeadings.push(r);
         }
 
         if (dataGroupingSettings.totalsRow.position === Ren.DataGridTotalsRowPositionEnum.BottomFixed) {
