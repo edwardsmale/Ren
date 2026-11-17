@@ -507,10 +507,7 @@ Ren.DateValueChart_DeclutterDateAxisLabels = (() => {
             ticks.push({ tickNode, textNode, date, lines, rect: null, shortRect: null });
         }
 
-        // A chart that is not on screen - one in a tab that is not showing, say - measures as
-        // nothing, and there is no telling from that what would fit, so its labels are left alone
-        // until it is laid out somewhere they can be measured.
-        return measureTicks(ticks) ? ticks : null;
+        return ticks;
     };
 
     /**
@@ -543,15 +540,47 @@ Ren.DateValueChart_DeclutterDateAxisLabels = (() => {
      */
     const declutter = (props) => {
 
+        const state = prepare(props);
+
+        measureLabels(state);
+        apply(state);
+
+        return lastResult;
+    };
+
+    /**
+     * Shows every tick with the whole of its label, ready for measuring: the first of the three
+     * steps declutter takes.  The steps are offered apart so that a caller with labels of its own
+     * to measure can have them all measured in one layout, writing nothing in between.
+     * @returns {object} What measure and apply take, or null for a chart with no axis drawn.
+     */
+    const prepare = (props) => {
+
         const result = { shown: 0, hidden: 0, yearsSuppressed: 0, level: "all" };
         lastResult = result;
 
-        if (!props || !props.chartGroup) return result;
+        const ticks = collectTicks(props ?? {});
 
-        const ticks = collectTicks(props);
+        if (ticks === null || ticks.length === 0) return null;
 
-        if (ticks === null || ticks.length === 0) return result;
+        return { props, result, ticks, isMeasured: false };
+    };
 
+    /** Measures the labels prepare showed, which costs one layout. */
+    const measureLabels = (state) => {
+
+        // A chart that is not on screen - one in a tab that is not showing, say - measures as
+        // nothing, and there is no telling from that what would fit, so its labels are left alone
+        // until it is laid out somewhere they can be measured.
+        if (state) state.isMeasured = measureTicks(state.ticks);
+    };
+
+    /** Shows or hides each label as measured. */
+    const apply = (state) => {
+
+        if (!state || !state.isMeasured) return;
+
+        const { props, result, ticks } = state;
         const ticksToLabel = chooseTicksToLabel(ticks, props, result);
         const shownTicks = new Set(ticksToLabel);
 
@@ -589,12 +618,13 @@ Ren.DateValueChart_DeclutterDateAxisLabels = (() => {
 
             previousYearLine = yearLine;
         }
-
-        return result;
     };
 
     return {
         declutter,
+        prepare,
+        measure: measureLabels,
+        apply,
         getLabellableDates,
         setTickLabelLines,
         getDiagnostics

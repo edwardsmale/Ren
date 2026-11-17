@@ -775,7 +775,9 @@ Ren.DateValueChart_StyleUpdater = (() => {
         setDateAxisTickLength(props, scaleY);
         Ren.DateValueChart_Axes.updateValueAxisTicks(props);
 
-        Ren.DateValueChart_DeclutterDateAxisLabels.declutter(props);
+        // The date axis labels are measured along with the value labels below, so that the two
+        // cost one layout between them rather than one each.
+        const dateAxisLabels = Ren.DateValueChart_DeclutterDateAxisLabels.prepare(props);
 
         // Set via the SVG attribute, as a CSS transform overrides rather than compounds with it,
         // and divided by scaleY so the offset stays constant in visual pixels.
@@ -824,7 +826,14 @@ Ren.DateValueChart_StyleUpdater = (() => {
         // A label's on-screen size is known only now, and which are shown decides what each lands
         // on, and so its colour.
         Ren.DateValueChart_BarValueLabelLayout.layout(props);
-        Ren.DateValueChart_DeclutterValueLabels.declutter(props);
+
+        const valueLabels = Ren.DateValueChart_DeclutterValueLabels.prepare(props);
+
+        Ren.DateValueChart_DeclutterDateAxisLabels.measure(dateAxisLabels);
+        Ren.DateValueChart_DeclutterValueLabels.measure(valueLabels);
+        Ren.DateValueChart_DeclutterDateAxisLabels.apply(dateAxisLabels);
+        Ren.DateValueChart_DeclutterValueLabels.apply(valueLabels);
+
         Ren.DateValueChart_BarSeriesNames.layout(props);
         Ren.DateValueChart_LineNames.layout(props);
         Ren.DateValueChart_PieLabels.layout(props);

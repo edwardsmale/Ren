@@ -167,33 +167,52 @@ Ren.DateValueChart_DeclutterValueLabels = (() => {
     };
 
     /**
-     * Settles which of a chart's value labels are shown and where.
-     * @returns {object} { placed, flipped, hidden }, for the QA hooks.
+     * Shows a chart's value labels where drawn, ready for measuring: the first of the three steps
+     * declutter takes.  The steps are offered apart so that a caller with labels of its own to
+     * measure can have them all measured in one layout, writing nothing in between.
+     * @returns {object} What measure and apply take, or null for a chart with no labels to place.
      */
-    const declutter = (props) => {
+    const prepare = (props) => {
 
         const result = { placed: 0, flipped: 0, hidden: 0 };
         lastResult = result;
 
-        if (!props || !props.chartGroup || !props.scaleY) return result;
+        if (!props || !props.chartGroup || !props.scaleY) return null;
 
         const layer = props.chartGroup.querySelector(
             "." + Ren.DateValueChart_RenderValueLabels.LABELS_LAYER_CLASS
         );
 
-        if (!layer) return result;
+        if (!layer) return null;
 
         const wrappers = collectWrappers(layer);
-        if (!wrappers.length) return result;
+        if (!wrappers.length) return null;
 
-        // Measured before any label is moved or hidden, so that the pass costs one layout.
-        const rects = [];
+        return { props, result, wrappers, rects: null };
+    };
 
-        for (let i = 0; i < wrappers.length; i++) {
+    /**
+     * Measures the labels prepare showed, all before any is moved or hidden, so that this costs
+     * one layout.
+     */
+    const measureLabels = (state) => {
 
-            rects.push(measure(wrappers[i]));
+        if (!state) return;
+
+        state.rects = [];
+
+        for (let i = 0; i < state.wrappers.length; i++) {
+
+            state.rects.push(measure(state.wrappers[i]));
         }
+    };
 
+    /** Shows, moves or hides each label as measured, reading nothing from the page. */
+    const apply = (state) => {
+
+        if (!state) return;
+
+        const { props, result, wrappers, rects } = state;
         const placedRects = [];
 
         for (let i = 0; i < wrappers.length; i++) {
@@ -254,12 +273,27 @@ Ren.DateValueChart_DeclutterValueLabels = (() => {
             placedRects.push(candidates[chosenIndex]);
             result.placed++;
         }
+    };
 
-        return result;
+    /**
+     * Settles which of a chart's value labels are shown and where.
+     * @returns {object} { placed, flipped, hidden }, for the QA hooks.
+     */
+    const declutter = (props) => {
+
+        const state = prepare(props);
+
+        measureLabels(state);
+        apply(state);
+
+        return lastResult;
     };
 
     return {
         declutter,
+        prepare,
+        measure: measureLabels,
+        apply,
         getDiagnostics
     };
 })();
