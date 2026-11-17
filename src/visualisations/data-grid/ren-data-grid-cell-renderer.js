@@ -465,8 +465,6 @@ Ren.DataGridCellRenderer = (
 
         if (rowIndexesIncHeadingsToRender.length === 0 || columnIndexes.length === 0) return;
 
-        let childGrouping = null;
-
         const overallSummaryStats = dataGroupingSettings.groupings.firstGroupOfOutermostGrouping()?.summaryStats;
         const columnFormats = dataGroupingSettings.getDataRowsColumnFormats();
         const columnValueFormats = columnFormats.columnValueFormats;
@@ -630,6 +628,135 @@ Ren.DataGridCellRenderer = (
             dataGridMainSection: document.createDocumentFragment()
         };
 
+        // Data rows are rendered once, outside the groupings' passes, as their stats are read from
+        // the groups of the data rows' grouping whichever pass renders them.  Their menus stand for
+        // the grouping one in from the outermost, or none where there is only the one grouping.
+        const dataRowsMenuGrouping = groupingsEntriesLength > 1
+            ? dataGroupingSettings.groupings.entries[groupingsEntriesLength - 2]
+            : null;
+
+        for (let ri = 0; ri < rowIndexesIncHeadingsToRender.length; ri++) {
+
+            const r = rowIndexesIncHeadingsToRender[ri];
+            const rowData = rowDataCache.get(r);
+            const rowIndex = rowData.rowIndex;
+
+            if (!rowData.isDataRow) continue;
+
+            const group = rowData.group;
+            if (!group) continue;
+
+            const rowModel = rowData.rowModel;
+            const rowVals = rowData.rowVals;
+
+            for (let ci = 0; ci < columnIndexes.length; ci++) {
+
+                const columnIndex = columnIndexes[ci];
+
+                if (anyColumnHasFormatFunction) {
+
+                    dataGroupingSettings.summaryStats.lazyPopulateSummaryStats(
+                        columnFormats,
+                        columnIndex,
+                        dataRowsGrouping
+                    );
+                }
+
+                // setCellValue passes the stats to data-row calc functions too.
+                if (anyColumnHasCalcFunction) {
+
+                    dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
+                        columnCalcFunctions[columnIndex],
+                        columnIndex,
+                        dataRowsGrouping
+                    );
+                }
+
+                const cell = addCellToFragment(columnIndex, r, fragments);
+
+                const compressedValue = rowModel.CV[columnIndex];
+
+                const cellValue = tabularData.CompressionDictionary.decompressValue(
+                    compressedValue,
+                    columnIndex
+                );
+
+                const calculatedValue = applyCalcFunctions(
+                    cellValue,
+                    columnCalcFunctions[columnIndex],
+                    rowVals,
+                    columnIndex,
+                    group.summaryStats,
+                    overallSummaryStats,
+                    rowData.compressedRowVals
+                );
+
+                setCellValue(
+                    cell,
+                    calculatedValue,
+                    columnValueFormats[columnIndex],
+                    columnFormatFunctions[columnIndex],
+                    rowVals,
+                    columnIndex,
+                    group.summaryStats,
+                    overallSummaryStats,
+                    rowData.compressedRowVals
+                );
+
+                const autoMenuName = getColumnAutoMenuName(columnIndex);
+
+                if (autoMenuName) {
+                    Ren.AutoMenu.applyMenu(cell, autoMenuName, cellValue);
+                }
+
+                const cellStyleFunctions = columnCellStyleFunctions[columnIndex];
+
+                if (cellStyleFunctions) {
+
+                    dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
+                        cellStyleFunctions,
+                        columnIndex,
+                        dataRowsGrouping
+                    );
+                }
+
+                cellStyles.applyStyle(
+                    cell,
+                    cellStyles.getCellStyle(
+                        getDataRowStyle(rowData, dataRowsGrouping),
+                        cellStyleFunctions,
+                        columnIndex,
+                        calculatedValue,
+                        rowVals,
+                        group.summaryStats,
+                        overallSummaryStats,
+                        rowData.compressedRowVals
+                    )
+                );
+
+                const menuState = cell.dataRowMenuState;
+
+                if (menuState) {
+
+                    menuState.rowIndex = rowIndex;
+                    menuState.grouping = dataRowsMenuGrouping;
+                    menuState.cellValue = cellValue;
+                    menuState.rowVals = rowVals;
+                }
+                else {
+
+                    cell.dataRowMenuState = {
+                        rowIndex,
+                        grouping: dataRowsMenuGrouping,
+                        cellValue,
+                        rowVals
+                    };
+
+                    contextMenuItems.addCellMenuItems(columnIndex, cell);
+                }
+            }
+        }
+
         for (let i = 0; i < groupingsEntriesLength; i++) {
 
             const grouping = dataGroupingSettings.groupings.entries[i];
@@ -663,124 +790,9 @@ Ren.DataGridCellRenderer = (
                 const rowData = rowDataCache.get(r);
                 const rowIndex = rowData.rowIndex;
 
-                if (rowIndex < 0) continue;
+                if (rowIndex < 0 || rowData.isDataRow) continue;
 
-                if (rowData.isDataRow) {
-
-                    const group = rowData.group;
-                    if (!group) continue;
-
-                    const rowModel = rowData.rowModel;
-                    const rowVals = rowData.rowVals;
-
-                    for (let ci = 0; ci < columnIndexes.length; ci++) {
-
-                        const columnIndex = columnIndexes[ci];
-
-                        if (anyColumnHasFormatFunction) {
-
-                            dataGroupingSettings.summaryStats.lazyPopulateSummaryStats(
-                                columnFormats,
-                                columnIndex,
-                                grouping
-                            );
-                        }
-
-                        // setCellValue passes the stats to data-row calc functions too.
-                        if (anyColumnHasCalcFunction) {
-
-                            dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
-                                columnCalcFunctions[columnIndex],
-                                columnIndex,
-                                grouping
-                            );
-                        }
-
-                        const cell = addCellToFragment(columnIndex, r, fragments);
-
-                        const compressedValue = rowModel.CV[columnIndex];
-
-                        const cellValue = tabularData.CompressionDictionary.decompressValue(
-                            compressedValue,
-                            columnIndex
-                        );
-
-                        const calculatedValue = applyCalcFunctions(
-                            cellValue,
-                            columnCalcFunctions[columnIndex],
-                            rowVals,
-                            columnIndex,
-                            group.summaryStats,
-                            overallSummaryStats,
-                            rowData.compressedRowVals
-                        );
-
-                        setCellValue(
-                            cell,
-                            calculatedValue,
-                            columnValueFormats[columnIndex],
-                            columnFormatFunctions[columnIndex],
-                            rowVals,
-                            columnIndex,
-                            group.summaryStats,
-                            overallSummaryStats,
-                            rowData.compressedRowVals
-                        );
-
-                        const autoMenuName = getColumnAutoMenuName(columnIndex);
-
-                        if (autoMenuName) {
-                            Ren.AutoMenu.applyMenu(cell, autoMenuName, cellValue);
-                        }
-
-                        const cellStyleFunctions = columnCellStyleFunctions[columnIndex];
-
-                        if (cellStyleFunctions) {
-
-                            dataGroupingSettings.summaryStats.populateStatsUsedByFunctions(
-                                cellStyleFunctions,
-                                columnIndex,
-                                grouping
-                            );
-                        }
-
-                        cellStyles.applyStyle(
-                            cell,
-                            cellStyles.getCellStyle(
-                                getDataRowStyle(rowData, grouping),
-                                cellStyleFunctions,
-                                columnIndex,
-                                calculatedValue,
-                                rowVals,
-                                group.summaryStats,
-                                overallSummaryStats,
-                                rowData.compressedRowVals
-                            )
-                        );
-
-                        const menuState = cell.dataRowMenuState;
-
-                        if (menuState) {
-
-                            menuState.rowIndex = rowIndex;
-                            menuState.grouping = childGrouping;
-                            menuState.cellValue = cellValue;
-                            menuState.rowVals = rowVals;
-                        }
-                        else {
-
-                            cell.dataRowMenuState = {
-                                rowIndex,
-                                grouping: childGrouping,
-                                cellValue,
-                                rowVals
-                            };
-
-                            contextMenuItems.addCellMenuItems(columnIndex, cell);
-                        }
-                    }
-                }
-                else if (groups && r >= tabularData.DataRowCount) { // group row
+                if (groups && r >= tabularData.DataRowCount) { // group row
 
                     const groupIndex = rowIndex - tabularData.DataRowCount;
                     const group = groups.get(groupIndex);
@@ -988,7 +1000,6 @@ Ren.DataGridCellRenderer = (
                 }
             }
 
-            childGrouping = grouping;
         }
 
         if (fragments.frozenTopLeftSection.childNodes.length > 0) {
