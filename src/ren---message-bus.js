@@ -3,6 +3,11 @@ Ren.MessageBus = (() => {
     let interval = null;
     const messageQueue = [];
 
+    // While sendQueuedMessages is sending, a message notified by a listener is sent in the same
+    // batch, so starting the timer for it would only make a tick that finds the queue empty, and
+    // nest timers deeper (which the browser delays further).
+    let isSendingQueuedMessages = false;
+
     // Bucketed by message type ID, so dispatch never scans every listener on the bus.  Within a
     // bucket, registration order is invocation order.
     const listenerBuckets = new Map();
@@ -25,7 +30,7 @@ Ren.MessageBus = (() => {
 
     const startInterval = () => {
 
-        if (interval) return;
+        if (interval || isSendingQueuedMessages) return;
 
         interval = setInterval(sendQueuedMessages, 1);
     };
@@ -326,13 +331,20 @@ Ren.MessageBus = (() => {
         stopInterval();
         dispatchDepth++;
 
+        const wasSendingQueuedMessages = isSendingQueuedMessages;
+        isSendingQueuedMessages = true;
+
         try {
 
             dispatchQueuedMessages();
         }
         finally {
 
+            isSendingQueuedMessages = wasSendingQueuedMessages;
             dispatchDepth--;
+
+            // So that, if a throw ended the batch early, what is left in the queue is still sent.
+            if (!isSendingQueuedMessages && messageQueue.length) startInterval();
         }
 
         sweepListenersIfNotDispatching();

@@ -46,4 +46,32 @@ describe("Ren.MessageBus", () => {
 
         expect(removeIf).toHaveBeenCalledTimes(1);
     });
+
+    test("Notify_FromListenerDuringBatch_SentInSameBatchWithoutStartingTimer", () => {
+
+        const first = Ren.MessageBus.createMessageType();
+        const second = Ren.MessageBus.createMessageType();
+
+        const received = [];
+
+        handle(first, () => { received.push("first"); second.notify(); });
+        handle(second, () => { received.push("second"); });
+
+        first.notify();
+
+        const setIntervalSpy = jest.spyOn(window, "setInterval");
+
+        try {
+
+            Ren.MessageBus.sendQueuedMessages();
+
+            expect(received).toEqual(["first", "second"]);
+            expect(setIntervalSpy).toHaveBeenCalledTimes(0);
+            expect(Ren.MessageBus.isIdle()).toBe(true);
+        }
+        finally {
+
+            setIntervalSpy.mockRestore();
+        }
+    });
 });
