@@ -113,7 +113,7 @@ Ren.Messages = (() => {
             }
         ),
         // Notified immediately, so that a listener can put something on screen while the browser
-        // can still paint it, which it cannot once the bus is draining redraw work synchronously.
+        // can still paint it, which it cannot once the bus is sending the queued redraw messages.
         filterChanging: createMessage(
             ["dataGroupingSettingsGroup", "filterGroup", "containingReportGuid"]
         ),

@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+Fix the message bus sometimes losing events passed between parts of a report.
+
 ## 1.1.19 (2026-11-17)
 
 Scroll grids more smoothly, as scrolling one no longer restyles every grid on the page.

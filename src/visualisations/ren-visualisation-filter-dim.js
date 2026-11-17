@@ -5,7 +5,7 @@
  * This answers the filterChanging message and dims everything following the settings group or
  * filter group the change was made to, in the report context it was made in.  filterChanging is
  * used rather than filterChanged because it is notified in the turn of the click, which the browser
- * paints before the message bus drains.
+ * paints before the message bus sends its queued messages.
  *
  * A visualisation drawn inside another that is being dimmed doesn't get a dim of its own, and the
  * outer dim stays on until every visualisation under it has redrawn.  A visualisation is finished

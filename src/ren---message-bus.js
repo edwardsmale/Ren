@@ -28,6 +28,16 @@ Ren.MessageBus = (() => {
     let currentOwner = null;
     const ownerStack = [];
 
+    // Where each queued message was notified from, for when a listener throws, is only captured
+    // when asked for, by adding renTraceMessages=1 to the page's query string or calling
+    // Ren.MessageBus.traceNotifications(), as capturing a stack costs microseconds on every notify.
+    let isTracingNotifications = location.search.indexOf("renTraceMessages=1") !== -1;
+    let isTraceHintShown = false;
+
+    const captureNotifyError = () => (isTracingNotifications ? new Error() : null);
+
+    const traceNotifications = (isOn = true) => { isTracingNotifications = isOn; };
+
     const startInterval = () => {
 
         if (interval || isSendingQueuedMessages) return;
@@ -266,7 +276,7 @@ Ren.MessageBus = (() => {
 
                     // The error is captured but not formatted here: reading .stack is what costs,
                     // and it is only ever read if a listener throws.
-                    messageObj.notifyError = new Error();
+                    messageObj.notifyError = captureNotifyError();
                     trackPendingMessage(messageObj, undefined);
                     messageQueue.push(messageObj);
 
@@ -313,7 +323,7 @@ Ren.MessageBus = (() => {
                         return;
                     }
 
-                    messageObj.notifyError = new Error();
+                    messageObj.notifyError = captureNotifyError();
 
                     if (dedupeKeyFn) trackPendingMessage(messageObj, messageObj.dedupeKey);
 
@@ -351,6 +361,20 @@ Ren.MessageBus = (() => {
     };
 
     const outputListenerStackTrace = (notifyError, messageTypeId) => {
+
+        if (!notifyError) {
+
+            if (!isTraceHintShown) {
+
+                isTraceHintShown = true;
+                console.info(
+                    "[MessageBus] Add renTraceMessages=1 to the query string, or call " +
+                    "Ren.MessageBus.traceNotifications(), to see where a message was notified from."
+                );
+            }
+
+            return;
+        }
 
         const formattedStack = `Notification: ${messageTypes.get(messageTypeId)}\n` +
             notifyError.stack.split("\n")
@@ -398,7 +422,7 @@ Ren.MessageBus = (() => {
 
             Ren.GlobalErrorHandler.logError("[MessageBus] Error in removeIf:", e);
 
-            if (notifyError) outputListenerStackTrace(notifyError, messageTypeId);
+            outputListenerStackTrace(notifyError, messageTypeId);
 
             return true;
         }
@@ -458,10 +482,7 @@ Ren.MessageBus = (() => {
                             e
                         );
 
-                        if (notifyError) {
-
-                            outputListenerStackTrace(notifyError, messageTypeId);
-                        }
+                        outputListenerStackTrace(notifyError, messageTypeId);
                     }
                 }
             }
@@ -529,6 +550,7 @@ Ren.MessageBus = (() => {
         withOwner,
         removeListener,
         removeListenersByOwner,
-        isIdle
+        isIdle,
+        traceNotifications
     };
 })();

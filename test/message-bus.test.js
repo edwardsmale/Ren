@@ -109,6 +109,58 @@ describe("Ren.MessageBus", () => {
         expect(received).toEqual(["a", 1, 2, "a"]);
     });
 
+    describe("a listener that throws", () => {
+
+        let logErrorSpy;
+        let warnSpy;
+        let infoSpy;
+
+        beforeEach(() => {
+
+            logErrorSpy = jest.spyOn(Ren.GlobalErrorHandler, "logError").mockImplementation(() => {});
+            warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            infoSpy = jest.spyOn(console, "info").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+
+            Ren.MessageBus.traceNotifications(false);
+            logErrorSpy.mockRestore();
+            warnSpy.mockRestore();
+            infoSpy.mockRestore();
+        });
+
+        const notifyToThrowingListener = () => {
+
+            const messageType = Ren.MessageBus.createMessageType(["value"]);
+
+            Ren.MessageBus.populateMessageNames({ throwingMessage: messageType });
+            handle(messageType, () => { throw new Error("listener failed"); });
+
+            messageType.notify(1);
+            Ren.MessageBus.sendQueuedMessages();
+        };
+
+        test("ListenerThrows_NotTracing_ErrorLoggedWithoutNotifyStack", () => {
+
+            notifyToThrowingListener();
+
+            expect(logErrorSpy).toHaveBeenCalledTimes(1);
+            expect(warnSpy).toHaveBeenCalledTimes(0);
+        });
+
+        test("ListenerThrows_Tracing_NotifyStackShown", () => {
+
+            Ren.MessageBus.traceNotifications();
+
+            notifyToThrowingListener();
+
+            expect(logErrorSpy).toHaveBeenCalledTimes(1);
+            expect(warnSpy).toHaveBeenCalledTimes(1);
+            expect(warnSpy.mock.calls[0][0]).toContain("Notification: throwingMessage");
+        });
+    });
+
     test("Notify_FromListenerDuringBatch_SentInSameBatchWithoutStartingTimer", () => {
 
         const first = Ren.MessageBus.createMessageType();
