@@ -1219,6 +1219,24 @@ Ren.DateValueChart_Legend = (() => {
     };
 
     /**
+     * Lays the legend's items out down the given number of rows, or along rows when it's 0.
+     */
+    const setItemsLayout = (itemsNode, rowCount) => {
+
+        if (!rowCount) {
+
+            itemsNode.style.display = "flex";
+            return;
+        }
+
+        itemsNode.style.display = "grid";
+        itemsNode.style.gridTemplateRows = `repeat(${rowCount}, auto)`;
+        itemsNode.style.gridAutoFlow = "column";
+        itemsNode.style.gridAutoColumns = "max-content";
+        itemsNode.style.justifyContent = "start";
+    };
+
+    /**
      * Gives every legend item the width of the widest, and lays the items out down columns rather
      * than along rows, so that the highest series, which come first, are all at the left however
      * many rows there are.  Only done when the legend is new or its sizes or width have changed, as
@@ -1254,8 +1272,25 @@ Ren.DateValueChart_Legend = (() => {
 
         if (!itemsNode) return false;
 
-        const heightBefore = legendNode.offsetHeight;
         const items = itemsNode.querySelectorAll(".ren-legend-item");
+
+        // A legend drawn afresh with the items it had, at the width it had - as on every redraw
+        // that leaves the series alone, such as a filter change - takes the layout it had, as
+        // measuring the items forces the whole document to be restyled and laid out.
+        const itemsKey = legendWidth + "|" + items.length + "|" + itemsNode.textContent;
+        const kept = props.legendAlignment;
+
+        if (!isResized && kept && kept.key === itemsKey) {
+
+            setItemsLayout(itemsNode, kept.rowCount);
+
+            if (kept.isCutShort) addCutShortLabelTitles(items);
+
+            legendNode.setAttribute("data-items-aligned", legendWidth);
+            return false;
+        }
+
+        const heightBefore = legendNode.offsetHeight;
 
         // The items are measured at their own widths, flowing along rows.
         props.legendItemsStylesheet.textContent = "";
@@ -1287,24 +1322,25 @@ Ren.DateValueChart_Legend = (() => {
         props.legendItemsStylesheet.textContent =
             `.${props.guid} .ren-legend-item { width: ${itemWidth}px; padding-right: 1rem }`;
 
-        if (widest > MAX_ITEM_WIDTH) {
+        const isCutShort = widest > MAX_ITEM_WIDTH;
+
+        if (isCutShort) {
             addCutShortLabelTitles(items);
         }
+
+        let rowCount = 0;
 
         if (items.length > 0) {
 
             // As few rows as the columns that fit allow, each column filled before the next.
             // Beyond MAX_ROWS the legend grows no taller, its items scrolling across instead.
             const columnCount = getColumnCount(itemsNode, items, layoutScale);
-            const rowCount = Math.min(MAX_ROWS, Math.ceil(items.length / columnCount));
+            rowCount = Math.min(MAX_ROWS, Math.ceil(items.length / columnCount));
 
-            itemsNode.style.display = "grid";
-            itemsNode.style.gridTemplateRows = `repeat(${rowCount}, auto)`;
-            itemsNode.style.gridAutoFlow = "column";
-            itemsNode.style.gridAutoColumns = "max-content";
-            itemsNode.style.justifyContent = "start";
+            setItemsLayout(itemsNode, rowCount);
         }
 
+        props.legendAlignment = { key: itemsKey, rowCount, isCutShort };
         legendNode.setAttribute("data-items-aligned", legendWidth);
 
         return legendNode.offsetHeight !== heightBefore;
