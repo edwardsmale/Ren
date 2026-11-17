@@ -338,6 +338,26 @@ Ren.MessageBus = (() => {
         sweepListenersIfNotDispatching();
     };
 
+    /**
+     * A removeIf that throws is reported as a listener's error would be, and the message is
+     * dropped.
+     */
+    const isRemoved = (removeIf, args, messageTypeId, notifyError) => {
+
+        try {
+
+            return removeIf.apply(null, args);
+        }
+        catch (e) {
+
+            Ren.GlobalErrorHandler.logError("[MessageBus] Error in removeIf:", e);
+
+            if (notifyError) outputListenerStackTrace(notifyError, messageTypeId);
+
+            return true;
+        }
+    };
+
     const dispatchQueuedMessages = () => {
 
         while (true) {
@@ -351,6 +371,10 @@ Ren.MessageBus = (() => {
 
                 if (!bucket) continue;
 
+                // A message about something destroyed since it was queued is dropped.  Asked once
+                // for the message, not once per listener, as it's the same answer for each.
+                if (removeIf && isRemoved(removeIf, args, messageTypeId, notifyError)) continue;
+
                 // Don't cache bucket.length as it may change during iteration.
 
                 for (let j = 0; j < bucket.length; j++) {
@@ -362,11 +386,6 @@ Ren.MessageBus = (() => {
                     if (listener.orphaned) continue;
 
                     try {
-
-                        if (removeIf && removeIf.apply(null, args)) {
-
-                            orphanListener(listener);
-                        }
 
                         // Orphaned before invoking, so a callback that synchronously re-dispatches
                         // this message type can't re-enter it; the sweep comes too late for that.

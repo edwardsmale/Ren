@@ -7,6 +7,7 @@ Ren.Messages = (() => {
     const createMessage = Ren.MessageBus.createMessageType;
 
     // Notifying a message with a dedupe key first removes any pending messages with the same key.
+    // A queued message whose removeIf is true by the time it is dispatched is dropped.
 
     const events = {
         allReportsLoaded: createMessage(),
