@@ -15,7 +15,8 @@ Ren.BaseVisualisationCreator = (config) => {
         getInitialisation,
         renderVisualisation,
         getContextMenuItems,
-        getStyleUpdater,             // Returns { updateStylesheet, handleThemeChange? }.
+        getStyleUpdater,             // Returns { updateStylesheet, handleThemeChange?,
+                                     // isStyledByRender? }.
         getValidator,                // Returns { validate }.
         getDataPreparer,             // Returns { prepareData }.
         getQAHelper,                 // Returns { setQa }.
@@ -138,8 +139,13 @@ Ren.BaseVisualisationCreator = (config) => {
                 contextMenuItemsProvider.addShowWindowsMenuItems(element);
             }
 
+            // A renderer that styles what it has just drawn is not styled again, as the pass
+            // measures the drawing, which forces the whole page to be restyled and laid out.
             const styleUpdater = getStyleUpdater();
-            styleUpdater.updateStylesheet(propsArg);
+
+            if (!styleUpdater.isStyledByRender?.(propsArg)) {
+                styleUpdater.updateStylesheet(propsArg);
+            }
 
             return true;
         };

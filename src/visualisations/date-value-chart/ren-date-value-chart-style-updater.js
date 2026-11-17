@@ -1645,6 +1645,15 @@ Ren.DateValueChart_StyleUpdater = (() => {
         shareLegendHighlights(props);
     };
 
+    /**
+     * Whether a chart's render has already styled it at its size, so needs no pass after.  A
+     * chart drawn as several charts styles each of them as it draws it, but not their legend.
+     *
+     * @param {object} props - The chart's props.
+     * @returns {boolean}
+     */
+    const isStyledByRender = (props) => !props.multiChartProps;
+
     return {
         DATE_AXIS_TICK_SIZE,
         IN_PLACE_PASTEL_STRENGTH,
@@ -1652,6 +1661,7 @@ Ren.DateValueChart_StyleUpdater = (() => {
         defaultLabelFontSizes,
         getSeriesColour,
         updateStylesheet,
+        isStyledByRender,
         updateLegendStylesheet,
         updateScales,
         updateBarColour,
