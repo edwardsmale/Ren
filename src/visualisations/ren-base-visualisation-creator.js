@@ -335,6 +335,7 @@ Ren.BaseVisualisationCreator = (config) => {
         const styleUpdater = getStyleUpdater();
 
         lifecycle.start({
+            getElement: () => (props.guid && document.querySelector("." + props.guid)) || null,
             redraw,
             // A redraw detects the columns again, so it takes in a grouping change as well.
             recreate: redraw,

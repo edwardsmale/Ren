@@ -135,7 +135,9 @@ Ren.VisualisationLifecycle = (config) => {
 
     /**
      * Subscribes any of the redraw, recreate, resize and themeChanged handlers given.  Called
-     * once the visualisation has been built, so that a failed build leaves nothing behind.
+     * once the visualisation has been built, so that a failed build leaves nothing behind.  With
+     * getElement, returning what the visualisation is drawn in, it's redrawn before those out of
+     * view.
      */
     const start = (handlers) => {
 
@@ -169,6 +171,7 @@ Ren.VisualisationLifecycle = (config) => {
 
         Ren.DataGroupingSettingsBinding({
             visualisation,
+            getElement: handlers.getElement,
             onSettingsChanged: redrawAction,
             onFilterChanged: followsGroupFilters ? redrawAction : null,
             onFilterGroupChanged: followsGroupFilters ? redrawAction : null,

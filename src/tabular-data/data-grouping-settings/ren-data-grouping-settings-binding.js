@@ -6,7 +6,8 @@
  *         visualisation,
  *         group: sourceGroup,
  *         onSettingsChanged: { action: "refresh", rank: 1, handler: () => refresh() },
- *         onFilterChanged: { action: "sync", handler: () => sync() }
+ *         onFilterChanged: { action: "sync", handler: () => sync() },
+ *         getElement: () => element    // Optional: what it draws, to answer it first when in view.
  *     });
  * Actions scheduled within one synchronous turn are flushed together at its end: repeats of an
  * action collapse into one call (the last one's arguments win), and only the highest-ranked pending
@@ -68,7 +69,9 @@ Ren.DataGroupingSettingsBinding = (config) => {
         if (flushScheduled) return;
 
         flushScheduled = true;
-        setTimeout(flush, 0);
+
+        // With many visualisations following one filter, those in view are answered first.
+        Ren.InViewFirstQueue.add(flush, config.getElement ? config.getElement() : null);
     };
 
     /**
