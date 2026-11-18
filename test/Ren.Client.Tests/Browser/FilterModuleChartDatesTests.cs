@@ -22,7 +22,7 @@ public class FilterModuleChartDatesTests : BrowserTest
         await DateValueChart.CreateFromColumnHeadingAsync(Ren, "OrderDate");
         await DateValueChart.SplitDataAsync(Ren, "Category");
         await DateValueChart.SelectDateGroupingAsync(Ren, "date-year-start");
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await DateValueChart.ClickMenuPathAsync(Ren, "Multi-chart", "By year");
         await Ren.WaitUntilLoadedAsync();
         await DateValueChart.ClickMenuPathAsync(Ren, "Filter by", "Category");

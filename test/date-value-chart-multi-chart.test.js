@@ -2,6 +2,8 @@ const { createTabularData } = require("./helpers/tabular-data");
 
 describe("Ren.DateValueChart_MultiChart", () => {
 
+    const PIE_SERIES = [{ chartType: Ren.SeriesChartTypeEnum.Pie }];
+
     const MultiChart = Ren.DateValueChart_MultiChart;
 
     const createRows = () => [
@@ -183,7 +185,7 @@ describe("Ren.DateValueChart_MultiChart", () => {
 
     test("render_Pies_ChartsNoTallerThanTheyAreWide", () => {
 
-        MultiChart.render(createProps({ showAsPies: true }), () => null);
+        MultiChart.render(createProps({ series: PIE_SERIES }), () => null);
 
         const grid = document.querySelector(".ren-date-value-chart-multi-chart-grid");
 
@@ -358,7 +360,7 @@ describe("Ren.DateValueChart_MultiChart", () => {
 
         MultiChart.render(createProps(), (chartProps) => {
 
-            chartProps.showAsPies = true;
+            chartProps.series = PIE_SERIES;
 
             return null;
         });

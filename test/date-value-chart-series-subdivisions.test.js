@@ -1,5 +1,7 @@
 describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
+    const PIE_SERIES = [{ chartType: Ren.SeriesChartTypeEnum.Pie }];
+
     const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
     const GroupingApplyer = Ren.DateValueChart_GroupingApplyer;
 
@@ -116,8 +118,8 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
         const props = {
             subdivideColumn: COLUMN,
-            seriesCount: 0,
-            showAsPies: true,
+            seriesCount: 1,
+            series: PIE_SERIES,
             subdivisionLabelPlacement: "around"
         };
 
@@ -139,8 +141,8 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
         const props = {
             subdivideColumn: COLUMN,
-            seriesCount: 0,
-            showAsPies: true,
+            seriesCount: 1,
+            series: PIE_SERIES,
             subdivisionLabels: "none",
             subdivisionLabelPlacement: "around"
         };
@@ -150,19 +152,35 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
     test("takeAroundLabels_Around_TakesPendingLabels", () => {
 
-        const pendingLabels = [{ fullText: "A" }];
+        const pendingLabels = [{ fullText: "A", pie: {} }];
         const props = {
             subdivideColumn: COLUMN,
-            seriesCount: 0,
-            showAsPies: true,
+            seriesCount: 1,
+            series: PIE_SERIES,
             subdivisionLabelPlacement: "around",
             subdivisionPendingLabels: pendingLabels
         };
 
         const taken = Subdivisions.takeAroundLabels(props);
 
-        expect(taken).toBe(pendingLabels);
+        expect(taken).toEqual(pendingLabels);
         expect(props.subdivisionPendingLabels).toBeNull();
+    });
+
+    test("takeAroundLabels_PiesBesideBars_LeavesBarsLabels", () => {
+
+        const pieLabel = { fullText: "A", pie: {} };
+        const barLabel = { fullText: "B", barNode: {} };
+        const props = {
+            subdivideColumn: COLUMN,
+            seriesCount: 1,
+            series: PIE_SERIES,
+            subdivisionLabelPlacement: "around",
+            subdivisionPendingLabels: [pieLabel, barLabel]
+        };
+
+        expect(Subdivisions.takeAroundLabels(props)).toEqual([pieLabel]);
+        expect(props.subdivisionPendingLabels).toEqual([barLabel]);
     });
 
     test("takeAroundLabels_Inside_LeavesPendingLabels", () => {
@@ -170,8 +188,8 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
         const pendingLabels = [{ fullText: "A" }];
         const props = {
             subdivideColumn: COLUMN,
-            seriesCount: 0,
-            showAsPies: true,
+            seriesCount: 1,
+            series: PIE_SERIES,
             subdivisionPendingLabels: pendingLabels
         };
 
@@ -678,7 +696,7 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
 
     test("buildStyles_Pies_PieLabelFontSize", () => {
 
-        const rules = Subdivisions.buildStyles({ showAsPies: true, pieLabelFontSize: 15 }).join("");
+        const rules = Subdivisions.buildStyles({ series: PIE_SERIES, pieLabelFontSize: 15 }).join("");
 
         expect(rules).toContain("font-size: 15px");
     });

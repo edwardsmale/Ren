@@ -464,7 +464,8 @@ Ren.DateValueChart_ContextMenu_YAxis = (props, visualisation) => {
 
         const getUpdateYScaleBehaviour = (axisName) => {
 
-            const behaviour = props.axes[axisName]?.updateYScaleBehaviour || "AlwaysUpdate";
+            const behaviour = props.axes[axisName]?.updateYScaleBehaviour
+                || Ren.DateValueChart_Pies.getDefaultScaleBehaviour(props);
 
             // "Unaltered" is the old name of "Fixed", still held by saved settings.
             return behaviour === "Unaltered" ? "Fixed" : behaviour;

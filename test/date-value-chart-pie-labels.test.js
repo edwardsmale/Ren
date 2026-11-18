@@ -1,5 +1,7 @@
 describe("Ren.DateValueChart_PieLabels", () => {
 
+    const PIE_SERIES = [{ chartType: Ren.SeriesChartTypeEnum.Pie }];
+
     const PieLabels = Ren.DateValueChart_PieLabels;
 
     const props = {
@@ -24,43 +26,43 @@ describe("Ren.DateValueChart_PieLabels", () => {
 
     test("areLabelsShown_NothingToSay_False", () => {
 
-        const labelProps = { showAsPies: true, pieLabelNames: false, pieLabelPercentages: false };
+        const labelProps = { series: PIE_SERIES, pieLabelNames: false, pieLabelPercentages: false };
 
         expect(PieLabels.areLabelsShown(labelProps)).toBe(false);
     });
 
     test("areTotalsShown_NoHole_False", () => {
 
-        expect(PieLabels.areTotalsShown({ showAsPies: true })).toBe(false);
+        expect(PieLabels.areTotalsShown({ series: PIE_SERIES })).toBe(false);
     });
 
     test("areTotalsShown_Hole_True", () => {
 
-        expect(PieLabels.areTotalsShown({ showAsPies: true, pieHoleRadius: 0.5 })).toBe(true);
+        expect(PieLabels.areTotalsShown({ series: PIE_SERIES, pieHoleRadius: 0.5 })).toBe(true);
     });
 
     test("areSharesInside_Unset_True", () => {
 
-        expect(PieLabels.areSharesInside({ showAsPies: true })).toBe(true);
+        expect(PieLabels.areSharesInside({ series: PIE_SERIES })).toBe(true);
     });
 
     test("areSharesInside_Around_True", () => {
 
-        const shareProps = { showAsPies: true, pieLabels: "around", pieSharesInside: true };
+        const shareProps = { series: PIE_SERIES, pieLabels: "around", pieSharesInside: true };
 
         expect(PieLabels.areSharesInside(shareProps)).toBe(true);
     });
 
     test("areSharesInside_TurnedOff_False", () => {
 
-        const shareProps = { showAsPies: true, pieSharesInside: false };
+        const shareProps = { series: PIE_SERIES, pieSharesInside: false };
 
         expect(PieLabels.areSharesInside(shareProps)).toBe(false);
     });
 
     test("areSharesInside_Auto_False", () => {
 
-        const shareProps = { showAsPies: true, pieLabels: "auto", pieSharesInside: true };
+        const shareProps = { series: PIE_SERIES, pieLabels: "auto", pieSharesInside: true };
 
         expect(PieLabels.areSharesInside(shareProps)).toBe(false);
     });
@@ -68,7 +70,7 @@ describe("Ren.DateValueChart_PieLabels", () => {
     test("areSharesInside_PercentagesOff_False", () => {
 
         const shareProps = {
-            showAsPies: true,
+            series: PIE_SERIES,
             pieLabels: "outside",
             pieLabelNames: true,
             pieLabelPercentages: false,
@@ -173,14 +175,14 @@ describe("Ren.DateValueChart_PieLabels", () => {
 
     test("areValuesInside_ValuesOff_False", () => {
 
-        const insideProps = { showAsPies: true, pieValuePosition: "inside" };
+        const insideProps = { series: PIE_SERIES, pieValuePosition: "inside" };
 
         expect(PieLabels.areValuesInside(insideProps)).toBe(false);
     });
 
     test("areValuesInside_ValuesOnInside_True", () => {
 
-        const insideProps = { showAsPies: true, pieLabelValues: true, pieValuePosition: "inside" };
+        const insideProps = { series: PIE_SERIES, pieLabelValues: true, pieValuePosition: "inside" };
 
         expect(PieLabels.areValuesInside(insideProps)).toBe(true);
     });

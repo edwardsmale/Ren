@@ -363,8 +363,10 @@ Ren.DateValueChart_RenderChartSetup = (() => {
 
             seriesMaxes[i] = maxVal;
 
-            // A series switched off in the legend is not plotted, so must not hold its axis open.
+            // A series switched off in the legend is not plotted, so must not hold its axis open,
+            // and nor is a pie's slice read off it.
             if (props.series[i].isEnabled === false) continue;
+            if (Ren.DateValueChart_Pies.isPieSeries(props, i)) continue;
 
             const axis = props.series[i].valueAxis;
             axisMaxes[axis] = Math.max(axisMaxes[axis], maxVal || 0);
@@ -406,7 +408,8 @@ Ren.DateValueChart_RenderChartSetup = (() => {
                 return;
             }
 
-            const updateYScaleBehaviour = props.axes[axis].updateYScaleBehaviour || "AlwaysUpdate";
+            const updateYScaleBehaviour = props.axes[axis].updateYScaleBehaviour
+                || Ren.DateValueChart_Pies.getDefaultScaleBehaviour(props);
 
             if (updateYScaleBehaviour === "AlwaysUpdate") {
 

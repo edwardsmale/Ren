@@ -30,6 +30,7 @@ Ren.DateValueChart_ValueAxisFit = (() => {
             const series = props.series[i];
 
             if (!series || series.isEnabled === false) continue;
+            if (series.chartType === Ren.SeriesChartTypeEnum.Pie) continue;
 
             if (axisNames.indexOf(series.valueAxis || "leftAxis") !== -1) seriesIndexes.push(i);
         }

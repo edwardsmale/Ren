@@ -643,8 +643,16 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             Ren.DateValueChart_LastPeriodEstimate.getInheritedMode(props.series);
 
         // Likewise how they are drawn, so that lines stay lines rather than going back to bars.
+        // Each new series takes up how the series of its own value column were drawn, and
+        // failing that how most of them were.
         props.inheritedSeriesSettings =
             Ren.DateValueChart_SeriesSplit.getSharedSeriesSettings(props.series);
+
+        props.inheritedSeriesSettingsBySource =
+            Ren.DateValueChart_SeriesSplit.getSharedSeriesSettingsBySource(
+                props.series,
+                props.seriesSourceHeadings
+            );
 
         visualisation.series = [];
         visualisation.includedSeries = null;
@@ -893,7 +901,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
     const hasSubdivideColumn = () => {
 
         if (!visualisation.chartDataGroupingSettings) return false;
-        if (Ren.DateValueChart_Pies.isShown(props)) return true;
+        if (Ren.DateValueChart_Pies.hasPies(props)) return true;
 
         const series = props.series || [];
 

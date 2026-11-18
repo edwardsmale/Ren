@@ -249,6 +249,7 @@ Ren.DateValueChart_TrendLines = (() => {
             const series = props.series[i];
 
             if (!series || series.isEnabled === false || !series.trendLine) continue;
+            if (Ren.DateValueChart_Pies.isPieSeries(props, i)) continue;
 
             const axis = props.axes[series.valueAxis || "leftAxis"];
 

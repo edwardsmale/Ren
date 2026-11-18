@@ -112,7 +112,7 @@ Ren.DateValueChart_PieLabels = (() => {
     /** Gets a value indicating whether the slices are labelled. */
     const areLabelsShown = (props) => {
 
-        if (!Ren.DateValueChart_Pies.isShown(props)) return false;
+        if (!Ren.DateValueChart_Pies.hasPies(props)) return false;
         if (getPlacement(props) === PLACEMENTS.Off) return false;
 
         const content = getContent(props);
@@ -121,7 +121,7 @@ Ren.DateValueChart_PieLabels = (() => {
     };
 
     /** Gets a value indicating whether each pie's total is written in its hole. */
-    const areTotalsShown = (props) => Ren.DateValueChart_Pies.isShown(props)
+    const areTotalsShown = (props) => Ren.DateValueChart_Pies.hasPies(props)
         && props.pieHoleTotals !== false
         && Ren.DateValueChart_Pies.getHoleRadius(props) > 0;
 
@@ -1189,7 +1189,7 @@ Ren.DateValueChart_PieLabels = (() => {
      */
     const layoutStacked = (props, labels, radiusPx, hugsPie, result, placedBoxes) => {
 
-        const plotHeightPx = props.innerHeight * props.scaleY;
+        const plotHeightPx = Ren.DateValueChart_Pies.getBandHeight(props) * props.scaleY;
         const periodWidthPx = (props.piePeriodWidth ?? props.innerWidth) * props.scaleX;
         const columns = new Map();
         let leftmostX = Infinity;
@@ -1537,7 +1537,7 @@ Ren.DateValueChart_PieLabels = (() => {
         };
 
         if (!props || !props.chartGroup || !props.scaleX || !props.scaleY) return result;
-        if (!Ren.DateValueChart_Pies.isShown(props)) return result;
+        if (!Ren.DateValueChart_Pies.hasPies(props)) return result;
 
         const radiusPx = Ren.DateValueChart_Pies.getRadiusPx(props, props.scaleX, props.scaleY);
         const holePx = radiusPx * Ren.DateValueChart_Pies.getHoleRadius(props);
@@ -1668,7 +1668,7 @@ Ren.DateValueChart_PieLabels = (() => {
         outsideLabels.sort((a, b) => b.slice.share - a.slice.share);
 
         const plotWidthPx = props.innerWidth * props.scaleX;
-        const plotHeightPx = props.innerHeight * props.scaleY;
+        const plotHeightPx = Ren.DateValueChart_Pies.getBandHeight(props) * props.scaleY;
 
         for (let i = 0; i < outsideLabels.length; i++) {
 

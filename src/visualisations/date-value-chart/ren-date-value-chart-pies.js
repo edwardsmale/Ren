@@ -1,7 +1,10 @@
 /**
- * Draws a date/value chart as a pie per period in place of its bars, lines and dots, each slice a
- * series' share of the period's total.  The slices are drawn in each series' own group, so the
- * legend, the series' menus and its colour reach them as they do the series' bars.
+ * Draws a pie per period for the series of a date/value chart drawn as pies, each slice a series'
+ * share of the period's total of those series.  The slices are drawn in each series' own group, so
+ * the legend, the series' menus and its colour reach them as they do the series' bars.  Where
+ * every series is a pie the pies fill the plot, which has no value axes.  Alongside series drawn
+ * as bars, lines or dots they fill its top half, over them, and the value axes default to scaling
+ * the others' highest value to halfway up, below the pies.
  */
 Ren.DateValueChart_Pies = (() => {
 
@@ -18,10 +21,65 @@ Ren.DateValueChart_Pies = (() => {
     const SLICE_CLASS = "ren-data-series__pie-slice";
     const SLICE_GROUP_CLASS = "ren-pie-slice";
 
+    // The share of the plot's height the pies take, from its top, alongside other series.
+    const MIXED_BAND_SHARE = 0.5;
+
     /**
-     * Gets a value indicating whether the chart is drawn as pies.
+     * Gets a value indicating whether a series is drawn as a slice of the pies.
      */
-    const isShown = (props) => props.showAsPies === true;
+    const isPieSeries = (props, seriesIndex) =>
+        props.series?.[seriesIndex]?.chartType === Ren.SeriesChartTypeEnum.Pie;
+
+    /**
+     * Gets the series the chart draws: those not switched off in the legend, or every series where
+     * all are, which are still drawn as what they are in the legend.
+     */
+    const getDrawnSeries = (props) => {
+
+        const series = (props.series || []).slice(0, props.seriesCount ?? undefined)
+            .filter(Boolean);
+        const enabled = series.filter(s => s.isEnabled !== false);
+
+        return enabled.length ? enabled : series;
+    };
+
+    const isPie = (series) => series.chartType === Ren.SeriesChartTypeEnum.Pie;
+
+    /**
+     * Gets a value indicating whether the chart is drawn wholly as pies, every series a slice of
+     * them, so has no value axes or other marks.
+     */
+    const isShown = (props) => {
+
+        const series = getDrawnSeries(props);
+
+        return series.length > 0 && series.every(isPie);
+    };
+
+    /**
+     * Gets a value indicating whether the chart draws pies, wholly or alongside other series.
+     */
+    const hasPies = (props) => getDrawnSeries(props).some(isPie);
+
+    /**
+     * Gets a value indicating whether the chart draws pies alongside series drawn as bars, lines
+     * or dots.
+     */
+    const isMixed = (props) => hasPies(props) && !isShown(props);
+
+    /**
+     * Gets the height, from the plot's top, the pies are drawn in: the whole plot's, or the top
+     * half alongside other series.
+     */
+    const getBandHeight = (props) =>
+        isMixed(props) ? props.innerHeight * MIXED_BAND_SHARE : props.innerHeight;
+
+    /**
+     * Gets how a value axis scales where it is not set to: its highest value halfway up beneath
+     * pies, so that the pies above clear the bars, lines and dots, or else at the top.
+     */
+    const getDefaultScaleBehaviour = (props) =>
+        isMixed(props) ? "AlwaysUpdateHalfway" : "AlwaysUpdate";
 
     /**
      * Gets the radius of the hole in the middle of each pie, as a share of the pie's radius.
@@ -38,13 +96,14 @@ Ren.DateValueChart_Pies = (() => {
     const getRadiusPx = (props, scaleX, scaleY) => {
 
         const periodWidthPx = (props.piePeriodWidth ?? props.innerWidth) * scaleX;
-        const widestRadiusPx = PIE_SPAN / 2 * Math.min(periodWidthPx, props.innerHeight * scaleY);
+        const bandHeightPx = getBandHeight(props) * scaleY;
+        const widestRadiusPx = PIE_SPAN / 2 * Math.min(periodWidthPx, bandHeightPx);
 
         return Ren.DateValueChart_PieLabels.getRadiusPx(
             props,
             widestRadiusPx,
             periodWidthPx,
-            props.innerHeight * scaleY
+            bandHeightPx
         );
     };
 
@@ -156,7 +215,7 @@ Ren.DateValueChart_Pies = (() => {
 
         for (let i = 0; i < props.seriesCount; i++) {
 
-            if (props.series[i].isEnabled === false) continue;
+            if (props.series[i].isEnabled === false || !isPieSeries(props, i)) continue;
 
             seriesIndexes.push(i);
             valueFns.push(getSliceValueFn(props, i));
@@ -178,7 +237,7 @@ Ren.DateValueChart_Pies = (() => {
         }
 
         const holeRadius = getHoleRadius(props);
-        const centreY = props.innerHeight / 2;
+        const centreY = getBandHeight(props) / 2;
         const dateTickFormat = Ren.DateValueChart_DateTickFormat.getChartTickFormat(props);
         const pies = [];
 
@@ -275,7 +334,7 @@ Ren.DateValueChart_Pies = (() => {
      */
     const buildStyles = (props, scaleX, scaleY) => {
 
-        if (!isShown(props) || !(scaleX > 0) || !(scaleY > 0)) return [];
+        if (!hasPies(props) || !(scaleX > 0) || !(scaleY > 0)) return [];
 
         const radius = getRadiusPx(props, scaleX, scaleY) / PATH_RADIUS;
         const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
@@ -329,6 +388,11 @@ Ren.DateValueChart_Pies = (() => {
         MAX_HOLE_RADIUS,
         PATH_RADIUS,
         isShown,
+        hasPies,
+        isMixed,
+        isPieSeries,
+        getBandHeight,
+        getDefaultScaleBehaviour,
         getClickTarget,
         getHoleRadius,
         getSeriesName,

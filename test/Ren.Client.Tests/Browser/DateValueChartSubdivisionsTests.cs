@@ -230,7 +230,7 @@ public class DateValueChartSubdivisionsTests : BrowserTest
     public async Task DoubleClickingASlicesBand_OpensItsRowsFilteredToTheBand()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await SubdivideByAsync("Search Terms");
 
         await Poll(() => Ren.Root.Locator(PieMark).CountAsync()).ToBeGreaterThan(1);
@@ -435,7 +435,7 @@ public class DateValueChartSubdivisionsTests : BrowserTest
     public async Task ASplitPieChart_SubdividesEachSlice()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await DateValueChart.SplitDataAsync(Ren, "Product Code");
 
         var slices = await Ren.Root.Locator(".ren-data-series__pie-slice").CountAsync();
@@ -532,7 +532,7 @@ public class DateValueChartSubdivisionsTests : BrowserTest
     public async Task AShareInASubdividedSlice_HasABackgroundOfTheSlicesColour()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await SubdivideByAsync("Search Terms");
 
         await Poll(() => Ren.Root.Locator(PieMark).CountAsync()).ToBeGreaterThan(1);
@@ -574,7 +574,7 @@ public class DateValueChartSubdivisionsTests : BrowserTest
     public async Task APiesBandRules_AreScopedToItsOwnChart()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await SubdivideByAsync("Search Terms");
 
         await Poll(() => Ren.Root.Locator(PieMark).CountAsync()).ToBeGreaterThan(0);
@@ -608,7 +608,7 @@ public class DateValueChartSubdivisionsTests : BrowserTest
     public async Task PieSlices_SubdividedAndLabelledWithinTheirBands()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await SubdivideByAsync("Search Terms");
 
         await Poll(() => Ren.Root.Locator(PieMark).CountAsync()).ToBeGreaterThan(0);

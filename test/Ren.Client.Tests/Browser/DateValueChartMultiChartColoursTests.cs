@@ -23,7 +23,7 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
         await DateValueChart.CreateFromColumnHeadingAsync(Ren, "OrderDate");
         await DateValueChart.SplitDataAsync(Ren, "Channel");
         await DateValueChart.SelectDateGroupingAsync(Ren, "date-year-start");
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await DateValueChart.ClickMenuPathAsync(Ren, "Multi-chart", "By year");
         await Ren.WaitUntilLoadedAsync();
     }
@@ -41,10 +41,17 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
     {
         await CreateMultiChartAsync();
 
-        var settings = (await SavedSettingsTextAsync()).Replace(
-            "\"showAsPies\":true",
-            "\"showAsPies\":true,\"pieHoleRadius\":0.45,\"subdivideColumn\":\"Brand\","
-                + "\"subdivisionLabels\":\"names\",\"pieLabelValues\":true");
+        // Put ahead of the chart's series, as charts no longer save a setting of their own for
+        // being drawn as pies.
+        var saved = await SavedSettingsTextAsync();
+        var seriesAt = saved.IndexOf("\"series\":[", StringComparison.Ordinal);
+
+        Assert.IsTrue(seriesAt >= 0, "The chart's series weren't saved.");
+
+        var settings = saved.Insert(
+            seriesAt,
+            "\"pieHoleRadius\":0.45,\"subdivideColumn\":\"Brand\","
+                + "\"subdivisionLabels\":\"names\",\"pieLabelValues\":true,");
 
         await Ren.OpenWithSettingsAsync(Fixture, JsonNode.Parse(settings));
         await Ren.WaitUntilLoadedAsync();

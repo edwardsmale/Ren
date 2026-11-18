@@ -3,10 +3,10 @@ namespace Ren.Client.Tests.Browser;
 // These tests cover what a date/value chart's context menu offers and what its items act on.  A
 // series' menu is its own, holding none of the chart's date items, while the chart's menu, opened
 // away from every series, offers most of the series' items to act on them all at once.  Both keep
-// the series' items in the submenus they share with the chart's, such as Values and Chart type.
+// the series' items in the submenus they share with the chart's, such as Values and Draw as.
 // The bar layout is how bars are laid out against each other, so it's only offered with more than
-// one series.  The chart types are each followed by their own options, such as Lines by Line style
-// and Line layout.
+// one series.  Draw as lists the kinds with the series' own options, such as Lines' Line style,
+// then the chart's layouts.  On a series' menu, Draw as and Labels are with the series' own items.
 [TestClass]
 public class DateValueChartMenuTests : BrowserTest
 {
@@ -100,7 +100,7 @@ public class DateValueChartMenuTests : BrowserTest
     {
         await CreateTwoSeriesChartAsync();
 
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Lines");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Lines");
 
         await ExpectShownAsync("g.ren-series-1 .ren-data-series__line-path");
         await ExpectShownAsync("g.ren-series-2 .ren-data-series__line-path");
@@ -144,11 +144,11 @@ public class DateValueChartMenuTests : BrowserTest
         await ExpectShownAsync(BarLayoutItem);
     }
 
-    [TestMethod("the chart's menu: follows each chart type with its own options")]
-    public async Task FollowsEachChartTypeWithItsOwnOptions()
+    [TestMethod("the chart's menu: lists the kinds, then the layouts")]
+    public async Task ListsTheKindsThenTheLayouts()
     {
         await CreateTwoSeriesChartAsync();
-        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Chart type", "Lines");
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Draw as", "Lines");
 
         await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(ChartTypeItem);
@@ -159,15 +159,38 @@ public class DateValueChartMenuTests : BrowserTest
         var order = new[]
         {
             "chart-type-bars",
-            "bar-layout",
             "chart-type-lines",
             "series-line-style",
-            "line-layout",
             "chart-type-dots",
-            "chart-type-pies"
+            "chart-type-pies",
+            "bar-layout",
+            "line-layout"
         };
 
         Expect(ids.Where(order.Contains).ToArray()).ToEqual(order);
+    }
+
+    [TestMethod("a series' menu: has Draw as and Labels once each, with the series' own items")]
+    public async Task HasDrawAsAndLabelsWithTheSeriesOwnItems()
+    {
+        await CreateTwoSeriesChartAsync();
+
+        await OpenSeriesMenuAsync();
+
+        // Each item with the heading of the section it's in.
+        var entries = await Ren.Root.Locator(".ren-context-menu").First.EvaluateAsAsync<string[]>("""
+            menu => {
+                let section = "";
+                return Array.from(menu.querySelectorAll(".ren-context-menu__section-heading, [id]"))
+                    .map(entry => entry.classList.contains("ren-context-menu__section-heading")
+                        ? (section = entry.textContent, null)
+                        : section + ": " + entry.id)
+                    .filter(entry => entry);
+            }
+            """);
+
+        Expect(entries.Where(entry => entry.EndsWith(": chart-type") || entry.EndsWith(": chart-labels")).ToArray())
+            .ToEqual(new[] { "Series: chart-type", "Series: chart-labels" });
     }
 
     [TestMethod("the chart's menu: turns pies off when the series are drawn as bars")]
@@ -175,23 +198,24 @@ public class DateValueChartMenuTests : BrowserTest
     {
         await CreateTwoSeriesChartAsync();
 
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Bars");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Bars");
 
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='1']");
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='2']");
     }
 
-    [TestMethod("the chart's menu: turns pies off when they're chosen again")]
-    public async Task TurnsPiesOffWhenTheyreChosenAgain()
+    [TestMethod("a series' menu: draws just that series as pies, beside the others' bars")]
+    public async Task DrawsJustThatSeriesAsPies()
     {
         await CreateTwoSeriesChartAsync();
 
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Draw as", "Pies");
 
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='1']");
-        await ExpectShownAsync(".ren-bar.ren-vertical[data-series='2']");
+        await ExpectShownAsync(".ren-pie-slice[data-series='2']");
+        await ExpectNotShownAsync(".ren-bar.ren-vertical[data-series='2']");
+        await ExpectNotShownAsync(".ren-pie-slice[data-series='1']");
     }
 
     [TestMethod("a series' menu: offers the series' items")]
@@ -241,7 +265,7 @@ public class DateValueChartMenuTests : BrowserTest
     {
         await CreateTwoSeriesChartAsync();
 
-        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Chart type", "Lines");
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Draw as", "Lines");
 
         await ExpectShownAsync("g.ren-series-2 .ren-data-series__line-path");
         await ExpectNotShownAsync(".ren-bar.ren-vertical[data-series='2']");
@@ -338,6 +362,26 @@ public class DateValueChartMenuTests : BrowserTest
         {
             await ExpectEstimatedInPlaceAsync(seriesNumber);
         }
+    }
+
+    [TestMethod("a split: keeps each value column's series drawn as they were")]
+    public async Task KeepsEachValueColumnsSeriesDrawnAsTheyWere()
+    {
+        await CreateTwoSeriesChartAsync();
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, "Draw as", "Pies");
+
+        // The split drops both series, each column's new ones taking up how it was drawn.
+        await DateValueChart.SplitDataAsync(Ren, "Discontinued");
+
+        await Poll(() => DateValueChart.SeriesCountAsync(Ren)).ToBe(6);
+
+        var drawnSeries = await Page.EvaluateAsync<int[]>("""
+            () => [".ren-bar.ren-vertical", ".ren-pie-slice"].map(selector =>
+                new Set(Array.from(document.querySelectorAll(selector + "[data-series]"))
+                    .map(mark => mark.getAttribute("data-series"))).size)
+            """);
+
+        Expect(drawnSeries).ToEqual(new[] { 3, 3 });
     }
 
     [TestMethod("estimate last period: is seasonally adjusted by default")]

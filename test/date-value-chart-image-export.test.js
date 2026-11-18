@@ -135,7 +135,7 @@ describe("Ren.DateValueChart_ImageExport", () => {
 
         props.svg = item.querySelector("svg");
         props.multiChartRange = {};
-        props.showAsPies = true;
+        props.series.forEach(series => { series.chartType = Ren.SeriesChartTypeEnum.Pie; });
 
         return { item, props };
     };

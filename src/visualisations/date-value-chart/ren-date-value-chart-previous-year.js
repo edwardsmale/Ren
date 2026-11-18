@@ -11,7 +11,8 @@ Ren.DateValueChart_PreviousYear = (() => {
      * Gets a value indicating whether a series is set to compare with the previous year.
      */
     const isComparing = (props, seriesIndex) =>
-        props.series?.[seriesIndex]?.compareWithPreviousYear === true;
+        props.series?.[seriesIndex]?.compareWithPreviousYear === true
+        && !Ren.DateValueChart_Pies.isPieSeries(props, seriesIndex);
 
     /**
      * Gets a value indicating whether the chart can draw the previous year: it bins its own dates
@@ -20,7 +21,7 @@ Ren.DateValueChart_PreviousYear = (() => {
     const isAvailable = (props) => !!props.previousYearGroupingEntry
         && !!props.previousYearInputData
         && !props.isAllTime
-        && !props.showAsPies
+        && !Ren.DateValueChart_Pies.isShown(props)
         && props.previousYearGroupingEntry.binPeriod >= Ren.DatePeriodEnum.Day;
 
     const isWanted = (props) => {

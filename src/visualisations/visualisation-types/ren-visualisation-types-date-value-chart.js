@@ -28,9 +28,10 @@ Ren.VisualisationTypes_DateValueChart = {
         subdivisionLabels: "String",
         subdivisionLabelPlacement: "String",
 
-        // Draws a pie per period in place of the bars, lines and dots, each series a slice of it,
-        // with a hole in the middle pieHoleRadius (0 to 0.9 of the pie's radius, 0 by default)
-        // across.
+        // The series drawn as pies (a series' chartType of "Pie") share a pie per period, each a
+        // slice of it, with a hole in the middle pieHoleRadius (0 to 0.9 of the pie's radius, 0 by
+        // default) across.  showAsPies, which drew every series so, is only read from charts
+        // saved with it, whose series are then each made pies.
         showAsPies: "Boolean",
         pieHoleRadius: "Number",
 

@@ -23,7 +23,7 @@ public class DateValueChartAxisStartAtZeroTests : BrowserTest
     private async Task CreateLineChartAsync()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Lines");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Lines");
     }
 
     private async Task<double> LowestPlottedValueAsync() =>

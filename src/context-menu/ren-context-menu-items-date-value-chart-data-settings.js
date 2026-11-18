@@ -769,7 +769,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         id: "chart-index",
         exclusiveGroup: "chart-alternative-values",
         title: "Plots each series as an index of its first value, which is 100",
-        visible: () => !props.showAsPies,
+        visible: () => !Ren.DateValueChart_Pies.isShown(props),
         action: toggleIndex,
         ticked: () => props.showAsIndex === true
     };
@@ -780,7 +780,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         id: "chart-change",
         exclusiveGroup: "chart-alternative-values",
         title: "Plots each period's value as its change on the period before, as a percentage",
-        visible: () => !props.showAsPies,
+        visible: () => !Ren.DateValueChart_Pies.isShown(props),
         action: () => toggleAlternativeValues("showAsChange"),
         ticked: () => props.showAsChange === true
     };
@@ -864,12 +864,22 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
                 || Ren.DateValueChart_TrendLines.DEFAULT_PERIODS) === option.periods;
     };
 
-    // Pies have no line to follow.
+    // Gets a value indicating whether the series the menu acts on are all slices of pies, which
+    // have no line to follow nor points to mark.
+    const areTargetSeriesPies = () => {
+
+        const seriesIndexes = getTargetSeriesIndexes();
+
+        return seriesIndexes.length > 0 && seriesIndexes.every(
+            seriesIndex => Ren.DateValueChart_Pies.isPieSeries(props, seriesIndex - 1)
+        );
+    };
+
     const trendLineMenuItem = {
         section: "Chart data",
         text: "Trend line",
         id: "chart-trend-line",
-        visible: () => !props.showAsPies,
+        visible: () => !areTargetSeriesPies(),
         submenu: trendLineOptions.map(option => ({
             text: option.text,
             id: `chart-trend-line-${option.id}`,
@@ -881,13 +891,12 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         }))
     };
 
-    // Pies have no points to mark.
     const markExtremesMenuItem = {
         section: "Chart data",
         text: "Mark highest and lowest",
         id: "chart-mark-extremes",
         title: "Rings and labels each series' highest and lowest values",
-        visible: () => !props.showAsPies,
+        visible: () => !areTargetSeriesPies(),
         action: () => toggleSeriesProperty("markExtremes", false),
         ticked: () => getSeriesProperty("markExtremes", false) === true
     };
@@ -897,7 +906,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         text: "Compare with previous year",
         id: "chart-previous-year",
         title: "Draws each series' values for the year before over it, as a dotted line",
-        visible: () => Ren.DateValueChart_PreviousYear.isAvailable(props),
+        visible: () => Ren.DateValueChart_PreviousYear.isAvailable(props) && !areTargetSeriesPies(),
         action: () => {
 
             props.skipExtentRecalculation = false;

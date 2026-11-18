@@ -21,7 +21,7 @@ Ren.DateValueChart_NonWorkingDays = (() => {
      */
     const isAvailable = (props) => props.datePeriod <= Ren.DatePeriodEnum.Day
         && !props.isAllTime
-        && !props.showAsPies
+        && !Ren.DateValueChart_Pies.isShown(props)
         && props.hasDateColumn !== false;
 
     /**

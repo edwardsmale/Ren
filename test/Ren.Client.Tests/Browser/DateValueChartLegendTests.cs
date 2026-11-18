@@ -372,7 +372,7 @@ public class DateValueChartLegendTests : BrowserTest
     {
         var (removedLabel, otherNumber) = await RemoveFirstSeriesAsync();
 
-        await DateValueChart.ClickSeriesMenuPathAsync(Ren, otherNumber, "Chart type", "Lines");
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, otherNumber, "Draw as", "Lines");
 
         var lineSelector = $".ren-series-{otherNumber} .ren-data-series--line";
 
@@ -384,7 +384,7 @@ public class DateValueChartLegendTests : BrowserTest
     {
         var (removedLabel, otherNumber) = await RemoveFirstSeriesAsync();
 
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
 
         await Poll(() => TitleWithinAsync(".ren-pie-labels--other")).ToBe("\"Other\" represents 1 series:\n" + removedLabel);
         Expect(await Page.Locator($".ren-pie-labels-layer > .ren-series-{otherNumber}").GetAttributeAsync("class"))

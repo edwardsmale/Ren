@@ -727,6 +727,8 @@ Ren.CreateDateValueChart = (() => {
 
         const previousAxes = props.axes;
 
+        // A value axis' updateYScaleBehaviour is left unset until chosen, as how it scales by
+        // default depends on what the chart draws (see DateValueChart_Pies.getDefaultScaleBehaviour).
         props.axes = {
             xAxis: {
                 updateXScaleBehaviour: xAxis.updateXScaleBehaviour || "AlwaysUpdate"
@@ -739,7 +741,7 @@ Ren.CreateDateValueChart = (() => {
                 formatFunction: leftAxis.formatFunction,
                 showValueLabels: leftAxis.showValueLabels !== undefined ? leftAxis.showValueLabels : true,
                 fromSettings: leftAxis.fromSettings !== undefined ? leftAxis.fromSettings : false,
-                updateYScaleBehaviour: leftAxis.updateYScaleBehaviour || "AlwaysUpdate",
+                updateYScaleBehaviour: leftAxis.updateYScaleBehaviour,
                 startAtZero: leftAxis.startAtZero !== false,
                 logScale: leftAxis.logScale === true
             },
@@ -751,7 +753,7 @@ Ren.CreateDateValueChart = (() => {
                 formatFunction: rightAxis.formatFunction,
                 showValueLabels: rightAxis.showValueLabels !== undefined ? rightAxis.showValueLabels : true,
                 fromSettings: rightAxis.fromSettings !== undefined ? rightAxis.fromSettings : false,
-                updateYScaleBehaviour: rightAxis.updateYScaleBehaviour || "AlwaysUpdate",
+                updateYScaleBehaviour: rightAxis.updateYScaleBehaviour,
                 startAtZero: rightAxis.startAtZero !== false,
                 logScale: rightAxis.logScale === true
             },
@@ -766,7 +768,7 @@ Ren.CreateDateValueChart = (() => {
                 showValueLabels:
                     hiddenAxis.showValueLabels !== undefined ? hiddenAxis.showValueLabels : true,
                 fromSettings: hiddenAxis.fromSettings !== undefined ? hiddenAxis.fromSettings : false,
-                updateYScaleBehaviour: hiddenAxis.updateYScaleBehaviour || "AlwaysUpdate"
+                updateYScaleBehaviour: hiddenAxis.updateYScaleBehaviour
             }
         };
 
@@ -859,6 +861,18 @@ Ren.CreateDateValueChart = (() => {
 
         const isNewChart = !visualisation.series?.length;
 
+        // How the series a split has just dropped were drawn, which the series replacing them
+        // take up from those of the same value column, or else from them all.
+        const getInheritedSeriesSettings = (index) => {
+
+            if (!isNewChart) return null;
+
+            const sourceHeading = props.seriesSourceHeadings?.[index] ?? props.valueHeadings[index];
+
+            return props.inheritedSeriesSettingsBySource?.get(sourceHeading) ??
+                props.inheritedSeriesSettings;
+        };
+
         // A percentage series is drawn as a line, on its own axis where shown alongside other
         // units.
         const buildDefaultSeriesSettings = (index) => {
@@ -885,7 +899,7 @@ Ren.CreateDateValueChart = (() => {
                 dotSize: "medium",
                 isEnabled: true,
                 estimateLastPeriod: inheritedEstimateLastPeriod
-            }, isNewChart ? props.inheritedSeriesSettings : null);
+            }, getInheritedSeriesSettings(index));
         };
 
         // A split series nobody has styled yet takes the chart's splitSeriesDefaults over the usual
@@ -905,7 +919,7 @@ Ren.CreateDateValueChart = (() => {
             const settings = Object.assign(
                 buildDefaultSeriesSettings(index),
                 visualisation.splitSeriesDefaults,
-                isNewChart ? props.inheritedSeriesSettings : null
+                getInheritedSeriesSettings(index)
             );
 
             if (minorSplitSeriesHeadings?.has(props.valueHeadings[index])) {
@@ -1000,8 +1014,22 @@ Ren.CreateDateValueChart = (() => {
             visualisation.series[i] ??= buildDefaultSeriesSettings(i);
         }
 
+        // Charts drawn wholly as pies were once marked so as a whole, and are now so by each series
+        // being drawn as a pie.
+        if (visualisation.showAsPies === true) {
+
+            for (let i = 0; i < visualisation.series.length; i++) {
+
+                visualisation.series[i] ??= buildDefaultSeriesSettings(i);
+                visualisation.series[i].chartType = Ren.SeriesChartTypeEnum.Pie;
+            }
+
+            delete visualisation.showAsPies;
+        }
+
         // Taken up now, so not by series the user later clears away.
         props.inheritedSeriesSettings = null;
+        props.inheritedSeriesSettingsBySource = null;
 
         props.series = [];
 
@@ -1180,8 +1208,6 @@ Ren.CreateDateValueChart = (() => {
         props.subdivideColumn = visualisation.subdivideColumn || null;
         props.subdivisionLabels = visualisation.subdivisionLabels || "names";
         props.subdivisionLabelPlacement = visualisation.subdivisionLabelPlacement || "inside";
-
-        props.showAsPies = visualisation.showAsPies === true;
 
         // A share of each pie's radius; left undefined when unset, for no hole.
         props.pieHoleRadius = visualisation.pieHoleRadius !== undefined

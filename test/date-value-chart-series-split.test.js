@@ -2,6 +2,32 @@ describe("Ren.DateValueChart_SeriesSplit", () => {
 
     const SeriesSplit = Ren.DateValueChart_SeriesSplit;
 
+    const PIE = Ren.SeriesChartTypeEnum.Pie;
+    const BAR = Ren.SeriesChartTypeEnum.Bar;
+    const LINE = Ren.SeriesChartTypeEnum.Line;
+
+    test("getSharedSeriesSettings_PiesOutnumberingLine_Pie", () => {
+
+        const series = [{ chartType: PIE }, { chartType: PIE }, { chartType: LINE }];
+
+        expect(SeriesSplit.getSharedSeriesSettings(series).chartType).toBe(PIE);
+    });
+
+    test("getSharedSeriesSettingsBySource_PieColumnBesideBarColumn_EachKeepsItsType", () => {
+
+        const series = [{ chartType: PIE }, { chartType: BAR }, { chartType: PIE }];
+        const bySource = SeriesSplit.getSharedSeriesSettingsBySource(series, ["Sales", "Units", "Sales"]);
+
+        expect(bySource.get("Sales").chartType).toBe(PIE);
+        expect(bySource.get("Units").chartType).toBe(BAR);
+    });
+
+    test("getSharedSeriesSettings_AllPies_Pie", () => {
+
+        expect(SeriesSplit.getSharedSeriesSettings([{ chartType: PIE }, { chartType: PIE }]).chartType)
+            .toBe(PIE);
+    });
+
     test("buildSeriesColumns_NullAndBlankSplitValues_NamedAsFiltersCaptionThem", () => {
 
         const seriesColumns = SeriesSplit.buildSeriesColumns(

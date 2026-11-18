@@ -260,7 +260,7 @@ public class DateValueChartCopyImageTests : BrowserTest
     public async Task DrawsPiesAtTheirSizeOnThePage()
     {
         await CreateChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await Ren.WaitUntilLoadedAsync();
         await CopyImageAsync();
 

@@ -307,12 +307,13 @@ Ren.DateValueChart_Render = (() => {
 
                 [Ren.SeriesChartTypeEnum.Bar]: "bar",
                 [Ren.SeriesChartTypeEnum.Line]: "line",
-                [Ren.SeriesChartTypeEnum.Dot]: "point"
+                [Ren.SeriesChartTypeEnum.Dot]: "point",
+                [Ren.SeriesChartTypeEnum.Pie]: "pie"
             };
 
             // Series switched off in the legend keep their type string, as the legend still draws
-            // their marker, but are left out of the types to render.  Drawn as pies, every series
-            // is a slice, marked as a bar is, and none is drawn as its own type.
+            // their marker, but are left out of the types to render.  A series drawn as a pie is a
+            // slice of the pies, drawn together by DateValueChart_Pies, and is marked as a bar is.
             const seriesTypeStrings = [];
             const typesNeeded = new Set();
             const isPies = Ren.DateValueChart_Pies.isShown(props);
@@ -320,12 +321,10 @@ Ren.DateValueChart_Render = (() => {
             for (let i = 0; i < props.seriesCount; i++) {
 
                 const chartType = props.series[i].chartType ?? Ren.SeriesChartTypeEnum.Bar;
-                const typeString = isPies
-                    ? "bar"
-                    : seriesChartTypeToSeriesMap[chartType] ?? "bar";
+                const typeString = seriesChartTypeToSeriesMap[chartType] ?? "bar";
                 seriesTypeStrings[i] = typeString;
 
-                if (props.series[i].isEnabled !== false && !isPies) typesNeeded.add(typeString);
+                if (props.series[i].isEnabled !== false) typesNeeded.add(typeString);
             }
 
             props.seriesTypeStrings = seriesTypeStrings;
@@ -1091,16 +1090,18 @@ Ren.DateValueChart_Render = (() => {
                 renderSeriesOfType("point", seriesConfigs.point);
             }
 
-            if (isPies) {
-                Ren.DateValueChart_Pies.render(props, currentData);
-            }
-            else {
+            if (!isPies) {
 
                 Ren.DateValueChart_PreviousYear.render(props);
                 Ren.DateValueChart_TrendLines.render(props, currentData);
                 Ren.DateValueChart_Extremes.render(props, currentData);
                 Ren.DateValueChart_ValueLines.render(props);
                 Ren.DateValueChart_NonWorkingDays.render(props);
+            }
+
+            // Over the series they share the plot with.
+            if (props.seriesTypes.includes("pie")) {
+                Ren.DateValueChart_Pies.render(props, currentData);
             }
 
             Ren.DateValueChart_SeriesSubdivisions.renderLabels(props);

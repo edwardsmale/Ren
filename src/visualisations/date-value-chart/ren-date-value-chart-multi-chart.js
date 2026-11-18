@@ -253,9 +253,9 @@ Ren.DateValueChart_MultiChart = (() => {
 
         for (let index = 0; index < seriesCount; index++) {
 
-            seriesTypeStrings.push(Ren.DateValueChart_Pies.isShown(props)
-                ? "bar"
-                : Ren.DateValueChart_LastPeriodEstimate.getSeriesTypeString(props, index));
+            seriesTypeStrings.push(
+                Ren.DateValueChart_LastPeriodEstimate.getSeriesTypeString(props, index)
+            );
         }
 
         return Object.assign(props.multiChartLegendProps, {
@@ -454,7 +454,7 @@ Ren.DateValueChart_MultiChart = (() => {
             "pointer-events": "none"
         });
 
-        if (chartProps.showAsPies) {
+        if (Ren.DateValueChart_Pies.isShown(chartProps)) {
 
             Ren.Svg.setStyles(label, { "left": "0", "right": "0", "text-align": "center" });
         }

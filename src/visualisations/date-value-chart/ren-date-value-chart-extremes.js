@@ -220,6 +220,7 @@ Ren.DateValueChart_Extremes = (() => {
             const series = props.series[i];
 
             if (!series || series.isEnabled === false || series.markExtremes !== true) continue;
+            if (Ren.DateValueChart_Pies.isPieSeries(props, i)) continue;
 
             const axis = props.axes[series.valueAxis || "leftAxis"];
 

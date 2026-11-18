@@ -424,6 +424,7 @@ Ren.DateValueChart_LastPeriodEstimate = (() => {
 
             case Ren.SeriesChartTypeEnum.Line: return "line";
             case Ren.SeriesChartTypeEnum.Dot: return "point";
+            case Ren.SeriesChartTypeEnum.Pie: return "pie";
             default: return "bar";
         }
     };

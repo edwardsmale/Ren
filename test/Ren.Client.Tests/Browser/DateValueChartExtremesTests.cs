@@ -189,7 +189,7 @@ public class DateValueChartExtremesTests : BrowserTest
     public async Task RingsALinesPointsRoundAtTheSizeTheChartIsShown()
     {
         await CreateSingleSeriesChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Lines");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Lines");
         await DateValueChart.ClickMenuPathAsync(Ren, MarkHighestAndLowest);
 
         var ring = (await Ren.Root.Locator(Marker).First.BoundingBoxAsync())!;
@@ -241,7 +241,7 @@ public class DateValueChartExtremesTests : BrowserTest
     public async Task LabelsStackedBarsBeyondTheirWholeStack()
     {
         await CreateTwoSeriesChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Bar layout", "Stacked");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Bar layout", "Stacked");
         await DateValueChart.ClickSeriesMenuPathAsync(Ren, 1, MarkHighestAndLowest);
         await DateValueChart.ClickSeriesMenuPathAsync(Ren, 2, MarkHighestAndLowest);
 
@@ -291,7 +291,7 @@ public class DateValueChartExtremesTests : BrowserTest
     public async Task LabelsALinesRingsBesideThemClearOfItsValueLabels()
     {
         await CreateSingleSeriesChartAsync();
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Lines");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Lines");
         await DateValueChart.ClickMenuPathAsync(Ren, MarkHighestAndLowest);
 
         var boxes = await LabelBoxesBesideValueLabelsAsync();

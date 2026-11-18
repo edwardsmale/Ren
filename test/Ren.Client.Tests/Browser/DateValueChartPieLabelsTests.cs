@@ -19,18 +19,25 @@ public class DateValueChartPieLabelsTests : BrowserTest
         await DateValueChart.CreateFromColumnHeadingAsync(Ren, "OrderDate");
         await DateValueChart.SplitDataAsync(Ren, "Partner");
         await DateValueChart.SelectDateGroupingAsync(Ren, "date-year-start");
-        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
         await Ren.WaitUntilLoadedAsync();
 
-        var settings = (await SavedSettingsTextAsync())
-            .Replace(
-                "\"showAsPies\":true",
-                "\"showAsPies\":true,\"pieHoleRadius\":0.45,\"subdivideColumn\":\"Brand\","
+        // The chart's settings are put ahead of its series, as charts no longer save a setting of
+        // their own for being drawn as pies.
+        var saved = await SavedSettingsTextAsync();
+        var seriesAt = saved.IndexOf("\"series\":[", StringComparison.Ordinal);
+
+        Assert.IsTrue(seriesAt >= 0, "The chart's series weren't saved.");
+
+        var settings = saved
+            .Insert(
+                seriesAt,
+                "\"pieHoleRadius\":0.45,\"subdivideColumn\":\"Brand\","
                     + "\"subdivisionLabels\":\"names\",\"pieLabelValues\":true,\"pieSharesInside\":false,"
                     + "\"pieValuePosition\":\"below\",\"multiChartPeriod\":\"year\","
                     + "\"multiChartKeepEmptyPeriods\":true,\"multiChartMaxCount\":4,\"multiChartSlider\":true,"
                     + "\"fillAvailableSpace\":true,\"showLegend\":true,\"legendSize\":\"small\","
-                    + "\"showDateAxis\":false,\"chartTitle\":\"{value} by {split}\",\"chartSubtitle\":\"{filters}\"")
+                    + "\"showDateAxis\":false,\"chartTitle\":\"{value} by {split}\",\"chartSubtitle\":\"{filters}\",")
             .Replace("\"popupHeight\":240", "\"popupWidth\":1178,\"popupHeight\":503")
             .Replace("\"visualisationWidth\":608", "\"visualisationWidth\":1178")
             .Replace("\"visualisationHeight\":224", "\"visualisationHeight\":487");

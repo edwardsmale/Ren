@@ -16,7 +16,7 @@ public class VisualisationResetTests : BrowserTest
     {
         await Ren.OpenAsync(DeclaredChartFixture);
 
-        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 1, "Chart type", "Lines");
+        await DateValueChart.ClickSeriesMenuPathAsync(Ren, 1, "Draw as", "Lines");
         await Expect(Ren.Root.Locator(Line)).Not.ToHaveCountAsync(0);
 
         await DateValueChart.ClickMenuPathAsync(Ren, "Reset");

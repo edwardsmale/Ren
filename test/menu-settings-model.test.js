@@ -111,11 +111,11 @@ test("build_ItemDoneOnce_IsLeftOut", () => {
 test("build_RootSections_AreGroupsInMenuOrder", () => {
 
     const nodes = build([
-        option("Show legend", true, { id: "legend", section: "Chart appearance" }),
+        option("Show legend", true, { id: "legend", section: "Appearance" }),
         option("Show date filter", false, { id: "filter", section: "Dates" })
     ]);
 
-    expect(nodes.map(n => n.heading)).toEqual(["Dates", "Chart appearance"]);
+    expect(nodes.map(n => n.heading)).toEqual(["Dates", "Appearance"]);
 });
 
 test("build_IncludeLeavesOutItemsWithADependency", () => {

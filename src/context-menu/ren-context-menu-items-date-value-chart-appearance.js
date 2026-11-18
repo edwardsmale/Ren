@@ -602,7 +602,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     };
 
     const legendMenuItem = buildPropertyToggle({
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Show legend",
         id: "show-legend",
         propertyName: "showLegend",
@@ -634,7 +634,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     const setSubtitle = (text) => setChartProperty("chartSubtitle", text.trim(), showTitles);
 
     const titleMenuItem = {
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Title...",
         id: "chart-title",
         title: "{value} in the title stands for the value column, and {split} for the column the"
@@ -648,7 +648,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     };
 
     const subtitleMenuItem = {
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Subtitle...",
         id: "chart-subtitle",
         title: "{filters} in the subtitle stands for the filters on the chart's data, and is left"
@@ -741,14 +741,10 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         ]
     };
 
-    // Redrawn, as the pies are drawn in place of the series' own marks.
-    const setShowAsPies = (showAsPies) =>
-        setChartProperty("showAsPies", showAsPies, props.redrawChart);
-
     const pieHoleSizeMenuItem = {
         text: "Hole size...",
         id: "pie-hole-size",
-        visible: () => Ren.DateValueChart_Pies.isShown(props),
+        visible: () => Ren.DateValueChart_Pies.hasPies(props),
         action: () => {
 
             Ren.CreateNumberEditorPopupWindow(
@@ -859,7 +855,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     const pieLayoutMenuItem = {
         text: "Pie layout",
         id: "pie-layout",
-        visible: () => Ren.DateValueChart_Pies.isShown(props),
+        visible: () => Ren.DateValueChart_Pies.hasPies(props),
         submenu: [
             buildPieHoleOption("No hole", 0),
             buildPieHoleOption("Small hole", 0.3),
@@ -872,60 +868,42 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         ]
     };
 
-    // Drawing the series as bars, lines or dots draws them in place of the pies, so both are
-    // changed in the one commit.
-    const setSeriesChartType = (chartType) => {
-
-        if (Ren.DateValueChart_Pies.isShown(props)) {
-
-            props.showAsPies = false;
-
-            if (visualisation) {
-                visualisation.showAsPies = false;
-            }
-        }
-
-        setSeriesProperty("chartType", chartType);
-    };
-
-    const buildSeriesChartTypeOption = (text, id, chartType) => ({
+    const buildSeriesChartTypeOption = (text, id, chartType, title) => ({
         text: text,
         id: id,
+        title: title,
         visible: () => !!getTargetSeriesIndex(),
-        action: () => setSeriesChartType(chartType),
-        ticked: () => !Ren.DateValueChart_Pies.isShown(props)
-            && getSeriesProperty("chartType", Ren.SeriesChartTypeEnum.Bar) === chartType
+        action: () => setSeriesProperty("chartType", chartType),
+        ticked: () => getSeriesProperty("chartType", Ren.SeriesChartTypeEnum.Bar) === chartType
     });
 
-    // What the series are drawn as, each kind followed by its own options: bars and their layout,
-    // lines and their style and layout, dots and their size, then pies and their layout.  On a
-    // series' menu the kinds, line style and dot size are that series', while the layouts and pies
-    // are the chart's.  Where the series are drawn as a mixture, none of bars, lines or dots is
-    // ticked.
+    // What the series are drawn as - the kinds, with the line style and dot size under theirs -
+    // then how the chart lays out each kind.  On a series' menu the kinds, line style and dot size
+    // are that series', and the layouts follow under the whole chart's heading.  Where the series
+    // are drawn as a mixture, none of the kinds is ticked.  The series drawn as pies share a pie
+    // per period, drawn over the plot's top half where other series are drawn as bars, lines or
+    // dots.
     const chartTypeMenuItem = {
-        section: "Chart appearance",
-        text: "Chart type",
+        section: "Appearance",
+        text: "Draw as",
         id: "chart-type",
         submenu: [
             targetSeriesHeadingMenuItem,
             buildSeriesChartTypeOption("Bars", "chart-type-bars", Ren.SeriesChartTypeEnum.Bar),
-            barLayoutMenuItem,
-            Ren.MENU_SEPARATOR,
             buildSeriesChartTypeOption("Lines", "chart-type-lines", Ren.SeriesChartTypeEnum.Line),
             seriesLineStyleMenuItem,
-            lineLayoutMenuItem,
-            Ren.MENU_SEPARATOR,
             buildSeriesChartTypeOption("Dots", "chart-type-dots", Ren.SeriesChartTypeEnum.Dot),
             seriesDotSizeMenuItem,
+            buildSeriesChartTypeOption(
+                "Pies",
+                "chart-type-pies",
+                Ren.SeriesChartTypeEnum.Pie,
+                "Draws a pie for each period, each series drawn as pies a slice of it"
+            ),
             Ren.MENU_SEPARATOR,
-            {
-                text: "Pies",
-                id: "chart-type-pies",
-                title: "Draws a pie for each period, each series a slice of it",
-                // Switched off again, the series are drawn as they were before.
-                action: () => setShowAsPies(!Ren.DateValueChart_Pies.isShown(props)),
-                ticked: () => Ren.DateValueChart_Pies.isShown(props)
-            },
+            chartHeadingMenuItem,
+            barLayoutMenuItem,
+            lineLayoutMenuItem,
             pieLayoutMenuItem
         ]
     };
@@ -979,7 +957,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Pie labels",
         id: "pie-labels",
         title: "Labels each slice with its series' name, value or share of the pie",
-        visible: () => Ren.DateValueChart_Pies.isShown(props),
+        visible: () => Ren.DateValueChart_Pies.hasPies(props),
         submenu: [
             { text: "Automatic", placement: pieLabelPlacements.Auto },
             { text: "Inside slices", placement: pieLabelPlacements.Inside },
@@ -1029,7 +1007,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
 
     pieLabelFontSizeMenuItem.visible = () => Ren.DateValueChart_PieLabels.areLabelsShown(props)
         || Ren.DateValueChart_PieLabels.areTotalsShown(props)
-        || (Ren.DateValueChart_Pies.isShown(props)
+        || (Ren.DateValueChart_Pies.hasPies(props)
             && Ren.DateValueChart_SeriesSubdivisions.isActive(props)
             && Ren.DateValueChart_SeriesSubdivisions.getLabelContent(props)
                 !== Ren.DateValueChart_SeriesSubdivisions.LABEL_CONTENTS.None);
@@ -1196,7 +1174,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     });
 
     const hoverMenuItem = {
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Hover",
         id: "chart-hover",
         submenu: [
@@ -1210,7 +1188,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     // Which labels the series show, which on a series' menu is that series', then how the chart
     // places and shows them, then how big each kind is drawn.
     const labelsMenuItem = {
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Labels",
         id: "chart-labels",
         submenu: [
@@ -1245,7 +1223,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     });
 
     const axisVisibilityMenuItem = {
-        section: "Chart appearance",
+        section: "Appearance",
         text: "Axes",
         id: "axis-visibility",
         submenu: [

@@ -570,8 +570,36 @@ Ren.DateValueChart_SeriesSplit = (() => {
         return settings;
     };
 
+    /**
+     * Gets how the series of each value column are drawn, keyed by the column, for the series a
+     * change of split replaces them with to take up from the column they too are made from.  So
+     * a column drawn as pies stays pies beside another drawn as bars.  sourceHeadings holds the
+     * column each series was made from, by its index.
+     */
+    const getSharedSeriesSettingsBySource = (series, sourceHeadings) => {
+
+        const seriesBySource = new Map();
+
+        for (let i = 0; i < (sourceHeadings?.length ?? 0); i++) {
+
+            if (!series?.[i] || sourceHeadings[i] == null) continue;
+
+            if (!seriesBySource.has(sourceHeadings[i])) seriesBySource.set(sourceHeadings[i], []);
+
+            seriesBySource.get(sourceHeadings[i]).push(series[i]);
+        }
+
+        const settingsBySource = new Map();
+
+        seriesBySource.forEach((sourceSeries, sourceHeading) =>
+            settingsBySource.set(sourceHeading, getSharedSeriesSettings(sourceSeries)));
+
+        return settingsBySource;
+    };
+
     return {
         getSharedSeriesSettings,
+        getSharedSeriesSettingsBySource,
         MAX_SERIES,
         OTHER_VALUE,
         OTHER_LABEL,

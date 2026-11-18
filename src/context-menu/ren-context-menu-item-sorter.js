@@ -103,7 +103,7 @@ Ren.ContextMenuItemSorter = () => {
             // A chart: the series clicked, then what it plots and which series it draws, then the
             // dates every series is drawn along, then how the whole of it looks.
             "Y-Axis", "X-Axis", "Axis Label", "Series", "Chart data", "Dates",
-            "Chart appearance",
+            "Appearance",
             "Tabbed Module", "Tab", "Arrange", "Other", "Tech"
         ]);
 

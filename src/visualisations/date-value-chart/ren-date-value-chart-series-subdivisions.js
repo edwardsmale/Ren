@@ -135,7 +135,7 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
     /**
      * Gets a value indicating whether the chart's subdivision labels are stacked around its pies.
      */
-    const areLabelsAround = (props) => Ren.DateValueChart_Pies.isShown(props)
+    const areLabelsAround = (props) => Ren.DateValueChart_Pies.hasPies(props)
         && isActive(props)
         && getLabelContent(props) !== LABEL_CONTENTS.None
         && getLabelPlacement(props) === LABEL_PLACEMENTS.Around;
@@ -630,7 +630,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
 
     /**
      * Takes the pies' subdivision labels kept so far for Ren.DateValueChart_PieLabels to stack
-     * around the pies, where they go there, leaving none for renderLabels.  Gets none otherwise.
+     * around the pies, where they go there, leaving the bars' for renderLabels.  Gets none
+     * otherwise.
      */
     const takeAroundLabels = (props) => {
 
@@ -638,9 +639,11 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
 
         if (!pendingLabels || !areLabelsAround(props)) return NO_SUBDIVISIONS;
 
-        props.subdivisionPendingLabels = null;
+        const barLabels = pendingLabels.filter(label => !label.pie);
 
-        return pendingLabels;
+        props.subdivisionPendingLabels = barLabels.length ? barLabels : null;
+
+        return pendingLabels.filter(label => label.pie);
     };
 
     /**
@@ -1013,13 +1016,12 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
 
         const measurements = measureLabels(labels);
 
-        if (Ren.DateValueChart_Pies.isShown(props)) {
-            layoutPieLabels(props, labels, measurements, result);
-        }
-        else {
+        // Pies drawn alongside bars leave labels of both.
+        const pieLabels = labels.filter(label => label.pie);
+        const barLabels = labels.filter(label => !label.pie);
 
-            layoutBarLabels(props, labels, measurements, result);
-        }
+        if (pieLabels.length) layoutPieLabels(props, pieLabels, measurements, result);
+        if (barLabels.length) layoutBarLabels(props, barLabels, measurements, result);
 
         return result;
     };

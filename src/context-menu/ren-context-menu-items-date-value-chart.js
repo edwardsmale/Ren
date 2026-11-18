@@ -616,7 +616,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         const subdivisionPlacements = Ren.DateValueChart_SeriesSubdivisions.LABEL_PLACEMENTS;
 
         // Only pies' labels can go around them.
-        const arePieSubdivisionsLabelled = () => Ren.DateValueChart_Pies.isShown(props)
+        const arePieSubdivisionsLabelled = () => Ren.DateValueChart_Pies.hasPies(props)
             && Ren.DateValueChart_SeriesSubdivisions.getLabelContent(props)
                 !== subdivisionContents.None;
 
@@ -899,7 +899,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             {},
             Ren.ContextMenuItems_VisualisationEffects.getMenuItems(visualisation)[0],
             {
-                section: "Chart appearance",
+                section: "Appearance",
                 positionAtEndOfSection: true,
                 visible: () => !!visualisation.element && !visualisation.isVirtual
             }
@@ -951,7 +951,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         // Previewed as the slider moves, then redrawn once it closes, settling what is worked out
         // from the colours as the chart is drawn, such as the value labels' contrast.
         const colourSchemeMenuItem = {
-            section: "Chart appearance",
+            section: "Appearance",
             text: "Colours...",
             id: "chart-colour-scheme",
             positionAtEndOfSection: true,
@@ -973,13 +973,30 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             )
         };
 
-        // How the chart looks, grouped by topic rather than by what is acted on: each submenu
-        // leads with the items for the series clicked, or every series away from them, then has
-        // the chart's own.  Read rather than acted on, so after the items that change what the
-        // chart says.  Offered on the chart and on what it plots alike.
-        const chartAppearanceMenuItems = [
-            chartTypeMenuItem,
-            labelsMenuItem,
+        // What the series are drawn as and how they're labelled lead with the series' own items,
+        // then the whole chart's, so on a series' menu they're with the rest of the series' own,
+        // and away from every series with the rest of how the chart looks.  One item for both, so
+        // that the settings window, which reads the chart's menu as if opened on a series, has
+        // them under Series on its Individual Series tab.
+        const inSeriesSectionWhenClicked = (menuItem) => {
+
+            const copy = Object.defineProperties({}, Object.getOwnPropertyDescriptors(menuItem));
+
+            Object.defineProperty(copy, "section", {
+                get: () => isSeriesClicked() ? "Series" : "Appearance",
+                enumerable: true,
+                configurable: true
+            });
+
+            return copy;
+        };
+
+        const drawAsMenuItem = inSeriesSectionWhenClicked(chartTypeMenuItem);
+        const seriesLabelsMenuItem = inSeriesSectionWhenClicked(labelsMenuItem);
+
+        // How the chart looks, grouped by topic rather than by what is acted on.  Read rather
+        // than acted on, so after the items that change what the chart says.
+        const chartLooksMenuItems = [
             titleMenuItem,
             subtitleMenuItem,
             legendMenuItem,
@@ -989,12 +1006,17 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             effectsMenuItem
         ];
 
-        // What tells the series apart, then hiding and removing it, last as they take it out of
-        // the chart.  How it is drawn is under the chart's appearance, and its values under the
-        // chart's data, each beside the chart-wide items on the same topic.
+        const chartAppearanceMenuItems = [drawAsMenuItem, seriesLabelsMenuItem]
+            .concat(chartLooksMenuItems);
+
+        // What tells the series apart and how it is drawn, then hiding and removing it, last as
+        // they take it out of the chart.  Its values are under the chart's data, beside the
+        // chart-wide items on the same topic.
         const seriesOwnMenuItems = [
             seriesLabelMenuItem,
             seriesColourMenuItem,
+            drawAsMenuItem,
+            seriesLabelsMenuItem,
             assignAxisMenuItem,
             moveSeriesEarlierMenuItem,
             moveSeriesLaterMenuItem,
@@ -1007,19 +1029,15 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             estimateLastPeriodMenuItem
         ]);
 
-        // A legend entry is offered how its series is drawn and labelled, and the legend itself.
-        const seriesMenuItems = seriesOwnMenuItems.concat([
-            chartTypeMenuItem,
-            labelsMenuItem,
-            legendMenuItem
-        ]);
+        // A legend entry is offered the legend itself too.
+        const seriesMenuItems = seriesOwnMenuItems.concat([legendMenuItem]);
 
         // A plotted series' menu is its own, so it leads with the data point and the period
         // clicked, unsectioned so that they come before the series they belong to, and ends
         // with how the whole chart looks, as on the chart around it.
         const plottedSeriesMenuItems = [showDataMenuItem, clickedDatesMenuItem, addMarkerMenuItem]
             .concat(seriesOwnMenuItems)
-            .concat(chartAppearanceMenuItems);
+            .concat(chartLooksMenuItems);
 
         /**
          * Adds the series items to everything drawn for a series - its bars, line or points, its

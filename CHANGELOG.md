@@ -7,6 +7,8 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 Add a settings window to date/value charts, opened from a cog beside their pickers.
+Let date/value charts draw some series as pies beside others drawn as bars, lines or dots.
+Rename the date/value chart menu's "Chart type" to "Draw as", and "Chart appearance" to "Appearance".
 
 ## 1.1.20 (2026-11-20)
 

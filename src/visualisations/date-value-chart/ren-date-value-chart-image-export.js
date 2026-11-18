@@ -191,7 +191,7 @@ Ren.DateValueChart_ImageExport = (() => {
 
     const appendDateRangeLabel = (svg, props, label, width, top) => {
 
-        const isCentred = !!props.showAsPies;
+        const isCentred = Ren.DateValueChart_Pies.isShown(props);
 
         const text = Ren.Svg.append(svg, "text", {
             "class": "ren-image-date-range",

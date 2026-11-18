@@ -27,7 +27,7 @@ Ren.DateValueChart_ValueTransforms = (() => {
      */
     const canShowYearToDate = (props) => props.datePeriod < Ren.DatePeriodEnum.Year
         && !props.isAllTime
-        && !props.showAsPies;
+        && !Ren.DateValueChart_Pies.isShown(props);
 
     /**
      * Gets a value indicating whether a series is set to show its total for the year to date.
@@ -96,7 +96,7 @@ Ren.DateValueChart_ValueTransforms = (() => {
      */
     const canShowPerDay = (props) => props.datePeriod >= Ren.DatePeriodEnum.Week
         && !props.isAllTime
-        && !props.showAsPies;
+        && !Ren.DateValueChart_Pies.isShown(props);
 
     /**
      * Gets a value indicating whether a series is shown per day: the chart is set to show its

@@ -1,15 +1,63 @@
 describe("Ren.DateValueChart_Pies", () => {
 
+    const PIE_SERIES = [{ chartType: Ren.SeriesChartTypeEnum.Pie }];
+
     const Pies = Ren.DateValueChart_Pies;
 
-    test("isShown_ShowAsPiesUnset_False", () => {
+    const BAR = Ren.SeriesChartTypeEnum.Bar;
+    const PIE = Ren.SeriesChartTypeEnum.Pie;
+
+    const MIXED_PROPS = {
+        seriesCount: 2,
+        series: [{ chartType: PIE }, { chartType: BAR }],
+        innerHeight: 400
+    };
+
+    test("isShown_NoSeries_False", () => {
 
         expect(Pies.isShown({})).toBe(false);
     });
 
-    test("isShown_ShowAsPiesTrue_True", () => {
+    test("isShown_EverySeriesPie_True", () => {
 
-        expect(Pies.isShown({ showAsPies: true })).toBe(true);
+        expect(Pies.isShown({ series: PIE_SERIES })).toBe(true);
+    });
+
+    test("isShown_PieAndBar_FalseButHasPies", () => {
+
+        expect(Pies.isShown(MIXED_PROPS)).toBe(false);
+        expect(Pies.hasPies(MIXED_PROPS)).toBe(true);
+        expect(Pies.isMixed(MIXED_PROPS)).toBe(true);
+    });
+
+    test("isShown_BarSwitchedOffInLegend_True", () => {
+
+        const props = {
+            seriesCount: 2,
+            series: [{ chartType: PIE }, { chartType: BAR, isEnabled: false }]
+        };
+
+        expect(Pies.isShown(props)).toBe(true);
+    });
+
+    test("hasPies_PieBeyondSeriesDrawn_False", () => {
+
+        const props = { seriesCount: 1, series: [{ chartType: BAR }, { chartType: PIE }] };
+
+        expect(Pies.hasPies(props)).toBe(false);
+    });
+
+    test("getBandHeight_Mixed_TopHalf", () => {
+
+        expect(Pies.getBandHeight(MIXED_PROPS)).toBe(200);
+        expect(Pies.getBandHeight({ series: PIE_SERIES, innerHeight: 400 })).toBe(400);
+    });
+
+    test("getDefaultScaleBehaviour_Mixed_Halfway", () => {
+
+        expect(Pies.getDefaultScaleBehaviour(MIXED_PROPS)).toBe("AlwaysUpdateHalfway");
+        expect(Pies.getDefaultScaleBehaviour({ series: [{ chartType: BAR }] }))
+            .toBe("AlwaysUpdate");
     });
 
     test("getHoleRadius_Unset_Zero", () => {
@@ -56,7 +104,7 @@ describe("Ren.DateValueChart_Pies", () => {
 
     test("buildStyles_UnevenScale_SlicesScaledBackToRound", () => {
 
-        const props = { showAsPies: true, piePeriodWidth: 100, innerHeight: 500 };
+        const props = { series: PIE_SERIES, piePeriodWidth: 100, innerHeight: 500 };
 
         // The narrowest period is 200px wide on screen and the plot 250px high, so the pies
         // span 90% of 200px.
