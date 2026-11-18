@@ -166,6 +166,8 @@ Ren.DateValueChart_SettingsWindow = (() => {
 
         const runAsChartMenu = fn => runAsMenu(visualisation, fn);
 
+        const settingsWhenOpened = Ren.VisualisationOriginalSettings.snapshot(visualisation);
+
         Ren.MenuSettingsWindow.open({
             owner: visualisation,
             title: "Chart Settings",
@@ -200,7 +202,13 @@ Ren.DateValueChart_SettingsWindow = (() => {
                     runAction: (fn, seriesKey) => runAsSeriesMenu(visualisation, Number(seriesKey), fn)
                 }
             ],
-            runAction: runAsChartMenu
+            runAction: runAsChartMenu,
+            // Back to the chart as it was when the window was opened, undoing what was changed in
+            // it, rather than to the report's own settings as the menu's Reset is.
+            onReset: settingsWhenOpened
+                ? () => Ren.VisualisationOriginalSettings.restore(visualisation, settingsWhenOpened)
+                : null,
+            resetTitle: "Puts the chart back as it was when this window was opened"
         });
     };
 

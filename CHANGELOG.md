@@ -19,6 +19,7 @@ Stop the chart settings window shifting when switching between its series tabs.
 Show "Draw as" and "Labels" under Series on the All Series tab, as on Individual Series.
 Leave bar-only and pie-only settings out of the chart settings window, not greyed out, when they don't apply.
 Give a chart's legend entries the same menu as the series they name.
+Add a Reset link to the chart settings window, undoing changes made since it was opened.
 
 ## 1.1.20 (2026-11-20)
 

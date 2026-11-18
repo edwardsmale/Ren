@@ -16,6 +16,8 @@
  *                  dropdown's, so the window keeps its layout as tabs are switched.
  *   runAction    - runs what a control does, as the menu would have run it, where a tab has no
  *                  runAction of its own.
+ *   onReset      - optional: puts the owner's settings back, from a Reset link at the right of the
+ *                  tabs, whose tooltip is resetTitle.
  *
  * refresh(owner) builds an open window's settings afresh, as when its owner has redrawn after a
  * change made elsewhere.
@@ -98,6 +100,20 @@ Ren.MenuSettingsWindow = (() => {
 
             Ren.HtmlUtils.enrich(contentContainer)._content(container);
             tabbedModule.render(container);
+
+            if (options.onReset) {
+
+                const resetLink = Ren.HtmlUtils.create("button")
+                    ._addClass(CLASS_NAME + "__reset")
+                    ._set("type", "button")
+                    ._set("title", options.resetTitle || "")
+                    ._textContent("Reset");
+
+                resetLink.addEventListener("click", () => options.onReset());
+
+                container.querySelector(":scope > .ren-tabbed-module-widget__tabstrip")
+                    ?.appendChild(resetLink);
+            }
 
             let forms = [];
 

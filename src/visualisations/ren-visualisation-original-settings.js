@@ -64,10 +64,10 @@ Ren.VisualisationOriginalSettings = (() => {
     };
 
     /**
-     * Takes the snapshot a reset restores.  A visualisation carrying something a JSON round trip
-     * cannot describe simply gets no snapshot, and so is offered no reset.
+     * Gets a copy of a visualisation's settings as they are now, to be put back by restore(), or
+     * null where it carries something a JSON round trip cannot describe.
      */
-    const capture = (visualisation) => {
+    const snapshot = (visualisation) => {
 
         const settings = {};
         const keys = Object.keys(visualisation);
@@ -83,12 +83,23 @@ Ren.VisualisationOriginalSettings = (() => {
 
         try {
 
-            originalSettingsByVisualisation.set(visualisation, Ren.ObjectUtils.clone(settings));
+            return Ren.ObjectUtils.clone(settings);
         }
         catch (error) {
 
-            // Settings that can.t be cloned have nothing to be reset to.
+            // Settings that can't be cloned have nothing to be put back to.
+            return null;
         }
+    };
+
+    /**
+     * Takes the snapshot a reset restores.  A visualisation without one is offered no reset.
+     */
+    const capture = (visualisation) => {
+
+        const settings = snapshot(visualisation);
+
+        if (settings) originalSettingsByVisualisation.set(visualisation, settings);
     };
 
     /**
@@ -194,6 +205,18 @@ Ren.VisualisationOriginalSettings = (() => {
     };
 
     /**
+     * Gives a visualisation the settings in a snapshot, and only those, and keeps the change.
+     */
+    const applySettings = (visualisation, settings) => {
+
+        removeAddedSettings(visualisation, settings);
+
+        Object.assign(visualisation, Ren.ObjectUtils.clone(settings));
+
+        Ren.VisualisationSettingsSynchroniser.commitChange(visualisation);
+    };
+
+    /**
      * Puts a visualisation back the way the report declared it and draws it again.
      *
      * The settings groups are restored last: a grid is rebuilt from the live settings its group
@@ -206,11 +229,7 @@ Ren.VisualisationOriginalSettings = (() => {
 
         if (!originalSettings) return;
 
-        removeAddedSettings(visualisation, originalSettings);
-
-        Object.assign(visualisation, Ren.ObjectUtils.clone(originalSettings));
-
-        Ren.VisualisationSettingsSynchroniser.commitChange(visualisation);
+        applySettings(visualisation, originalSettings);
 
         restorePopupGeometry(visualisation);
 
@@ -219,9 +238,25 @@ Ren.VisualisationOriginalSettings = (() => {
         restoreSettingsGroups(visualisation);
     };
 
+    /**
+     * Puts a visualisation back to a snapshot taken earlier (see snapshot()) and draws it again.
+     * Unlike reset(), where a popup sits and its settings groups are left as they are, as a snapshot
+     * is of the visualisation's own settings alone.
+     */
+    const restore = (visualisation, settings) => {
+
+        if (!settings) return;
+
+        applySettings(visualisation, settings);
+
+        visualisation.recreate();
+    };
+
     return {
         capture,
         hasOriginalSettings,
-        reset
+        reset,
+        snapshot,
+        restore
     };
 })();
