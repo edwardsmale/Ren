@@ -234,16 +234,37 @@ Ren.DateValueChart_SeriesLimit = (() => {
         );
     };
 
+    // Gets the limit the picker shows, which may be one the chart's data was gathered with.
+    const getShownLimit = (props) =>
+        getLimit(props.visualisation) ?? props.gatheredSeriesLimit ?? null;
+
+    // Gets a value indicating whether the limit is offered: where there is one, or more than one
+    // series to limit.
+    const isOffered = (props) => !!getShownLimit(props) || getSeriesCount(props) >= 2;
+
+    /**
+     * Gets the menu item offering the limit, as the picker does, and so in the chart's settings
+     * window, where its editor becomes a field.
+     */
+    const getMenuItem = (props) => ({
+        section: "Chart data",
+        text: "Series shown...",
+        id: "series-limit",
+        title: "Limit the series shown to the top ones",
+        visible: () => isOffered(props),
+        action: () => openEditor(props, Ren.LastRightClickPosition)
+    });
+
     /**
      * Draws the limit as a picker in the given container (see DateValueChart_ColumnPickers), where
      * there is a limit or more than one series to limit.
      */
     const render = (props, container) => {
 
-        const limit = getLimit(props.visualisation) ?? props.gatheredSeriesLimit ?? null;
+        const limit = getShownLimit(props);
         const seriesCount = getSeriesCount(props);
 
-        if (!limit && seriesCount < 2) return;
+        if (!isOffered(props)) return;
 
         const status = Ren.HtmlUtils.create("button")
             ._addClass(PICKERS_CLASS_NAME + "__picker")
@@ -288,6 +309,7 @@ Ren.DateValueChart_SeriesLimit = (() => {
         getLargestGroupSize,
         getLimit,
         getLimitedHeadings,
+        getMenuItem,
         getMostShown,
         limitSplitSeries,
         openEditor,

@@ -266,6 +266,33 @@ describe("Ren.DateValueChart_SeriesSubdivisions", () => {
         );
     });
 
+    test("getSubdivisions_LimitSet_GathersBeyondIt", () => {
+
+        const rows = [];
+
+        for (let index = 0; index < 6; index++) {
+            rows.push(buildRow("V" + index, 6 - index));
+        }
+
+        const { props, row } = buildChart(rows);
+
+        props.subdivisionLimit = 3;
+
+        const subdivisions = Subdivisions.getSubdivisions(props, row, 0);
+
+        expect(subdivisions.map(subdivision => subdivision.label)).toEqual(
+            ["V0", "V1", Ren.DateValueChart_SeriesSplit.OTHER_LABEL]
+        );
+        expect(subdivisions[2].columnValues).toEqual(["V2", "V3", "V4", "V5"]);
+    });
+
+    test("getLimit_LimitOutOfRange_HeldWithinIt", () => {
+
+        expect(Subdivisions.getLimit({})).toBe(Subdivisions.MAX_SUBDIVISIONS);
+        expect(Subdivisions.getLimit({ subdivisionLimit: 1 })).toBe(Subdivisions.MIN_LIMIT);
+        expect(Subdivisions.getLimit({ subdivisionLimit: 999 })).toBe(Subdivisions.MAX_LIMIT);
+    });
+
     test("getMarkSubdivision_ElementIsNoBand_Null", () => {
 
         expect(Subdivisions.getMarkSubdivision(document.createElement("div"))).toBeNull();

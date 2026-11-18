@@ -28,6 +28,10 @@ Ren.VisualisationTypes_DateValueChart = {
         subdivisionLabels: "String",
         subdivisionLabelPlacement: "String",
 
+        // The most subdivisions a bar or slice is drawn with, the smallest beyond it gathered into
+        // one.  Unset, there are up to 20.
+        subdivisionLimit: "Number",
+
         // The series drawn as pies (a series' chartType of "Pie") share a pie per period, each a
         // slice of it, with a hole in the middle pieHoleRadius (0 to 0.9 of the pie's radius, 0 by
         // default) across.  showAsPies, which drew every series so, is only read from charts
@@ -297,6 +301,10 @@ Ren.VisualisationTypes_DateValueChart = {
             name: "subdivisionLabelPlacement",
             transform: (subdivisionLabelPlacement) =>
                 subdivisionLabelPlacement === "around" ? subdivisionLabelPlacement : undefined
+        },
+        {
+            name: "subdivisionLimit",
+            transform: (subdivisionLimit) => subdivisionLimit > 0 ? subdivisionLimit : undefined
         },
         {
             name: "showAsPies",

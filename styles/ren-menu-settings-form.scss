@@ -226,13 +226,15 @@
 
     &__number-input
     {
-        width: 4.5rem;
+        width: 3.5rem;
+        flex: none;
         font: inherit;
     }
 
     &__unit
     {
         color: #777777;
+        white-space: nowrap;
     }
 
     &__slider

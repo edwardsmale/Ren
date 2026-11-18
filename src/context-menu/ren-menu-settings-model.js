@@ -39,6 +39,10 @@
  *     out, as are links and the items only shown in tech mode.
  * Within a group, its controls come before its subgroups, and are otherwise in menu order.
  *
+ * A submenu with isChoiceLed, whose first run is a choice and whose other items are settings for
+ * what it chooses, is that choice, labelled with the submenu's text, with those settings as its
+ * children.  It's a control, so it keeps its place as they come and go.
+ *
  * options.includeHidden keeps the items the menu hides for now, marked isHidden, so that a form
  * built again after a change has the same controls, only some of them unavailable.  An item with
  * omitWhenHidden is left out all the same, for one that only applies to some settings, such as
@@ -453,10 +457,22 @@ Ren.MenuSettingsModel = (() => {
      * Gets the node for a submenu or section: a group headed by its name or, where it comes to a
      * single control, that control, a choice taking the name as its label.
      */
-    const createGroupOrControl = (heading, title, key, nodes) => {
+    const createGroupOrControl = (heading, title, key, nodes, isChoiceLed) => {
 
         if (nodes.length === 1 && nodes[0].type === "choice" && !nodes[0].label) {
             return Object.assign(nodes[0], { label: heading, title: title || nodes[0].title, key });
+        }
+
+        // A submenu whose choice leads the settings that follow it stays that choice, wherever the
+        // settings come and go, with them beneath it as its children.
+        if (isChoiceLed && nodes.length > 1 && nodes[0].type === "choice" && !nodes[0].label) {
+
+            return Object.assign(nodes[0], {
+                label: heading,
+                title: title || nodes[0].title,
+                key,
+                children: nodes.slice(1)
+            });
         }
 
         if (nodes.length === 1 && nodes[0].type !== "group") return nodes[0];
@@ -579,7 +595,10 @@ Ren.MenuSettingsModel = (() => {
                     return { kind: "node", node: createMenuNode(item, label, title, key, nodes) };
                 }
 
-                return { kind: "node", node: createGroupOrControl(label, title, key, nodes) };
+                return {
+                    kind: "node",
+                    node: createGroupOrControl(label, title, key, nodes, !!item.isChoiceLed)
+                };
             }
 
             if (item.action && ELLIPSIS.test(text)) {

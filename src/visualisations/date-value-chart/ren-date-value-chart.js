@@ -1208,6 +1208,7 @@ Ren.CreateDateValueChart = (() => {
         props.subdivideColumn = visualisation.subdivideColumn || null;
         props.subdivisionLabels = visualisation.subdivisionLabels || "names";
         props.subdivisionLabelPlacement = visualisation.subdivisionLabelPlacement || "inside";
+        props.subdivisionLimit = visualisation.subdivisionLimit > 0 ? visualisation.subdivisionLimit : null;
 
         // A share of each pie's radius; left undefined when unset, for no hole.
         props.pieHoleRadius = visualisation.pieHoleRadius !== undefined

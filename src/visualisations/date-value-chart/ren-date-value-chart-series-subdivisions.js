@@ -44,8 +44,12 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         Around: "around"
     };
 
-    // Any smaller bands are gathered into one, as they would be too thin to tell apart.
+    // Any smaller bands are gathered into one, as they would be too thin to tell apart.  The chart
+    // can be set to draw fewer or more, as subdivisionLimit, from MIN_LIMIT to MAX_LIMIT, the last
+    // of them being the gathered one.
     const MAX_SUBDIVISIONS = 20;
+    const MIN_LIMIT = 2;
+    const MAX_LIMIT = 50;
 
     const NO_SUBDIVISIONS = [];
 
@@ -141,18 +145,26 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         && getLabelPlacement(props) === LABEL_PLACEMENTS.Around;
 
     /**
-     * Gathers the smallest of the subdivisions, which are in order of size, into one where there
-     * are more than are drawn.
+     * Gets the most subdivisions a bar or slice is drawn with: the chart's subdivisionLimit, or
+     * MAX_SUBDIVISIONS where it has none.
      */
-    const gatherSmallest = (subdivisions) => {
+    const getLimit = (props) => props.subdivisionLimit > 0
+        ? Math.min(MAX_LIMIT, Math.max(MIN_LIMIT, Math.floor(props.subdivisionLimit)))
+        : MAX_SUBDIVISIONS;
 
-        if (subdivisions.length <= MAX_SUBDIVISIONS) return subdivisions;
+    /**
+     * Gathers the smallest of the subdivisions, which are in order of size, into one where there
+     * are more than the limit.
+     */
+    const gatherSmallest = (subdivisions, limit) => {
 
-        const kept = subdivisions.slice(0, MAX_SUBDIVISIONS - 1);
+        if (subdivisions.length <= limit) return subdivisions;
+
+        const kept = subdivisions.slice(0, limit - 1);
         const otherColumnValues = [];
         let otherValue = 0;
 
-        for (let i = MAX_SUBDIVISIONS - 1; i < subdivisions.length; i++) {
+        for (let i = limit - 1; i < subdivisions.length; i++) {
 
             otherValue += subdivisions[i].value;
             otherColumnValues.push(subdivisions[i].columnValues[0]);
@@ -171,7 +183,7 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
      * Aggregates rows by the column's values, keeping the values on the same side of nothing as
      * their total, as a bar runs only one way from its baseline.  Largest first.
      */
-    const buildSubdivisions = (rows, groupingEntry, column, valueHeading, binnedDate) => {
+    const buildSubdivisions = (rows, groupingEntry, column, valueHeading, binnedDate, limit) => {
 
         const rowsByValue = new Map();
 
@@ -232,7 +244,7 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
 
         kept.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
-        const subdivisions = gatherSmallest(kept);
+        const subdivisions = gatherSmallest(kept, limit);
 
         for (let i = 0; i < subdivisions.length; i++) {
 
@@ -278,7 +290,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
             subdivisionsByRows.set(rows, subdivisionsByKey);
         }
 
-        const key = groupingEntry.groupingSignature + "\n" + column + "\n" + valueHeading;
+        const limit = getLimit(props);
+        const key = groupingEntry.groupingSignature + "\n" + column + "\n" + valueHeading + "\n" + limit;
         let subdivisions = subdivisionsByKey.get(key);
 
         if (!subdivisions) {
@@ -288,7 +301,8 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
                 groupingEntry,
                 column,
                 valueHeading,
-                aggregatedRow[groupingEntry.dateHeading]
+                aggregatedRow[groupingEntry.dateHeading],
+                limit
             );
 
             subdivisionsByKey.set(key, subdivisions);
@@ -1114,6 +1128,9 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         LABEL_CONTENTS,
         LABEL_PLACEMENTS,
         MAX_SUBDIVISIONS,
+        MIN_LIMIT,
+        MAX_LIMIT,
+        getLimit,
         isActive,
         getLabelContent,
         getLabelPlacement,

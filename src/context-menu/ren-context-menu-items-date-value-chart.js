@@ -625,6 +625,9 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             text,
             title,
             visible: arePieSubdivisionsLabelled,
+            // Left out of the settings window, rather than greyed out, while there are no pie
+            // subdivision labels to place.
+            omitWhenHidden: true,
             action: () => {
 
                 props.subdivisionLabelPlacement = placement;
@@ -660,6 +663,66 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             ]
         };
 
+        // How many subdivisions each bar or slice is drawn with, the smallest beyond them gathered
+        // into one, offered while there are subdivisions.
+        const subdivisionLimitMenuItem = {
+            text: "Subdivisions shown...",
+            id: "subdivision-limit",
+            title: "Limit the subdivisions of each bar or slice to the largest ones, gathering the rest",
+            visible: () => Ren.DateValueChart_SeriesSubdivisions.isActive(props),
+            omitWhenHidden: true,
+            action: () => {
+
+                const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
+                let pendingLimit;
+                let isRedrawPending = false;
+
+                // A burst of changes, as when the slider is dragged, is redrawn for its last.
+                const applyPendingLimit = () => {
+
+                    isRedrawPending = false;
+
+                    if (Subdivisions.getLimit(props) === pendingLimit) return;
+
+                    const isDefault = pendingLimit === Subdivisions.MAX_SUBDIVISIONS;
+
+                    visualisation.subdivisionLimit = isDefault ? undefined : pendingLimit;
+                    props.subdivisionLimit = isDefault ? null : pendingLimit;
+
+                    commitRedraw();
+                };
+
+                Ren.CreateNumberEditorPopupWindow(
+                    "Subdivisions Shown",
+                    Subdivisions.getLimit(props),
+                    value => {
+
+                        pendingLimit = Math.min(
+                            Subdivisions.MAX_LIMIT,
+                            Math.max(Subdivisions.MIN_LIMIT, Math.round(value))
+                        );
+
+                        if (isRedrawPending) return;
+
+                        isRedrawPending = true;
+                        setTimeout(applyPendingLimit, 0);
+                    },
+                    {
+                        label: "Largest subdivisions",
+                        min: Subdivisions.MIN_LIMIT,
+                        max: Subdivisions.MAX_LIMIT,
+                        step: 1,
+                        width: 200,
+                        height: 90,
+                        showSlider: true,
+                        applyTypedValuesOnEnter: true,
+                        centredOnPoint: Ren.LastRightClickPosition,
+                        closeWhenFocusLost: true
+                    }
+                );
+            }
+        };
+
         // --- Menu-item modules ------------------------------------------------------------
 
         // The items live in the -appearance, -series-columns and -data-settings modules.  This is
@@ -689,6 +752,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             regroupData,
             commitRedraw,
             rebuildVisualisation,
+            subdivisionLimitMenuItem,
             subdivisionLabelsMenuItem
         };
 
@@ -720,9 +784,13 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             reinstateOtherSeriesMenuItem,
             reinstateRemovedSeriesMenuItem,
             splitDataMenuItem,
+            subdivideDataMenuItem,
             dateColumnMenuItem,
             columnPickers
         } = Ren.ContextMenuItems_DateValueChart_SeriesColumns(chart);
+
+        // As the Show picker offers it.
+        const seriesLimitMenuItem = Ren.DateValueChart_SeriesLimit.getMenuItem(props);
 
         const {
             trendLineMenuItem,
@@ -883,6 +951,8 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             addDataSeriesMenuItem,
             dateColumnMenuItem,
             splitDataMenuItem,
+            seriesLimitMenuItem,
+            subdivideDataMenuItem,
             filterByMenuItem,
             crossFilteringMenuItem,
             { section: "Chart data", text: "-" },

@@ -1072,6 +1072,9 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         Ren.DateValueChart_StyleUpdater.defaultLabelFontSizes.seriesNamesInBars
     );
 
+    // Left out of the settings window, rather than greyed out, as "Names in bars" is.
+    seriesNamesInBarsFontSizeMenuItem.omitWhenHidden = true;
+
     // Offered where any bar series shows its name, or the bars' subdivisions are labelled.
     seriesNamesInBarsFontSizeMenuItem.visible = () => {
 

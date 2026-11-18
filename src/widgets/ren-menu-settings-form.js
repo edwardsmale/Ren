@@ -289,7 +289,8 @@ Ren.MenuSettingsForm = (container, options) => {
             return isNaN(value) ? null : Math.min(node.max, Math.max(node.min, value));
         };
 
-        // As the editor it stands in for, a change shows as it is made and is kept once done.
+        // As the editor it stands in for, a change shows as it is made and is kept once done.  Where
+        // typed values wait for Enter, the slider's still show as it's slid.
         const apply = (from, isDone) => {
 
             const value = readValue(from);
@@ -299,7 +300,9 @@ Ren.MenuSettingsForm = (container, options) => {
             if (from !== input) input.value = String(value);
             if (slider && from !== slider) slider.value = String(value);
 
-            if (!node.applyOnEnterOnly || isDone) runAction(() => node.onChange(value));
+            const isTyped = from === input;
+
+            if (!node.applyOnEnterOnly || !isTyped || isDone) runAction(() => node.onChange(value));
 
             if (isDone) change(() => node.onCommit && node.onCommit(), node.key);
         };
@@ -483,13 +486,37 @@ Ren.MenuSettingsForm = (container, options) => {
         return row;
     };
 
+    /**
+     * Renders a choice, with the settings for what it chooses, where it has any (see
+     * Ren.MenuSettingsModel's isChoiceLed), set in beneath it.
+     */
+    const renderChoice = (node, depth) => {
+
+        const row = isShownAsRadios(node) ? renderChoiceRadios(node) : renderChoiceSelect(node);
+
+        if (!node.children?.length) return row;
+
+        const settings = create("div", "group")
+            ._addClass(CLASS_NAME + "__group--depth-" + Math.min(depth + 1, 3))
+            ._addClass(CLASS_NAME + "__choice-settings");
+
+        node.children.forEach(child => {
+
+            const element = renderNode(child, depth + 1);
+
+            if (element) settings._append(element);
+        });
+
+        return create("div", "choice-with-settings")._append(row, settings);
+    };
+
     const renderNode = (node, depth) => {
 
         switch (node.type) {
 
             case "group": return renderGroup(node, depth);
             case "toggle": return renderToggle(node);
-            case "choice": return isShownAsRadios(node) ? renderChoiceRadios(node) : renderChoiceSelect(node);
+            case "choice": return renderChoice(node, depth);
             case "number": return renderNumber(node);
             case "text": return renderText(node);
             case "button": return renderButton(node);
@@ -774,7 +801,13 @@ Ren.MenuSettingsForm = (container, options) => {
                 !option.isHidden || seenKeys.has(getOptionKey(node, option))
             );
 
-            return options.length ? Object.assign({}, node, { options }) : null;
+            if (!options.length) return null;
+
+            const shown = Object.assign({}, node, { options });
+
+            if (node.children) shown.children = node.children.map(getShown).filter(Boolean);
+
+            return shown;
         }
 
         return !node.isHidden || seenKeys.has(node.key) ? node : null;

@@ -891,7 +891,11 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         appendColumnTypeGroups(items, groups);
 
         if (props.subdivideColumn) {
-            items.push(Ren.MENU_SEPARATOR, chart.subdivisionLabelsMenuItem);
+            items.push(
+                Ren.MENU_SEPARATOR,
+                chart.subdivisionLimitMenuItem,
+                chart.subdivisionLabelsMenuItem
+            );
         }
 
         return items;
@@ -915,6 +919,23 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         }
 
         return false;
+    };
+
+    // As the Subdivide by picker offers it, and so in the settings window too.  Getter so the
+    // columns already used are left out of the submenu as they change.
+    const subdivideDataMenuItem = {
+        section: "Chart data",
+        text: "Subdivide by",
+        id: "subdivide-by",
+        // So that the settings window keeps the column picked where it is, with the subdivision
+        // labels beneath it while there are subdivisions.
+        isChoiceLed: true,
+        title: "The column the bars or slices are subdivided by",
+        visible: hasSubdivideColumn,
+        get submenu() {
+
+            return buildSubdivideColumnMenuItems();
+        }
     };
 
     /**
@@ -1029,6 +1050,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         reinstateOtherSeriesMenuItem,
         reinstateRemovedSeriesMenuItem,
         splitDataMenuItem,
+        subdivideDataMenuItem,
         columnPickers
     };
 };
