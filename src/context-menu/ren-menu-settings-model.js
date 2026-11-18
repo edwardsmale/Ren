@@ -7,7 +7,7 @@
  * The result is a tree of nodes:
  *   { type: "group", heading, title, key, children }
  *   { type: "toggle", label, title, key, checked, item }
- *   { type: "choice", label, title, key, options: [{ label, title, selected, item }] }
+ *   { type: "choice", label, title, key, options: [{ label, title, selected, item }], children }
  *   { type: "number", label, title, key, value, min, max, step, unit, showSlider,
  *     applyOnEnterOnly, onChange, onCommit }
  *   { type: "text", label, title, key, value, onApply }
@@ -198,21 +198,40 @@ Ren.MenuSettingsModel = (() => {
         return score;
     };
 
-    const createChoice = (run) => ({
+    /**
+     * Gets an option of a choice, from a tickable item or a toggle.
+     */
+    const toOption = (source, selected) => ({
+        label: source.label,
+        title: source.title,
+        selected: !!selected,
+        isHidden: !!source.isHidden,
+        item: source.item
+    });
+
+    /**
+     * Gets whether all of a group's nodes, or a choice's options, are hidden, so that it is too.
+     */
+    const isAllHidden = (nodes) => nodes.length > 0 && nodes.every(node => node.isHidden);
+
+    /**
+     * Gets a choice, as yet unlabelled, hidden where all its options are.
+     */
+    const createChoiceNode = (key, options, isUnnamed) => ({
         type: "choice",
         label: null,
         title: null,
-        key: run[0].key,
-        isUnnamed: run.every(leaf => !leaf.id),
-        isHidden: run.every(leaf => leaf.isHidden),
-        options: run.map(leaf => ({
-            label: leaf.label,
-            title: leaf.title,
-            selected: leaf.ticked,
-            isHidden: leaf.isHidden,
-            item: leaf.item
-        }))
+        key,
+        isUnnamed,
+        isHidden: isAllHidden(options),
+        options
     });
+
+    const createChoice = (run) => createChoiceNode(
+        run[0].key,
+        run.map(leaf => toOption(leaf, leaf.ticked)),
+        run.every(leaf => !leaf.id)
+    );
 
     const createToggle = (leaf, isAlone) => ({
         type: "toggle",
@@ -292,14 +311,6 @@ Ren.MenuSettingsModel = (() => {
         ...nodes.filter(node => node.type === "group")
     ];
 
-    const toOption = (toggle) => ({
-        label: toggle.label,
-        title: toggle.title,
-        selected: toggle.checked,
-        isHidden: toggle.isHidden,
-        item: toggle.item
-    });
-
     const countSelected = (options) => options.filter(option => option.selected).length;
 
     /**
@@ -310,7 +321,7 @@ Ren.MenuSettingsModel = (() => {
     const arePartsOfOneChoice = (first, second) => {
 
         const isUnlabelledChoice = (node) => node.type === "choice" && !node.label;
-        const getOptions = (node) => node.type === "choice" ? node.options : [toOption(node)];
+        const getOptions = (node) => node.type === "choice" ? node.options : [toOption(node, node.checked)];
 
         const isJoinable =
             (isUnlabelledChoice(first) && isUnlabelledChoice(second) &&
@@ -352,7 +363,7 @@ Ren.MenuSettingsModel = (() => {
      */
     const createChoiceOfToggles = (toggles) => {
 
-        const options = toggles.map(toOption);
+        const options = toggles.map(toggle => toOption(toggle, toggle.checked));
         const selected = toggles.find(toggle => toggle.checked);
 
         if (toggles[0].exclusiveGroup) {
@@ -361,22 +372,14 @@ Ren.MenuSettingsModel = (() => {
                 label: "None",
                 title: null,
                 selected: !selected,
-                isHidden: false,
+                isHidden: isAllHidden(options),
                 item: selected
                     ? { action: () => selected.item.action.apply(null, selected.item.actionParameters ?? []) }
                     : null
             });
         }
 
-        return {
-            type: "choice",
-            label: null,
-            title: null,
-            key: toggles[0].key,
-            isUnnamed: false,
-            isHidden: toggles.every(toggle => toggle.isHidden),
-            options
-        };
+        return createChoiceNode(toggles[0].key, options, false);
     };
 
     /**
@@ -435,49 +438,47 @@ Ren.MenuSettingsModel = (() => {
             if (previous.type === "choice") {
 
                 previous.options = previous.options.concat(
-                    node.type === "choice" ? node.options : [toOption(node)]
+                    node.type === "choice" ? node.options : [toOption(node, node.checked)]
                 );
             }
             else {
 
                 // The option on its own leads, as "None" does, and the choice takes its place.
-                node.options = [toOption(previous)].concat(node.options);
+                node.options = [toOption(previous, previous.checked)].concat(node.options);
                 joined[joined.length - 1] = node;
             }
 
             const choice = Ren.ArrayUtils.last(joined);
 
-            choice.isHidden = choice.options.every(option => option.isHidden);
+            choice.isHidden = isAllHidden(choice.options);
         }
 
         return joined;
     };
 
+    const createGroup = (heading, title, key, children) =>
+        ({ type: "group", heading, title, key, children, isHidden: isAllHidden(children) });
+
     /**
      * Gets the node for a submenu or section: a group headed by its name or, where it comes to a
-     * single control, that control, a choice taking the name as its label.
+     * single control, that control.  An unlabelled choice takes the name as its label, both alone
+     * and where it leads the settings for what it chooses (isChoiceLed), which are then its
+     * children, so that it keeps its place as they come and go.
      */
     const createGroupOrControl = (heading, title, key, nodes, isChoiceLed) => {
 
-        if (nodes.length === 1 && nodes[0].type === "choice" && !nodes[0].label) {
-            return Object.assign(nodes[0], { label: heading, title: title || nodes[0].title, key });
+        const [first, ...rest] = nodes;
+
+        if (first.type === "choice" && !first.label && (!rest.length || isChoiceLed)) {
+
+            Object.assign(first, { label: heading, title: title || first.title, key });
+
+            if (rest.length) first.children = rest;
+
+            return first;
         }
 
-        // A submenu whose choice leads the settings that follow it stays that choice, wherever the
-        // settings come and go, with them beneath it as its children.
-        if (isChoiceLed && nodes.length > 1 && nodes[0].type === "choice" && !nodes[0].label) {
-
-            return Object.assign(nodes[0], {
-                label: heading,
-                title: title || nodes[0].title,
-                key,
-                children: nodes.slice(1)
-            });
-        }
-
-        if (nodes.length === 1 && nodes[0].type !== "group") return nodes[0];
-
-        return { type: "group", heading, title, key, children: nodes, isHidden: isAllHidden(nodes) };
+        return nodes.length === 1 && first.type !== "group" ? first : createGroup(heading, title, key, nodes);
     };
 
     /**
@@ -492,11 +493,6 @@ Ren.MenuSettingsModel = (() => {
 
         return node;
     };
-
-    /**
-     * Gets whether everything in a group is hidden, so that the group is too.
-     */
-    const isAllHidden = (nodes) => nodes.length > 0 && nodes.every(node => node.isHidden);
 
     const createBuilder = (settings) => {
 
@@ -676,10 +672,6 @@ Ren.MenuSettingsModel = (() => {
         };
 
         /**
-         * Builds the nodes for a root menu, one group per section, in the order the menu shows
-         * them.  Items in no section come first, ungrouped.
-         */
-        /**
          * Builds the nodes for a list of items in sections, as a menu shows them: under a heading
          * each, where there is more than one section, or always for a root menu.  Items in no
          * section come first, ungrouped.
@@ -718,22 +710,9 @@ Ren.MenuSettingsModel = (() => {
                 if (!children.length) continue;
 
                 // A root menu's sections are kept whole, as its headings are what it is read by.
-                if (section.name && isRoot) {
-                    nodes.push({
-                        type: "group",
-                        heading: section.name,
-                        title: null,
-                        key,
-                        children,
-                        isHidden: isAllHidden(children)
-                    });
-                }
-                else if (section.name) {
-                    nodes.push(createGroupOrControl(section.name, null, key, children));
-                }
-                else {
-                    children.forEach(child => nodes.push(child));
-                }
+                if (!section.name) nodes.push(...children);
+                else if (isRoot) nodes.push(createGroup(section.name, null, key, children));
+                else nodes.push(createGroupOrControl(section.name, null, key, children));
             }
 
             return placeControlsFirst(nodes);

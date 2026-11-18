@@ -104,9 +104,7 @@
     }
 
     // Each level down is set in a little further, under a lighter heading.
-    &__group--depth-1,
-    &__group--depth-2,
-    &__group--depth-3
+    &__group--nested
     {
         margin-left: 8px;
     }
@@ -119,9 +117,7 @@
         font-weight: bold;
         font-size: 0.875rem;
 
-        .ren-menu-settings-form__group--depth-1 > &,
-        .ren-menu-settings-form__group--depth-2 > &,
-        .ren-menu-settings-form__group--depth-3 > &
+        .ren-menu-settings-form__group--nested > &
         {
             border-bottom: none;
             font-size: 0.8125rem;

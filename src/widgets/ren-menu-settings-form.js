@@ -1,7 +1,8 @@
 /**
  * Shows the settings Ren.MenuSettingsModel works out from a menu's items as a form: a heading for
  * each group, and a row for each control, its label on the left.  A choice of a few options is a
- * set of radio buttons, outlined as one, and a longer one a dropdown.
+ * set of radio buttons, outlined as one, and a longer one a dropdown.  A choice with settings for
+ * what it chooses has them set in beneath it.
  *
  * Options:
  *   runAction(fn) - runs what a control does, as the menu would have run it, e.g. as if opened on
@@ -25,11 +26,13 @@
 Ren.MenuSettingsForm = (container, options) => {
 
     const CLASS_NAME = "ren-menu-settings-form";
+    const UNAVAILABLE_CLASS_NAME = CLASS_NAME + "--unavailable";
 
     // The most options shown as radio buttons rather than a dropdown, beyond which they would take
     // up too much of the form.
     const MAX_RADIO_OPTIONS = 6;
 
+    const GENERAL_SUBTAB_TITLE = "General";
 
     const runAction = (options && options.runAction) || (fn => fn());
     const onChanged = (options && options.onChanged) || (() => {});
@@ -43,14 +46,12 @@ Ren.MenuSettingsForm = (container, options) => {
     // The controls and options that have been available while the form has been open.
     const seenKeys = new Set();
 
-    // Updates each shown control's value from its node, by key.
-    let valueUpdaters = new Map();
-    let groupUpdaters = new Map();
+    // Shows a node in the control or group shown for the node with its key, as the form is
+    // updated in place.
+    let updaters = new Map();
 
     // The subtab shown, by its title, kept as the form is rebuilt.
     let selectedSubtabTitle = null;
-
-    const GENERAL_SUBTAB_TITLE = "General";
 
     const runItem = (item) => runAction(() => item.action.apply(null, item.actionParameters ?? []));
 
@@ -61,8 +62,6 @@ Ren.MenuSettingsForm = (container, options) => {
         runAction(fn);
         onChanged();
     };
-
-    const isShownAsRadios = (node) => node.options.length <= MAX_RADIO_OPTIONS;
 
     /**
      * Describes the controls a model has, so that a model with the same ones is known to be.
@@ -80,15 +79,7 @@ Ren.MenuSettingsForm = (container, options) => {
     const create = (tagName, className) =>
         Ren.HtmlUtils.create(tagName)._addClass(CLASS_NAME + "__" + className);
 
-    /**
-     * Shows whether a node is hidden by the menu, greying out its element and disabling the given
-     * controls.
-     */
-    const showHidden = (element, controls, isHidden) => {
-
-        element.classList.toggle(CLASS_NAME + "--unavailable", !!isHidden);
-        controls.forEach(control => { control.disabled = !!isHidden; });
-    };
+    const isFocused = (element) => document.activeElement === element;
 
     const createRow = (node, control, isWide) => {
 
@@ -96,26 +87,22 @@ Ren.MenuSettingsForm = (container, options) => {
 
         if (node.title) row.title = node.title;
 
-        if (isWide) {
+        if (isWide) row._addClass(CLASS_NAME + "__row--wide");
+        else row._append(create("label", "label")._textContent(node.label || ""));
 
-            row._addClass(CLASS_NAME + "__row--wide");
-        }
-        else {
-
-            row._append(create("label", "label")._textContent(node.label || ""));
-        }
-
-        row._append(control);
-
-        return row;
+        return row._append(control);
     };
+
+    /*
+     * Each control's renderer gives { row, inputs, show(node) }: its row, the inputs disabled
+     * while the menu hides it, and how to show a node's value in it, as one with its key is
+     * updated.  The node shown is kept, so that what is done with the control is done with it.
+     */
 
     const renderToggle = (node) => {
 
         const control = create("label", "toggle");
         const checkbox = Ren.HtmlUtils.create("input")._set("type", "checkbox")._attr("data-key", node.key);
-
-        checkbox.checked = node.checked;
 
         checkbox.addEventListener("change", () => {
 
@@ -125,30 +112,24 @@ Ren.MenuSettingsForm = (container, options) => {
 
         control._append(checkbox, create("span", "toggle-text")._textContent(node.label));
 
-        const row = createRow(node, control, true);
+        return {
+            row: createRow(node, control, true),
+            inputs: [checkbox],
+            show: (newNode) => {
 
-        const showValue = () => {
-
-            checkbox.checked = node.checked;
-            showHidden(row, [checkbox], node.isHidden);
+                node = newNode;
+                checkbox.checked = node.checked;
+            }
         };
-
-        showValue();
-
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-            showValue();
-        });
-
-        return row;
     };
 
-    const renderChoiceRadios = (node) => {
+    const renderRadios = (node) => {
 
         const control = create("div", "radios")._attr("role", "radiogroup");
         // Unique in the page, as other forms' radio buttons are in it too.
         const name = CLASS_NAME + "-radio-" + (++Ren.MenuSettingsForm.radioNameCount);
+
+        if (node.label) control.setAttribute("aria-label", node.label);
 
         const labels = node.options.map((option, index) => {
 
@@ -179,36 +160,28 @@ Ren.MenuSettingsForm = (container, options) => {
             return label;
         });
 
-        if (node.label) control.setAttribute("aria-label", node.label);
+        return {
+            row: createRow(node, control, !node.label)._addClass(CLASS_NAME + "__row--radios"),
+            // Each is disabled with its option (see show).
+            inputs: [],
+            show: (newNode) => {
 
-        const row = createRow(node, control, !node.label)._addClass(CLASS_NAME + "__row--radios");
+                node = newNode;
 
-        const showSelected = () => {
+                labels.forEach((label, index) => {
 
-            labels.forEach((label, index) => {
+                    const option = node.options[index];
+                    const radio = label.querySelector("input");
 
-                const option = node.options[index];
-                const radio = label.querySelector("input");
-
-                radio.checked = !!option.selected;
-                showHidden(label, [radio], option.isHidden || node.isHidden);
-            });
-
-            row.classList.toggle(CLASS_NAME + "--unavailable", !!node.isHidden);
+                    radio.checked = !!option.selected;
+                    radio.disabled = !!(option.isHidden || node.isHidden);
+                    label.classList.toggle(UNAVAILABLE_CLASS_NAME, !!option.isHidden && !node.isHidden);
+                });
+            }
         };
-
-        showSelected();
-
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-            showSelected();
-        });
-
-        return row;
     };
 
-    const renderChoiceSelect = (node) => {
+    const renderSelect = (node) => {
 
         const select = create("select", "select")._attr("data-key", node.key);
 
@@ -228,24 +201,6 @@ Ren.MenuSettingsForm = (container, options) => {
             return element;
         });
 
-        const row = createRow(node, select, false);
-
-        const showSelected = () => {
-
-            const selectedIndex = node.options.findIndex(option => option.selected);
-
-            optionElements.forEach((element, index) => {
-                element.disabled = !!node.options[index].isHidden;
-            });
-
-            blankOption.hidden = selectedIndex >= 0;
-            select.value = selectedIndex >= 0 ? String(selectedIndex) : "";
-
-            showHidden(row, [select], node.isHidden);
-        };
-
-        showSelected();
-
         select.addEventListener("change", () => {
 
             const option = node.options[parseInt(select.value)];
@@ -253,34 +208,40 @@ Ren.MenuSettingsForm = (container, options) => {
             if (option && !option.selected) change(() => runItem(option.item), node.key);
         });
 
-        valueUpdaters.set(node.key, newNode => {
+        return {
+            row: createRow(node, select, false),
+            inputs: [select],
+            show: (newNode) => {
 
-            node = newNode;
-            if (document.activeElement !== select) showSelected();
-        });
+                node = newNode;
 
-        return row;
+                if (isFocused(select)) return;
+
+                const selectedIndex = node.options.findIndex(option => option.selected);
+
+                optionElements.forEach((element, index) => {
+                    element.disabled = !!node.options[index].isHidden;
+                });
+
+                blankOption.hidden = selectedIndex >= 0;
+                select.value = selectedIndex >= 0 ? String(selectedIndex) : "";
+            }
+        };
     };
 
     const renderNumber = (node) => {
 
         const control = create("div", "number");
 
-        const createInput = (type, className) => {
-
-            const input = create("input", className)
-                ._set("type", type)
-                ._set("min", String(node.min))
-                ._set("max", String(node.max))
-                ._set("step", String(node.step));
-
-            input.value = String(node.value ?? "");
-
-            return input;
-        };
+        const createInput = (type, className) => create("input", className)
+            ._set("type", type)
+            ._set("min", String(node.min))
+            ._set("max", String(node.max))
+            ._set("step", String(node.step));
 
         const input = createInput("number", "number-input")._attr("data-key", node.key);
         const slider = node.showSlider ? createInput("range", "slider") : null;
+        const inputs = [input, slider].filter(Boolean);
 
         const readValue = (from) => {
 
@@ -297,17 +258,14 @@ Ren.MenuSettingsForm = (container, options) => {
 
             if (value === null) return;
 
-            if (from !== input) input.value = String(value);
-            if (slider && from !== slider) slider.value = String(value);
+            inputs.forEach(other => { if (other !== from) other.value = String(value); });
 
-            const isTyped = from === input;
-
-            if (!node.applyOnEnterOnly || !isTyped || isDone) runAction(() => node.onChange(value));
+            if (!node.applyOnEnterOnly || from !== input || isDone) runAction(() => node.onChange(value));
 
             if (isDone) change(() => node.onCommit && node.onCommit(), node.key);
         };
 
-        [input, slider].filter(Boolean).forEach(element => {
+        inputs.forEach(element => {
 
             element.addEventListener("input", () => apply(element, false));
             element.addEventListener("change", () => apply(element, true));
@@ -318,29 +276,23 @@ Ren.MenuSettingsForm = (container, options) => {
         if (node.unit) control._append(create("span", "unit")._textContent(node.unit));
         if (slider) control._append(slider);
 
-        const row = createRow(node, control, false);
-        const inputs = [input, slider].filter(Boolean);
+        return {
+            row: createRow(node, control, false),
+            inputs,
+            show: (newNode) => {
 
-        showHidden(row, inputs, node.isHidden);
+                node = newNode;
 
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-
-            if (document.activeElement !== input) input.value = String(newNode.value ?? "");
-            if (slider && document.activeElement !== slider) slider.value = String(newNode.value ?? "");
-
-            showHidden(row, inputs, newNode.isHidden);
-        });
-
-        return row;
+                inputs.forEach(element => {
+                    if (!isFocused(element)) element.value = String(node.value ?? "");
+                });
+            }
+        };
     };
 
     const renderText = (node) => {
 
         const input = create("input", "text-input")._set("type", "text")._attr("data-key", node.key);
-
-        input.value = node.value;
 
         input.addEventListener("change", () => change(() => node.onApply(input.value), node.key));
 
@@ -349,18 +301,16 @@ Ren.MenuSettingsForm = (container, options) => {
             if (e.key === "Enter") input.blur();
         });
 
-        const row = createRow(node, input, false);
+        return {
+            row: createRow(node, input, false),
+            inputs: [input],
+            show: (newNode) => {
 
-        showHidden(row, [input], node.isHidden);
+                node = newNode;
 
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-            if (document.activeElement !== input) input.value = newNode.value;
-            showHidden(row, [input], newNode.isHidden);
-        });
-
-        return row;
+                if (!isFocused(input)) input.value = node.value;
+            }
+        };
     };
 
     const renderButton = (node) => {
@@ -372,17 +322,11 @@ Ren.MenuSettingsForm = (container, options) => {
 
         button.addEventListener("click", () => change(() => runItem(node.item), node.key));
 
-        const row = createRow(node, button, true);
-
-        showHidden(row, [button], node.isHidden);
-
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-            showHidden(row, [button], newNode.isHidden);
-        });
-
-        return row;
+        return {
+            row: createRow(node, button, true),
+            inputs: [button],
+            show: (newNode) => { node = newNode; }
+        };
     };
 
     /**
@@ -466,70 +410,74 @@ Ren.MenuSettingsForm = (container, options) => {
             );
         });
 
-        const row = createRow(node, button, false);
+        return {
+            row: createRow(node, button, false),
+            inputs: [button],
+            show: (newNode) => {
 
-        const showValue = () => {
+                node = newNode;
+                value._textContent(node.value);
+            }
+        };
+    };
 
-            value._textContent(node.value);
-            button.disabled = !!node.isHidden;
-            row.classList.toggle(CLASS_NAME + "--unavailable", !!node.isHidden);
+    const CONTROL_RENDERERS = {
+        toggle: renderToggle,
+        number: renderNumber,
+        text: renderText,
+        button: renderButton,
+        menu: renderMenu
+    };
+
+    /**
+     * Renders a control, noting how to show a node with its key in it, greyed out and disabled
+     * where the menu hides it.
+     */
+    const renderControl = (node, renderer) => {
+
+        const { row, inputs, show } = renderer(node);
+
+        const update = (newNode) => {
+
+            show(newNode);
+
+            row.classList.toggle(UNAVAILABLE_CLASS_NAME, !!newNode.isHidden);
+            inputs.forEach(input => { input.disabled = !!newNode.isHidden; });
         };
 
-        showValue();
-
-        valueUpdaters.set(node.key, newNode => {
-
-            node = newNode;
-            showValue();
-        });
+        update(node);
+        updaters.set(node.key, update);
 
         return row;
     };
 
-    /**
-     * Renders a choice, with the settings for what it chooses, where it has any (see
-     * Ren.MenuSettingsModel's isChoiceLed), set in beneath it.
-     */
-    const renderChoice = (node, depth) => {
+    const renderChildren = (parent, nodes, depth) => {
 
-        const row = isShownAsRadios(node) ? renderChoiceRadios(node) : renderChoiceSelect(node);
+        nodes.forEach(node => {
 
-        if (!node.children?.length) return row;
+            const element = renderNode(node, depth);
 
-        const settings = create("div", "group")
-            ._addClass(CLASS_NAME + "__group--depth-" + Math.min(depth + 1, 3))
-            ._addClass(CLASS_NAME + "__choice-settings");
-
-        node.children.forEach(child => {
-
-            const element = renderNode(child, depth + 1);
-
-            if (element) settings._append(element);
+            if (element) parent._append(element);
         });
 
-        return create("div", "choice-with-settings")._append(row, settings);
+        return parent;
     };
 
-    const renderNode = (node, depth) => {
+    const createGroupElement = (key, depth) => {
 
-        switch (node.type) {
+        const group = create("div", "group");
 
-            case "group": return renderGroup(node, depth);
-            case "toggle": return renderToggle(node);
-            case "choice": return renderChoice(node, depth);
-            case "number": return renderNumber(node);
-            case "text": return renderText(node);
-            case "button": return renderButton(node);
-            case "menu": return renderMenu(node);
-            default: return null;
-        }
+        if (key !== null) group._attr("data-group-key", key);
+
+        // Each level down is set in a little further.
+        if (depth > 0) group._addClass(CLASS_NAME + "__group--nested");
+
+        return group;
     };
 
-    function renderGroup(node, depth) {
+    const renderGroup = (node, depth) => {
 
-        const group = create("div", "group")
-            ._addClass(CLASS_NAME + "__group--depth-" + Math.min(depth, 3))
-            ._attr("data-group-key", node.key);
+        const group = createGroupElement(node.key, depth);
 
         if (node.heading) {
 
@@ -540,22 +488,43 @@ Ren.MenuSettingsForm = (container, options) => {
             group._append(heading);
         }
 
-        node.children.forEach(child => {
-
-            const element = renderNode(child, depth + 1);
-
-            if (element) group._append(element);
-        });
+        renderChildren(group, node.children, depth + 1);
 
         // Its heading is greyed out with its controls, where all of them are hidden.
-        const showGroupHidden = (isHidden) =>
-            group.classList.toggle(CLASS_NAME + "__group--unavailable", !!isHidden);
+        const update = (newNode) =>
+            group.classList.toggle(CLASS_NAME + "__group--unavailable", !!newNode.isHidden);
 
-        showGroupHidden(node.isHidden);
-        groupUpdaters.set(node.key, newNode => showGroupHidden(newNode.isHidden));
+        update(node);
+        updaters.set(node.key, update);
 
         return group;
-    }
+    };
+
+    /**
+     * Renders a choice, with the settings for what it chooses, where it has any (see
+     * Ren.MenuSettingsModel's isChoiceLed), set in beneath it.  The two are a group, so that the
+     * choice keeps its place on screen as they come and go.
+     */
+    const renderChoice = (node, depth) => {
+
+        const row = renderControl(node, node.options.length <= MAX_RADIO_OPTIONS ? renderRadios : renderSelect);
+
+        if (!node.children?.length) return row;
+
+        return create("div", "choice")
+            ._attr("data-group-key", node.key)
+            ._append(row, renderChildren(createGroupElement(null, depth + 1), node.children, depth + 1));
+    };
+
+    const renderNode = (node, depth) => {
+
+        if (node.type === "group") return renderGroup(node, depth);
+        if (node.type === "choice") return renderChoice(node, depth);
+
+        const renderer = CONTROL_RENDERERS[node.type];
+
+        return renderer ? renderControl(node, renderer) : null;
+    };
 
     const forEachNode = (node, fn) => {
 
@@ -674,7 +643,7 @@ Ren.MenuSettingsForm = (container, options) => {
 
             const tab = create("button", "subtab")._set("type", "button")._textContent(subtab.title);
 
-            tab.classList.toggle(CLASS_NAME + "--unavailable", subtab.isHidden);
+            tab.classList.toggle(UNAVAILABLE_CLASS_NAME, subtab.isHidden);
 
             tab.addEventListener("click", () => {
 
@@ -693,14 +662,7 @@ Ren.MenuSettingsForm = (container, options) => {
             // Each panel is a group, so that a control in it can be kept in place by it.
             const panel = create("div", "subtab-panel")._attr("data-group-key", subtab.key);
 
-            subtab.nodes.forEach(node => {
-
-                const element = renderNode(node, 0);
-
-                if (element) panel._append(element);
-            });
-
-            panels.push(panel);
+            panels.push(renderChildren(panel, subtab.nodes, 0));
         });
 
         form._append(strip);
@@ -723,30 +685,14 @@ Ren.MenuSettingsForm = (container, options) => {
         const found = findAnchor(anchors);
         const anchorTop = found ? found.element.getBoundingClientRect().top : null;
 
-        valueUpdaters = new Map();
-        groupUpdaters = new Map();
+        updaters = new Map();
 
         const form = Ren.HtmlUtils.create("div")._addClass(CLASS_NAME);
-
         const subtabs = getSubtabs(model);
 
-        if (!model.children.length) {
-
-            form._append(create("div", "empty")._textContent("There are no settings here."));
-        }
-        else if (subtabs) {
-
-            renderSubtabs(form, subtabs);
-        }
-        else {
-
-            model.children.forEach(child => {
-
-                const element = renderNode(child, 0);
-
-                if (element) form._append(element);
-            });
-        }
+        if (!model.children.length) form._append(create("div", "empty")._textContent("There are no settings here."));
+        else if (subtabs) renderSubtabs(form, subtabs);
+        else renderChildren(form, model.children, 0);
 
         Ren.HtmlUtils.enrich(container)._content(form);
 
@@ -786,31 +732,29 @@ Ren.MenuSettingsForm = (container, options) => {
      */
     const getShown = (node) => {
 
+        const shown = Object.assign({}, node);
+
+        if (node.children) shown.children = node.children.map(getShown).filter(Boolean);
+
         if (node.type === "group") {
 
-            const children = node.children.map(getShown).filter(Boolean);
+            if (!shown.children.length && node.key) return null;
 
-            if (!children.length && node.key) return null;
-
-            return Object.assign({}, node, { children, isHidden: children.every(child => child.isHidden) });
-        }
-
-        if (node.type === "choice") {
-
-            const options = node.options.filter(option =>
-                !option.isHidden || seenKeys.has(getOptionKey(node, option))
-            );
-
-            if (!options.length) return null;
-
-            const shown = Object.assign({}, node, { options });
-
-            if (node.children) shown.children = node.children.map(getShown).filter(Boolean);
+            shown.isHidden = shown.children.every(child => child.isHidden);
 
             return shown;
         }
 
-        return !node.isHidden || seenKeys.has(node.key) ? node : null;
+        if (node.type === "choice") {
+
+            shown.options = node.options.filter(option =>
+                !option.isHidden || seenKeys.has(getOptionKey(node, option))
+            );
+
+            return shown.options.length ? shown : null;
+        }
+
+        return !node.isHidden || seenKeys.has(node.key) ? shown : null;
     };
 
     const update = (fullModel) => {
@@ -829,18 +773,9 @@ Ren.MenuSettingsForm = (container, options) => {
 
         forEachNode(model, node => {
 
-            const updateValue = valueUpdaters.get(node.key);
+            const updateNode = updaters.get(node.key);
 
-            if (node.type === "group") {
-
-                const updateGroup = groupUpdaters.get(node.key);
-
-                if (updateGroup) updateGroup(node);
-            }
-            else if (updateValue) {
-
-                updateValue(node);
-            }
+            if (updateNode) updateNode(node);
         });
     };
 
