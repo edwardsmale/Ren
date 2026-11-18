@@ -15,6 +15,10 @@ Replace the pie layout's preset hole sizes with a "Holes" toggle beside "Hole si
 Shrink or abbreviate pie totals that don't fit their holes.
 Move "Estimate last period" to the chart's Dates, off the series menus.
 Tick the aggregation a chart series uses by default, not just one it's given.
+Stop the chart settings window shifting when switching between its series tabs.
+Show "Draw as" and "Labels" under Series on the All Series tab, as on Individual Series.
+Leave bar-only and pie-only settings out of the chart settings window, not greyed out, when they don't apply.
+Give a chart's legend entries the same menu as the series they name.
 
 ## 1.1.20 (2026-11-20)
 

@@ -75,13 +75,32 @@ Ren.DateValueChart_SettingsWindow = (() => {
         return options;
     };
 
+    // What the series are drawn as and how they're labelled, which the chart's menu has with how
+    // the chart looks unless opened on a series.  They're under Series on both series tabs, so
+    // that All Series has them where Individual Series does, but not on the Chart tab, where
+    // their chart-wide options stay with how the chart looks.
+    const SERIES_SECTION_ITEM_IDS = new Set(["chart-type", "chart-labels"]);
+
+    const inSeriesSection = (item) => {
+
+        if (!SERIES_SECTION_ITEM_IDS.has(item.id)) return item;
+
+        const copy = Object.defineProperties({}, Object.getOwnPropertyDescriptors(item));
+
+        Object.defineProperty(copy, "section", { value: "Series", enumerable: true, configurable: true });
+
+        return copy;
+    };
+
     /**
      * Gets the chart's menu items and, for a series, the series' own, which stand in for the
      * chart's of the same id as they do on the series' menu.
      */
-    const collectMenuItems = (visualisation, isForSeries) => {
+    const collectMenuItems = (visualisation, isSeriesTab, isForSeries) => {
 
-        const items = Ren.ContextMenuRegistry.collectItemsForElements(getMenuElements(visualisation));
+        let items = Ren.ContextMenuRegistry.collectItemsForElements(getMenuElements(visualisation));
+
+        if (isSeriesTab) items = items.map(inSeriesSection);
 
         if (!isForSeries) return items;
 
@@ -98,7 +117,7 @@ Ren.DateValueChart_SettingsWindow = (() => {
     const buildModel = (visualisation, runMenu, include, memory, isForSeries) => runMenu(() =>
 
         Ren.MenuSettingsModel.build(
-            collectMenuItems(visualisation, isForSeries),
+            collectMenuItems(visualisation, include === isForSeriesTab, isForSeries),
             {
                 include,
                 isTechMode: Ren.UrlContext.onEditorPage(),
@@ -160,6 +179,7 @@ Ren.DateValueChart_SettingsWindow = (() => {
                 },
                 {
                     title: "All Series",
+                    subjects: { label: "Series", text: "All" },
                     buildModel: () => buildModel(visualisation, runAsChartMenu, isForSeriesTab, allSeriesMemory)
                 },
                 {

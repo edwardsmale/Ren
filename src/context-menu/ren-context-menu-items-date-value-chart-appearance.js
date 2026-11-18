@@ -431,6 +431,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     const seriesNameInBarsMenuItem = {
         text: "Names in bars",
         id: "series-name-in-bars",
+        // Left out of the settings window, rather than greyed out, where there are no bars.
+        omitWhenHidden: true,
         title: "Writes the series' name up each of its bars, shortened where a bar is too short",
         visible: () => getTargetSeriesIndexes().some(
             seriesIndex => getSeriesPropertyAt(seriesIndex, "chartType", null)
@@ -472,6 +474,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     const barLayoutMenuItem = {
         text: "Bar layout",
         id: "bar-layout",
+        // Left out of the settings window, rather than greyed out, where there are no bars.
+        omitWhenHidden: true,
         // Offered whenever any series is drawn as bars, not only the target series, but not on a
         // single-series chart, whose bars have nothing to be laid out against.
         visible: () => {
@@ -866,6 +870,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     const pieLayoutMenuItem = {
         text: "Pie layout",
         id: "pie-layout",
+        // Left out of the settings window, rather than greyed out, where there are no pies.
+        omitWhenHidden: true,
         visible: () => Ren.DateValueChart_Pies.hasPies(props),
         submenu: [
             pieHolesMenuItem,

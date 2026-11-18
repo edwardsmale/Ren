@@ -11,7 +11,9 @@
  *                  settings are of one of several things, such as one of a chart's series, has
  *                  subjects, { label, getOptions }, where getOptions gets [{ key, label }]: a
  *                  dropdown above its settings chooses which, and its key is passed to buildModel
- *                  and the tab's runAction.
+ *                  and the tab's runAction.  A tab whose subjects are fixed, such as all of a
+ *                  chart's series, has { label, text } instead, shown in a header like the
+ *                  dropdown's, so the window keeps its layout as tabs are switched.
  *   runAction    - runs what a control does, as the menu would have run it, where a tab has no
  *                  runAction of its own.
  *
@@ -78,6 +80,9 @@ Ren.MenuSettingsWindow = (() => {
             Ren.NumberUtils.clamp(height, MIN_HEIGHT_PX, Math.min(MAX_HEIGHT_PX, onScreen)) + "px";
     };
 
+    // A tab whose subject is fixed shows it as text in place of a dropdown.
+    const hasFixedSubject = (tab) => tab.subjects?.text !== undefined;
+
     // owner -> { refresh }
     const openWindowsByOwner = new WeakMap();
 
@@ -142,7 +147,7 @@ Ren.MenuSettingsWindow = (() => {
 
             const buildTabModel = (tab) => {
 
-                if (!tab.subjects) return tab.buildModel();
+                if (!tab.subjects || hasFixedSubject(tab)) return tab.buildModel();
 
                 const key = updateSubjects(tab);
 
@@ -176,21 +181,43 @@ Ren.MenuSettingsWindow = (() => {
 
                     const select = Ren.HtmlUtils.create("select")._addClass(CLASS_NAME + "__subject-select");
 
-                    select.addEventListener("change", () => {
+                    let value = select;
 
-                        subjectKeys.set(tab.title, select.value);
-                        forms[options.tabs.indexOf(tab)].update(buildTabModel(tab));
-                    });
+                    if (hasFixedSubject(tab)) {
 
-                    subjectSelects.set(tab.title, select);
+                        // The select is kept, unseen, so that the header is as tall as on the
+                        // tabs that choose, and the window doesn't shift as tabs are switched.
+                        select.disabled = true;
+                        select.tabIndex = -1;
+                        select.setAttribute("aria-hidden", "true");
 
-                    const header = Ren.HtmlUtils.create("label")
+                        value = Ren.HtmlUtils.create("div")
+                            ._addClass(CLASS_NAME + "__subject-fixed")
+                            ._append(
+                                select,
+                                Ren.HtmlUtils.create("span")
+                                    ._addClass(CLASS_NAME + "__subject-text")
+                                    ._textContent(tab.subjects.text)
+                            );
+                    }
+                    else {
+
+                        select.addEventListener("change", () => {
+
+                            subjectKeys.set(tab.title, select.value);
+                            forms[options.tabs.indexOf(tab)].update(buildTabModel(tab));
+                        });
+
+                        subjectSelects.set(tab.title, select);
+                    }
+
+                    const header = Ren.HtmlUtils.create(hasFixedSubject(tab) ? "div" : "label")
                         ._addClass(CLASS_NAME + "__subject")
                         ._append(
                             Ren.HtmlUtils.create("span")
                                 ._addClass(CLASS_NAME + "__subject-label")
                                 ._textContent(tab.subjects.label),
-                            select
+                            value
                         );
 
                     const formContainer = Ren.HtmlUtils.create("div");

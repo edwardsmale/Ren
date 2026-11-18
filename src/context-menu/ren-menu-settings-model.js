@@ -40,7 +40,9 @@
  * Within a group, its controls come before its subgroups, and are otherwise in menu order.
  *
  * options.includeHidden keeps the items the menu hides for now, marked isHidden, so that a form
- * built again after a change has the same controls, only some of them unavailable.
+ * built again after a change has the same controls, only some of them unavailable.  An item with
+ * omitWhenHidden is left out all the same, for one that only applies to some settings, such as
+ * a chart's pie layout, which would only be clutter greyed out.
  *
  * options.memory, a Map kept by the caller between builds, keeps the decisions made on how items
  * are shown, such as whether a run is a choice or toggles, which otherwise depend in part on which
@@ -519,7 +521,7 @@ Ren.MenuSettingsModel = (() => {
             // controls whatever the settings are, rather than moving them as they come and go.
             const isHidden = !looked.value.isVisible;
 
-            if (isHidden && !settings.includeHidden) return null;
+            if (isHidden && (!settings.includeHidden || item.omitWhenHidden)) return null;
 
             const described = describeShown(item, parentKey, looked);
 

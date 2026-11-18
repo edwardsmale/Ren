@@ -25,6 +25,30 @@
     font-weight: normal;
 }
 
+// Fixed text in place of the dropdown, over an unseen one that keeps the header its height.
+.ren-menu-settings-window__subject-fixed
+{
+    display: grid;
+    align-items: center;
+    min-width: 0;
+
+    > *
+    {
+        grid-area: 1 / 1;
+    }
+
+    .ren-menu-settings-window__subject-select
+    {
+        visibility: hidden;
+    }
+}
+
+.ren-menu-settings-window__subject-text
+{
+    padding-left: 4px;
+    font-weight: normal;
+}
+
 .ren-menu-settings-window__tabs
 {
     display: flex;

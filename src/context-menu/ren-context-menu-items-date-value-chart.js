@@ -1027,12 +1027,13 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             getNotForOtherSeries(removeOtherSeriesMenuItem)
         ].concat(buildChartDataMenuItems(buildValuesMenuItem(true)));
 
-        // A legend entry is offered the legend itself too.
+        // A series' row of hovered values is offered the legend itself too.
         const seriesMenuItems = seriesOwnMenuItems.concat([legendMenuItem]);
 
         // A plotted series' menu is its own, so it leads with the data point and the period
         // clicked, unsectioned so that they come before the series they belong to, and ends
-        // with how the whole chart looks, as on the chart around it.
+        // with how the whole chart looks, as on the chart around it.  Its legend entry is offered
+        // the same, the data point and period items hiding as there is neither under the pointer.
         const plottedSeriesMenuItems = [showDataMenuItem, clickedDatesMenuItem, addMarkerMenuItem]
             .concat(seriesOwnMenuItems)
             .concat(chartLooksMenuItems);
@@ -1054,15 +1055,13 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
                 // Only the outermost, as the bars inside a series' group carry its number too.
                 if (seriesElements[i].parentElement.closest("[data-series]")) continue;
 
-                if (chartGroupNode && seriesElements[i].parentNode === chartGroupNode) {
+                const isPlotted = chartGroupNode && seriesElements[i].parentNode === chartGroupNode;
+
+                if (isPlotted || seriesElements[i].classList.contains("ren-legend-item")) {
 
                     Ren.IsolateContextMenu(seriesElements[i]);
                     Ren.AddContextMenuItems(seriesElements[i], plottedSeriesMenuItems);
                     continue;
-                }
-
-                if (seriesElements[i].classList.contains("ren-legend-item")) {
-                    Ren.IsolateContextMenu(seriesElements[i]);
                 }
 
                 Ren.AddContextMenuItems(seriesElements[i], seriesMenuItems);
