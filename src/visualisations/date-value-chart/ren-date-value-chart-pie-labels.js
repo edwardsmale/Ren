@@ -54,6 +54,9 @@ Ren.DateValueChart_PieLabels = (() => {
     // How far a label is kept from its slice's edges, and from the other labels.
     const LABEL_PADDING_PX = 2;
 
+    // The sizes a total too big for its hole is tried at, as a share of its own.
+    const TOTAL_FONT_SCALES = [1, 0.85, 0.7];
+
     // Around, a connector bends this far out from the rim, and runs on level to the label's
     // column, which starts CALLOUT_GAP_PX from the rim.  The pies are shrunk to make room for
     // labels up to MAX_CALLOUT_WIDTH_PX wide, though to no less than MIN_RADIUS_SHARE of their
@@ -432,6 +435,25 @@ Ren.DateValueChart_PieLabels = (() => {
             ) ?? "")
             : Ren.ValueFormatter.formatValueSimple(total, totalFormat);
 
+        // Tried where a total doesn't fit its hole as it is.  A total is a number, whatever the
+        // format of the column it's summed from.
+        const shownTotalFormat = totalFormats?.format ?? totalFormat;
+        const shortTotalFormats = Ren.DateValueChart_ValueFormats.getAbbreviatedFormats(
+            props,
+            shownTotalFormat === undefined || shownTotalFormat === Ren.SpreadsheetColumnFormatEnum.General
+                ? Ren.SpreadsheetColumnFormatEnum.Number
+                : shownTotalFormat
+        );
+
+        const formatShortTotal = (total) => shortTotalFormats
+            ? String(Ren.ValueFormatter.formatValue(
+                total,
+                null,
+                shortTotalFormats.format,
+                shortTotalFormats.formatFunction
+            ) ?? "")
+            : null;
+
         const isStacked = showLabels && isStackedPlacement(getPlacement(props));
         const fontScale = getFontSizePx(props) / 12;
         let widestTextPx = 0;
@@ -445,10 +467,17 @@ Ren.DateValueChart_PieLabels = (() => {
 
                 const totalNode = Ren.Svg.append(layer, "text", { "class": TOTAL_CLASS });
 
-                totalNode.textContent = formatTotal(pie.total);
+                const text = formatTotal(pie.total);
+                const shortText = formatShortTotal(pie.total);
+
+                totalNode.textContent = text;
                 totalNode.style.display = "none";
 
-                props.pieTotalNodes.push({ pie, textNode: totalNode });
+                props.pieTotalNodes.push({
+                    pie,
+                    textNode: totalNode,
+                    texts: shortText && shortText !== text ? [text, shortText] : [text]
+                });
             }
 
             if (!showLabels) continue;
@@ -1324,30 +1353,64 @@ Ren.DateValueChart_PieLabels = (() => {
         }
     };
 
-    /** Writes each pie's total in its hole, where it fits. */
+    /**
+     * Gets how a total may be written in its hole, from the best to the most squeezed: as it is,
+     * then smaller, then abbreviated, then abbreviated and smaller.
+     */
+    const getTotalCandidates = (total) => {
+
+        const candidates = [];
+
+        for (let i = 0; i < total.texts.length; i++) {
+
+            total.textNode.textContent = total.texts[i];
+
+            const size = measure(total.textNode);
+
+            if (size === null) continue;
+
+            TOTAL_FONT_SCALES.forEach(fontScale => candidates.push({
+                text: total.texts[i],
+                fontScale,
+                size: { width: size.width * fontScale, height: size.height * fontScale }
+            }));
+        }
+
+        return candidates;
+    };
+
+    /** Writes each pie's total in its hole, the best way it fits, and leaves it out otherwise. */
     const layoutTotals = (props, holePx, result) => {
 
         const totals = props.pieTotalNodes || [];
+        let fontSizePx = null;
 
         for (let i = 0; i < totals.length; i++) {
 
             const total = totals[i];
+
             total.textNode.style.display = "";
+            total.textNode.style.fontSize = "";
+            fontSizePx ??= parseFloat(getComputedStyle(total.textNode).fontSize);
 
-            const size = measure(total.textNode);
-            const x = total.pie.centreX * props.scaleX;
-            const y = total.pie.centreY * props.scaleY;
+            const candidate = getTotalCandidates(total).find(c =>
+                getFurthestDistanceToBox(0, 0, getBox(0, 0, c.size)) <= holePx - LABEL_PADDING_PX);
 
-            if (size === null
-                || getFurthestDistanceToBox(0, 0, getBox(0, 0, size))
-                    > holePx - LABEL_PADDING_PX) {
+            if (!candidate) {
 
+                total.textNode.textContent = total.texts[0];
                 total.textNode.style.display = "none";
                 continue;
             }
 
-            total.textNode.setAttribute("x", x);
-            total.textNode.setAttribute("y", y);
+            total.textNode.textContent = candidate.text;
+
+            if (candidate.fontScale !== 1) {
+                total.textNode.style.fontSize = fontSizePx * candidate.fontScale + "px";
+            }
+
+            total.textNode.setAttribute("x", total.pie.centreX * props.scaleX);
+            total.textNode.setAttribute("y", total.pie.centreY * props.scaleY);
             result.totals++;
         }
     };

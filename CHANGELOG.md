@@ -9,6 +9,12 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 Add a settings window to date/value charts, opened from a cog beside their pickers.
 Let date/value charts draw some series as pies beside others drawn as bars, lines or dots.
 Rename the date/value chart menu's "Chart type" to "Draw as", and "Chart appearance" to "Appearance".
+Put "Draw as" and "Labels" with a series' own items on its menu.
+Offer a series' colour and axis on the chart settings window's Individual Series tab.
+Replace the pie layout's preset hole sizes with a "Holes" toggle beside "Hole size...".
+Shrink or abbreviate pie totals that don't fit their holes.
+Move "Estimate last period" to the chart's Dates, off the series menus.
+Tick the aggregation a chart series uses by default, not just one it's given.
 
 ## 1.1.20 (2026-11-20)
 

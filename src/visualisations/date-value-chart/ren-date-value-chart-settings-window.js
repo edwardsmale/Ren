@@ -4,7 +4,8 @@
  * the items that act on the chart as a whole, and leaves out those that act on its series, which
  * are known by their reading the series the menu acts on (see Ren.MenuItemProbe).  Those are on
  * the series tabs: All Series has them as the menu offers them away from every series, acting on
- * them all, and Individual Series as it offers them on the series chosen there.
+ * them all, and Individual Series as the chart's menu and the series' own menu offer them on the
+ * series chosen there, as a series' colour, axis and so on are only on its own.
  */
 Ren.DateValueChart_SettingsWindow = (() => {
 
@@ -75,13 +76,29 @@ Ren.DateValueChart_SettingsWindow = (() => {
     };
 
     /**
+     * Gets the chart's menu items and, for a series, the series' own, which stand in for the
+     * chart's of the same id as they do on the series' menu.
+     */
+    const collectMenuItems = (visualisation, isForSeries) => {
+
+        const items = Ren.ContextMenuRegistry.collectItemsForElements(getMenuElements(visualisation));
+
+        if (!isForSeries) return items;
+
+        const seriesItems = latestPropsByVisualisation.get(visualisation)?.seriesMenuItems || [];
+        const seriesItemIds = new Set(seriesItems.map(item => item.id).filter(id => typeof id === "string"));
+
+        return items.filter(item => !seriesItemIds.has(item.id)).concat(seriesItems);
+    };
+
+    /**
      * Builds the settings of a tab from the chart's menu items, as the menu offers them when run
      * by runMenu, keeping those include picks.
      */
-    const buildModel = (visualisation, runMenu, include, memory) => runMenu(() =>
+    const buildModel = (visualisation, runMenu, include, memory, isForSeries) => runMenu(() =>
 
         Ren.MenuSettingsModel.build(
-            Ren.ContextMenuRegistry.collectItemsForElements(getMenuElements(visualisation)),
+            collectMenuItems(visualisation, isForSeries),
             {
                 include,
                 isTechMode: Ren.UrlContext.onEditorPage(),
@@ -97,7 +114,7 @@ Ren.DateValueChart_SettingsWindow = (() => {
 
     // The last period estimate's items, which are set for the chart as a whole in all but name:
     // the series it leaves out still take it up from the rest, and its other options are the
-    // chart's.  So they are offered on All Series and not on a series of its own.
+    // chart's.  So they are offered with the chart's dates on the Chart tab.
     const CHART_WIDE_SERIES_ITEM_IDS = ["chart-estimate-last-period", "chart-show-incomplete-last-period"];
 
     const isChartWideSeriesItem = (control) => {
@@ -107,7 +124,9 @@ Ren.DateValueChart_SettingsWindow = (() => {
         return CHART_WIDE_SERIES_ITEM_IDS.some(prefix => id.startsWith(prefix));
     };
 
-    const actsOnOneSeries = (control) => actsOnSeries(control) && !isChartWideSeriesItem(control);
+    const isForChart = (control) => !actsOnSeries(control) || isChartWideSeriesItem(control);
+
+    const isForSeriesTab = (control) => actsOnSeries(control) && !isChartWideSeriesItem(control);
 
     const open = (visualisation) => {
 
@@ -136,12 +155,12 @@ Ren.DateValueChart_SettingsWindow = (() => {
                 {
                     title: "Chart",
                     buildModel: () => buildModel(
-                        visualisation, runAsChartMenu, control => !actsOnSeries(control), chartMemory
+                        visualisation, runAsChartMenu, isForChart, chartMemory
                     )
                 },
                 {
                     title: "All Series",
-                    buildModel: () => buildModel(visualisation, runAsChartMenu, actsOnSeries, allSeriesMemory)
+                    buildModel: () => buildModel(visualisation, runAsChartMenu, isForSeriesTab, allSeriesMemory)
                 },
                 {
                     title: "Individual Series",
@@ -153,8 +172,9 @@ Ren.DateValueChart_SettingsWindow = (() => {
                         return buildModel(
                             visualisation,
                             fn => runAsSeriesMenu(visualisation, seriesIndex, fn),
-                            actsOnOneSeries,
-                            getSeriesMemory(seriesIndex)
+                            isForSeriesTab,
+                            getSeriesMemory(seriesIndex),
+                            true
                         );
                     },
                     runAction: (fn, seriesKey) => runAsSeriesMenu(visualisation, Number(seriesKey), fn)

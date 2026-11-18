@@ -741,10 +741,27 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         ]
     };
 
+    // Holes are drawn at 40% of the pie's radius until sized otherwise.
+    const DEFAULT_PIE_HOLE_RADIUS = 0.4;
+
+    const hasPieHoles = () => Ren.DateValueChart_Pies.getHoleRadius(props) > 0;
+
+    const pieHolesMenuItem = {
+        text: "Holes",
+        id: "pie-holes",
+        title: "Draws each pie with a hole in the middle",
+        ticked: hasPieHoles,
+        action: () => setChartProperty(
+            "pieHoleRadius",
+            hasPieHoles() ? 0 : DEFAULT_PIE_HOLE_RADIUS,
+            props.redrawChart
+        )
+    };
+
     const pieHoleSizeMenuItem = {
         text: "Hole size...",
         id: "pie-hole-size",
-        visible: () => Ren.DateValueChart_Pies.hasPies(props),
+        visible: hasPieHoles,
         action: () => {
 
             Ren.CreateNumberEditorPopupWindow(
@@ -769,12 +786,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
             );
         }
     };
-
-    const buildPieHoleOption = (text, holeRadius) => ({
-        text: text,
-        action: () => setChartProperty("pieHoleRadius", holeRadius, props.redrawChart),
-        ticked: () => Ren.DateValueChart_Pies.getHoleRadius(props) === holeRadius
-    });
 
     // Redrawn, as the totals are drawn with the pies.
     const pieHoleTotalsMenuItem = buildPropertyToggle({
@@ -857,10 +868,7 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         id: "pie-layout",
         visible: () => Ren.DateValueChart_Pies.hasPies(props),
         submenu: [
-            buildPieHoleOption("No hole", 0),
-            buildPieHoleOption("Small hole", 0.3),
-            buildPieHoleOption("Medium hole", 0.5),
-            buildPieHoleOption("Large hole", 0.7),
+            pieHolesMenuItem,
             pieHoleSizeMenuItem,
             Ren.MENU_SEPARATOR,
             pieHoleTotalsMenuItem,
@@ -877,8 +885,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         ticked: () => getSeriesProperty("chartType", Ren.SeriesChartTypeEnum.Bar) === chartType
     });
 
-    // What the series are drawn as - the kinds, with the line style and dot size under theirs -
-    // then how the chart lays out each kind.  On a series' menu the kinds, line style and dot size
+    // What the series are drawn as - the kinds, together so that the settings window shows them as
+    // one choice, then the line style and dot size - then how the chart lays out each kind.  On a series' menu the kinds, line style and dot size
     // are that series', and the layouts follow under the whole chart's heading.  Where the series
     // are drawn as a mixture, none of the kinds is ticked.  The series drawn as pies share a pie
     // per period, drawn over the plot's top half where other series are drawn as bars, lines or
@@ -891,15 +899,15 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
             targetSeriesHeadingMenuItem,
             buildSeriesChartTypeOption("Bars", "chart-type-bars", Ren.SeriesChartTypeEnum.Bar),
             buildSeriesChartTypeOption("Lines", "chart-type-lines", Ren.SeriesChartTypeEnum.Line),
-            seriesLineStyleMenuItem,
             buildSeriesChartTypeOption("Dots", "chart-type-dots", Ren.SeriesChartTypeEnum.Dot),
-            seriesDotSizeMenuItem,
             buildSeriesChartTypeOption(
                 "Pies",
                 "chart-type-pies",
                 Ren.SeriesChartTypeEnum.Pie,
                 "Draws a pie for each period, each series drawn as pies a slice of it"
             ),
+            seriesLineStyleMenuItem,
+            seriesDotSizeMenuItem,
             Ren.MENU_SEPARATOR,
             chartHeadingMenuItem,
             barLayoutMenuItem,

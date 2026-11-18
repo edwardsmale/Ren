@@ -12,7 +12,7 @@ public class DateValueChartPieLabelsTests : BrowserTest
 
     // Opens four charts across a popup, as a report does, their slices subdivided by brand and
     // labelled with their values.
-    private async Task OpenFourChartsAsync()
+    private async Task OpenFourChartsAsync(double holeRadius = 0.45)
     {
         await Ren.OpenAsync(Fixture);
         await Ren.Report.SelectColumnsAsync("OrderDate", "Sales");
@@ -32,7 +32,7 @@ public class DateValueChartPieLabelsTests : BrowserTest
         var settings = saved
             .Insert(
                 seriesAt,
-                "\"pieHoleRadius\":0.45,\"subdivideColumn\":\"Brand\","
+                $"\"pieHoleRadius\":{holeRadius},\"subdivideColumn\":\"Brand\","
                     + "\"subdivisionLabels\":\"names\",\"pieLabelValues\":true,\"pieSharesInside\":false,"
                     + "\"pieValuePosition\":\"below\",\"multiChartPeriod\":\"year\","
                     + "\"multiChartKeepEmptyPeriods\":true,\"multiChartMaxCount\":4,\"multiChartSlider\":true,"
@@ -79,5 +79,19 @@ public class DateValueChartPieLabelsTests : BrowserTest
 
         Assert.AreEqual(4, widths.Length);
         Assert.AreEqual(1, widths.Distinct().Count(), string.Join(", ", widths));
+    }
+
+    [TestMethod]
+    public async Task MultiChart_SmallHoles_TotalsShrunkAndAbbreviatedToFit()
+    {
+        await OpenFourChartsAsync(0.25);
+
+        var totals = await EvaluateAsync<string[]>("""
+            () => Array.from(document.querySelectorAll(".ren-pie-total"))
+                .map(total => (total.style.display === "none" ? "hidden: " : "") + total.textContent)
+            """);
+
+        Assert.AreEqual(4, totals.Length);
+        CollectionAssert.AreEqual(new[] { "295k", "309k", "325k", "344k" }, totals);
     }
 }

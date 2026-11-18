@@ -57,16 +57,17 @@ public class DateValueChartMenuTests : BrowserTest
 
     private async Task SelectEstimateLastPeriodAsync(string optionSelector)
     {
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(EstimateLastPeriodItem);
         await Ren.Root.ClickAsync(optionSelector);
         await Ren.WaitUntilLoadedAsync();
     }
 
-    // Read from the tick its option carries the next time the series' menu is opened.
+    // Read from the tick its option carries the next time the chart's menu is opened, which
+    // shows what the series all share.
     private async Task ExpectEstimatedInPlaceAsync(int seriesNumber)
     {
-        await OpenSeriesMenuAsync(seriesNumber);
+        await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(EstimateLastPeriodItem);
 
         await ExpectShownAsync(InPlaceEstimateItem + ".ren-is-checked");
@@ -160,9 +161,9 @@ public class DateValueChartMenuTests : BrowserTest
         {
             "chart-type-bars",
             "chart-type-lines",
-            "series-line-style",
             "chart-type-dots",
             "chart-type-pies",
+            "series-line-style",
             "bar-layout",
             "line-layout"
         };
@@ -203,6 +204,38 @@ public class DateValueChartMenuTests : BrowserTest
 
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='1']");
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='2']");
+    }
+
+    [TestMethod("the chart's menu: turns the pies' holes on and off, with their totals")]
+    public async Task TurnsThePiesHolesOnAndOff()
+    {
+        await CreateTwoSeriesChartAsync();
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pies");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pie layout", "Holes");
+
+        StringAssert.Contains(await SavedSettingsTextAsync(), "\"pieHoleRadius\":0.4");
+
+        await OpenChartMenuAsync();
+        await Ren.Root.MouseOverAsync(ChartTypeItem);
+        await Ren.Root.MouseOverAsync("#pie-layout");
+        await ExpectShownAsync("#pie-hole-size");
+        await ExpectShownAsync("#pie-hole-totals");
+        await ExpectShownAsync("#pie-total-format");
+        await Page.Keyboard.PressAsync("Escape");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Draw as", "Pie layout", "Holes");
+
+        var savedOff = await SavedSettingsTextAsync();
+        Assert.IsFalse(savedOff.Contains("\"pieHoleRadius\":0.4"), savedOff);
+
+        await OpenChartMenuAsync();
+        await Ren.Root.MouseOverAsync(ChartTypeItem);
+        await Ren.Root.MouseOverAsync("#pie-layout");
+        await ExpectShownAsync("#pie-holes");
+        await ExpectNotShownAsync("#pie-hole-size");
+        await ExpectNotShownAsync("#pie-hole-totals");
+        await ExpectNotShownAsync("#pie-total-format");
     }
 
     [TestMethod("a series' menu: draws just that series as pies, beside the others' bars")]
@@ -293,7 +326,7 @@ public class DateValueChartMenuTests : BrowserTest
     {
         await CreateSingleSeriesChartAsync();
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
 
         await ExpectShownAsync(EstimateLastPeriodItem);
     }
@@ -304,9 +337,21 @@ public class DateValueChartMenuTests : BrowserTest
         await CreateSingleSeriesChartAsync();
         await DateValueChart.SelectAggregationTypeAsync(Ren, "count");
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
 
         await ExpectShownAsync(EstimateLastPeriodItem);
+    }
+
+    // It's set for the chart as a whole, so it's with the chart's dates and not on a series.
+    [TestMethod("estimate last period: isn't on a series' menu")]
+    public async Task IsntOnASeriesMenu()
+    {
+        await CreateSingleSeriesChartAsync();
+
+        await OpenSeriesMenuAsync();
+
+        await ExpectShownAsync(ValuesItem);
+        await ExpectNotShownAsync(EstimateLastPeriodItem);
     }
 
     [TestMethod("estimate last period: isn't offered for an averaged series")]
@@ -315,7 +360,7 @@ public class DateValueChartMenuTests : BrowserTest
         await CreateSingleSeriesChartAsync();
         await DateValueChart.SelectAggregationTypeAsync(Ren, "average");
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
 
         await ExpectShownAsync(ValuesItem);
         await ExpectNotShownAsync(EstimateLastPeriodItem);
@@ -390,7 +435,7 @@ public class DateValueChartMenuTests : BrowserTest
         await CreateSingleSeriesChartAsync();
         await SelectEstimateLastPeriodAsync(InPlaceEstimateItem);
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(EstimateLastPeriodItem);
 
         await ExpectShownAsync(SeasonallyAdjustedItem + ".ren-is-checked");
@@ -403,7 +448,7 @@ public class DateValueChartMenuTests : BrowserTest
         await SelectEstimateLastPeriodAsync(InPlaceEstimateItem);
         await SelectEstimateLastPeriodAsync(SeasonallyAdjustedItem);
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(EstimateLastPeriodItem);
 
         await ExpectShownAsync(SeasonallyAdjustedItem);
@@ -415,7 +460,7 @@ public class DateValueChartMenuTests : BrowserTest
     {
         await CreateSingleSeriesChartAsync();
 
-        await OpenSeriesMenuAsync();
+        await OpenChartMenuAsync();
         await Ren.Root.MouseOverAsync(EstimateLastPeriodItem);
 
         await ExpectShownAsync(InPlaceEstimateItem);

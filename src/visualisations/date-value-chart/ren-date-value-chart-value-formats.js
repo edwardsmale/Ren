@@ -76,14 +76,22 @@ Ren.DateValueChart_ValueFormats = (() => {
             return defaultFormats;
         }
 
-        const name = defaultFormats.format === Ren.SpreadsheetColumnFormatEnum.Currency
+        return getAbbreviatedFormats(props, defaultFormats.format);
+    };
+
+    /**
+     * Gets the formats that show a format's values abbreviated, as £1.5m or 32k, or null where its
+     * values aren't numbers or currency.
+     */
+    const getAbbreviatedFormats = (props, format) => {
+
+        if (!isAbbreviatable(format)) return null;
+
+        const name = format === Ren.SpreadsheetColumnFormatEnum.Currency
             ? "currency-abbreviated-auto-dp"
             : "number-abbreviated-auto-dp";
 
-        return {
-            format: defaultFormats.format,
-            formatFunction: createFormatFunctions(props, [{ name }])
-        };
+        return { format, formatFunction: createFormatFunctions(props, [{ name }]) };
     };
 
     /**
@@ -221,6 +229,7 @@ Ren.DateValueChart_ValueFormats = (() => {
     };
 
     return {
+        getAbbreviatedFormats,
         getFormatForFunction,
         getPieTotalFormats,
         resolveFormats,

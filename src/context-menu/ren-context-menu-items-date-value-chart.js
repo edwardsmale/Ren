@@ -1025,9 +1025,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             hideOtherSeriesMenuItem,
             removeSeriesMenuItem,
             getNotForOtherSeries(removeOtherSeriesMenuItem)
-        ].concat(buildChartDataMenuItems(buildValuesMenuItem(true))).concat([
-            estimateLastPeriodMenuItem
-        ]);
+        ].concat(buildChartDataMenuItems(buildValuesMenuItem(true)));
 
         // A legend entry is offered the legend itself too.
         const seriesMenuItems = seriesOwnMenuItems.concat([legendMenuItem]);
@@ -1075,6 +1073,10 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         };
 
         props.addSeriesMenuItems = addSeriesMenuItems;
+
+        // For the settings window's Individual Series tab, as a series' items are only on its
+        // own menu.
+        props.seriesMenuItems = seriesMenuItems;
         addSeriesMenuItems();
 
         // Shows what the image will hold while the pointer rests over an item that makes one.

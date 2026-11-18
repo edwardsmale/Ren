@@ -218,7 +218,7 @@ Ren.MenuSettingsWindow = (() => {
 
         Ren.PopupWindow(CLASS_NAME, renderContent, options.title, {
             popupReuseId: options.popupReuseId,
-            width: 360,
+            width: 400,
             // Fitted to the settings once they are shown (see fitHeight).
             height: MIN_HEIGHT_PX,
             centred: true,

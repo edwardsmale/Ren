@@ -155,6 +155,28 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         return value;
     };
 
+    /**
+     * Gets the aggregation the target series' columns are grouped by, as the chart groups them:
+     * their own where set, else the chart's default for the column, else the column's own.  Null
+     * where there is no target series or their columns are aggregated differently.
+     */
+    const getTargetAggregationType = () => {
+
+        const infos = getTargetSeriesColumnInfos();
+        const settings = visualisation.chartDataGroupingSettings;
+        const columns = getChartGroupingEntry()?.columns;
+
+        const types = infos.map(info => Ren.ObjectUtils.getEnumValue(
+            Ren.AggregationTypeEnum,
+            columns?.[info.columnKey]?.aggregationType ??
+                settings?.columns?.[info.columnKey]?.aggregationType ??
+                tabularData?.ColumnModels?.[info.columnIndex]?.AggregationType,
+            null
+        ));
+
+        return types.length && types.every(type => type === types[0]) ? types[0] : null;
+    };
+
     const setTargetColumnSetting = (settingKey, value) => {
 
         const infos = getTargetSeriesColumnInfos();
@@ -208,7 +230,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
                 text: aggregationTypeAsString,
                 className: "qa-ren-chart-aggregation-menu-item-" + aggregationTypeKebabCase,
                 action: () => setTargetColumnSetting("aggregationType", value),
-                ticked: () => getTargetColumnSetting("aggregationType") === value
+                ticked: () => getTargetAggregationType() === value
             });
         }
 
@@ -223,7 +245,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
      */
     const usesWithRespectToAsOrdering = () => {
 
-        const aggregationType = getTargetColumnSetting("aggregationType");
+        const aggregationType = getTargetAggregationType();
 
         return aggregationType === Ren.AggregationTypeEnum.First
             || aggregationType === Ren.AggregationTypeEnum.Last
