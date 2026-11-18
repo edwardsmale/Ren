@@ -1,0 +1,290 @@
+// The settings window a visualisation's menu is offered in as a form (see
+// ren-menu-settings-window.js and ren-menu-settings-form.js).
+// What a tab's settings are of, such as which series, chosen above them.
+.ren-menu-settings-window__subject
+{
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 4px;
+    padding: 8px 10px;
+    border-bottom: solid 1px #dddddd;
+    background-color: #f6f6f6;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+// As wide as the form's own dropdowns, beneath it.
+.ren-menu-settings-window__subject-select
+{
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font: inherit;
+    font-weight: normal;
+}
+
+.ren-menu-settings-window__tabs
+{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    > .ren-tabbed-module-widget__content
+    {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+    }
+}
+
+.ren-menu-settings-form
+{
+    // A control the menu hides for now, which is greyed out rather than taken away so that the
+    // form keeps its shape.
+    &--unavailable,
+    &__group--unavailable > &__heading
+    {
+        opacity: 0.45;
+    }
+
+    padding: 6px 10px 10px;
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 0.8125rem;
+    color: #222222;
+
+    &__group
+    {
+        margin-top: 6px;
+    }
+
+    // Each level down is set in a little further, under a lighter heading.
+    &__group--depth-1,
+    &__group--depth-2,
+    &__group--depth-3
+    {
+        margin-left: 8px;
+    }
+
+    &__heading
+    {
+        margin: 4px 0 2px;
+        padding-bottom: 2px;
+        border-bottom: solid 1px #dddddd;
+        font-weight: bold;
+        font-size: 0.875rem;
+
+        .ren-menu-settings-form__group--depth-1 > &,
+        .ren-menu-settings-form__group--depth-2 > &,
+        .ren-menu-settings-form__group--depth-3 > &
+        {
+            border-bottom: none;
+            font-size: 0.8125rem;
+            color: #555555;
+        }
+    }
+
+    // A label on the left and its control on the right, or a control taking the whole row.
+    &__row
+    {
+        display: grid;
+        grid-template-columns: 9rem minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        min-height: 24px;
+
+        &--wide
+        {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__label
+    {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__toggle
+    {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+
+        input
+        {
+            margin: 0;
+        }
+    }
+
+    // A choice's radio buttons, outlined together as the one setting they are.
+    &__row--radios
+    {
+        align-items: start;
+        margin: 3px 0;
+
+        > .ren-menu-settings-form__label
+        {
+            padding-top: 4px;
+        }
+    }
+
+    &__radios
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+        padding: 3px 8px;
+        border: solid 1px #d8d8d8;
+        border-radius: 3px;
+    }
+
+    &__radio
+    {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 20px;
+        cursor: pointer;
+
+        input
+        {
+            margin: 0;
+        }
+    }
+
+    &__radio-text
+    {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__select,
+    &__text-input
+    {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        font: inherit;
+    }
+
+    &__number
+    {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__number-input
+    {
+        width: 4.5rem;
+        font: inherit;
+    }
+
+    &__unit
+    {
+        color: #777777;
+    }
+
+    &__slider
+    {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    &__button
+    {
+        justify-self: start;
+        padding: 1px 8px;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    &__empty
+    {
+        padding: 12px 0;
+        color: #777777;
+    }
+
+    // A section's subtab, in a lighter colour than the window's own tabs, and kept in view as its
+    // settings scroll.
+    &__subtabs
+    {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin: -6px -10px 6px;
+        padding: 6px 10px 0;
+        border-bottom: solid 1px #7aa7d6;
+        background-color: white;
+    }
+
+    &__subtab
+    {
+        padding: 0.1875rem 0.5rem;
+        border: solid 1px #7aa7d6;
+        border-bottom: none;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        background-color: #d6e8fb;
+        color: #1d3c5e;
+        font: inherit;
+        cursor: pointer;
+        transform: translateY(1px);
+
+        &:hover
+        {
+            background-color: #e6f1fc;
+        }
+
+        &--selected,
+        &--selected:hover
+        {
+            background-color: white;
+            font-weight: 600;
+        }
+    }
+
+    // A submenu too big to lay out, shown as what is set in it, opened from its pencil.
+    &__menu-button
+    {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+        padding: 1px 4px;
+        border: solid 1px transparent;
+        border-radius: 0.25rem;
+        background: none;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover:not(:disabled)
+        {
+            border-color: #B1B1B1;
+            background-color: #EEEEEE;
+        }
+    }
+
+    &__menu-value
+    {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #000000;
+    }
+
+    &__menu-pencil
+    {
+        color: #777777;
+    }
+}

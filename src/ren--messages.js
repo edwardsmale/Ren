@@ -278,6 +278,27 @@ Ren.Messages = (() => {
 
     Ren.MessageBus.populateMessageNames(requests);
 
+    // A request asks for something to be shown, which a menu item probed for what it shows is
+    // stopped before doing (see Ren.MenuItemProbe).
+    Object.keys(requests).forEach(name => {
+
+        const request = requests[name];
+        const notify = request.notify;
+        const notifyImmediately = request.notifyImmediately;
+
+        request.notify = function () {
+
+            Ren.MenuItemProbe.intercept("message", { name });
+            return notify.apply(this, arguments);
+        };
+
+        request.notifyImmediately = function () {
+
+            Ren.MenuItemProbe.intercept("message", { name });
+            return notifyImmediately.apply(this, arguments);
+        };
+    });
+
     return {
         Events: events,
         Requests: requests,

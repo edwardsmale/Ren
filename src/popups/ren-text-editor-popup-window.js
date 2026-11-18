@@ -170,6 +170,9 @@ Ren.CreateOkCancelTextEditorPopupWindow = (title, onOk, options) => {
  */
 Ren.CreateTextEditorPopupWindow = (title, initialText, onApply, options) => {
 
+    // A settings window offers the text itself (see Ren.MenuItemProbe).
+    Ren.MenuItemProbe.intercept("text", { title, initialText, onApply, options: options || {} });
+
     const width = (options && options.width) || 320;
     const height = (options && options.height) || 110;
     const centred = !options || options.centred !== false;

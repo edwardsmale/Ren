@@ -922,7 +922,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
                 text: "Pies",
                 id: "chart-type-pies",
                 title: "Draws a pie for each period, each series a slice of it",
-                action: () => setShowAsPies(true),
+                // Switched off again, the series are drawn as they were before.
+                action: () => setShowAsPies(!Ren.DateValueChart_Pies.isShown(props)),
                 ticked: () => Ren.DateValueChart_Pies.isShown(props)
             },
             pieLayoutMenuItem

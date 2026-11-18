@@ -44,6 +44,10 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
          */
         const getTargetSeriesIndexes = () => {
 
+            // Marks the items that act on series, which the chart's settings window offers on
+            // its series tabs rather than its Chart tab.
+            Ren.MenuItemProbe.noteDependency("series");
+
             const clickedSeriesIndex = getClickedSeriesIndex();
 
             if (!clickedSeriesIndex) {

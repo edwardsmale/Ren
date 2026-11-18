@@ -102,9 +102,15 @@ Ren.TabbedModuleWidget = () => {
         Ren.JsonHighlighter.setupDoubleClickSelectsEntireString();
     };
 
+    /**
+     * Gets the element holding a tab's content, for content other than text.
+     */
+    const getTabContent = (tabTitle) => tabInfos[tabTitle].content;
+
     return {
         setSelectedTab,
         setTabContent,
+        getTabContent,
         render,
         addTab
     };

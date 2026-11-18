@@ -125,6 +125,24 @@
         text-overflow: ellipsis;
         color: #000000;
     }
+
+    // The cog opening the chart's settings window, last in the row, drawn without the pickers'
+    // background and border.
+    &__settings,
+    &__settings:hover
+    {
+        padding: 0 4px;
+        border-color: transparent;
+        background: none;
+    }
+
+    &__settings-icon
+    {
+        display: block;
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+    }
 }
 .ren-visualisation:hover > .ren-date-value-chart-column-pickers,
 .ren-visualisation--focused > .ren-date-value-chart-column-pickers

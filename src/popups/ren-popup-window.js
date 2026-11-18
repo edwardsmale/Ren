@@ -23,6 +23,10 @@
      */
     Ren.PopupWindow = (className, renderContent, title, options) => {
 
+        // A menu item probed for what it shows is stopped before showing it (see
+        // Ren.MenuItemProbe).
+        Ren.MenuItemProbe.intercept("window", { className, title });
+
         const defaultOptions = {
             titleBarModifier: null,
             // Shows a warning triangle before the title.

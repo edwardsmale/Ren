@@ -678,6 +678,8 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Running total",
         id: "chart-running-total",
+        // Running total, year to date and rolling year total each switch the others off.
+        exclusiveGroup: "chart-totals",
         title: "Plots each period's total to date rather than the period's own value",
         action: () => {
 
@@ -698,6 +700,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Year to date",
         id: "chart-year-to-date",
+        exclusiveGroup: "chart-totals",
         title: "Plots each period's total for the year to date, starting again each year",
         visible: () => Ren.DateValueChart_ValueTransforms.canShowYearToDate(props),
         action: () => {
@@ -717,6 +720,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Rolling year total",
         id: "chart-rolling-year-total",
+        exclusiveGroup: "chart-totals",
         title: "Plots each period's total over the year to its end, such as a moving annual total",
         visible: () => Ren.DateValueChart_ValueTransforms.canShowRollingYearTotal(props),
         action: () => {
@@ -763,6 +767,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Index to first period",
         id: "chart-index",
+        exclusiveGroup: "chart-alternative-values",
         title: "Plots each series as an index of its first value, which is 100",
         visible: () => !props.showAsPies,
         action: toggleIndex,
@@ -773,6 +778,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Change on period before",
         id: "chart-change",
+        exclusiveGroup: "chart-alternative-values",
         title: "Plots each period's value as its change on the period before, as a percentage",
         visible: () => !props.showAsPies,
         action: () => toggleAlternativeValues("showAsChange"),
@@ -783,6 +789,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Change on year before",
         id: "chart-change-year-before",
+        exclusiveGroup: "chart-alternative-values",
         title: "Plots each period's value as its change on the same period a year before, as a "
             + "percentage",
         visible: () => Ren.DateValueChart_ValueTransforms.canShowYearOnYearChange(props),
@@ -813,6 +820,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         section: "Chart data",
         text: "Share of total",
         id: "chart-share-of-total",
+        exclusiveGroup: "chart-alternative-values",
         title: "Plots each series as its share of the period's total over the series shown",
         visible: () => props.seriesCount >= 2,
         action: toggleShareOfTotal,

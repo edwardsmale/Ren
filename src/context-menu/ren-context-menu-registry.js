@@ -293,6 +293,42 @@ Ren.ContextMenuRegistry = (() => {
         rightClickAncestors = ancestors || getAncestors(event.target);
     };
 
+    /**
+     * Collects the items the given elements contribute themselves, standing and right-click, as a
+     * menu opened on the first of them would offer them, for a settings window built from them
+     * (see Ren.MenuSettingsModel).  The elements are given innermost first.  Their other
+     * ancestors' items are left out, as they are the page's.
+     */
+    const collectItemsForElements = (elements) =>
+        removeItemsOverriddenByInnerContributors(collectItemsForRightClick(elements));
+
+    /**
+     * Runs a function as if the menu had been opened on an element, away from anything inside it,
+     * so that items reading what the menu was opened on read that element.  What the open menu was
+     * opened on is put back afterwards.
+     */
+    const withOpener = (element, fn) => {
+
+        const previousAncestors = rightClickAncestors;
+        const previousPosition = Ren.LastRightClickPosition;
+        const rect = element.getBoundingClientRect();
+
+        rightClickAncestors = getAncestors(element);
+
+        Ren.LastRightClickPosition = {
+            x: rect.left + window.scrollX + rect.width / 2,
+            y: rect.top + window.scrollY + rect.height / 2
+        };
+
+        try {
+            return fn();
+        }
+        finally {
+            rightClickAncestors = previousAncestors;
+            Ren.LastRightClickPosition = previousPosition;
+        }
+    };
+
     const openButtonMenu = (button, event) => {
 
         recordOpener(event);
@@ -394,6 +430,8 @@ Ren.ContextMenuRegistry = (() => {
         contribute,
         contributeStanding,
         contributeToButton,
+        collectItemsForElements,
+        withOpener,
         getRightClickAncestors,
         getRightClickContributingElements,
         openButtonMenu,

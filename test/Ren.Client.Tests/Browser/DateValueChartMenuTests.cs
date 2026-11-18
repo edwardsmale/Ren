@@ -182,6 +182,18 @@ public class DateValueChartMenuTests : BrowserTest
         await ExpectShownAsync(".ren-bar.ren-vertical[data-series='2']");
     }
 
+    [TestMethod("the chart's menu: turns pies off when they're chosen again")]
+    public async Task TurnsPiesOffWhenTheyreChosenAgain()
+    {
+        await CreateTwoSeriesChartAsync();
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Chart type", "Pies");
+
+        await ExpectShownAsync(".ren-bar.ren-vertical[data-series='1']");
+        await ExpectShownAsync(".ren-bar.ren-vertical[data-series='2']");
+    }
+
     [TestMethod("a series' menu: offers the series' items")]
     public async Task OffersTheSeriesItems()
     {

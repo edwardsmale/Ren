@@ -8,7 +8,7 @@ describe("Ren.VisualisationsTransformer", () => {
         const transformed = transform({
             visualisationTypeName: "DataGrid",
             containingReportUrl:
-                "https://reporting.example.com/BrandPartnershipSalesData_Overall?Partner=Durable"
+                "https://reports.example/CategorySales?Region=North"
         });
 
         expect(transformed.visualisationTypeName).toBe("DataGrid");
@@ -19,7 +19,7 @@ describe("Ren.VisualisationsTransformer", () => {
 
         const transformed = Ren.VisualisationsTransformer.transform(true, [{
             visualisationTypeName: "DataGrid",
-            containingReportUrl: "/Sales?Partner=Durable"
+            containingReportUrl: "/Sales?Region=North"
         }])[0];
 
         expect(transformed.hasOwnProperty("containingReportUrl")).toBe(false);
