@@ -15,6 +15,7 @@ After a filter change, redraw the visualisations in view first, showing each as 
 Update date/value charts faster when their points come out of date order.
 Grey out visualisations catching up with a filter change only after half a second.
 Lay out date/value chart labels faster, measuring axis and value labels together.
+Stop naming the released branch in release commits and ren.manifest.json.
 
 ## 1.1.19 (2026-11-17)
 

@@ -18,9 +18,7 @@ using Ren.Build;
 //   ci [--minified]           Builds and runs every test, as CI does (running the client tests
 //                             only on the minified build, with --minified, as Publish does).
 //   serve [<port>]            Serves the repo at http://localhost:8080/ (or the port given).
-//   release <version> [--branch <branch>]
-//                             Releases the version (see Releaser.cs), recording the branch it
-//                             releases (by default, the one main has merged since the last one).
+//   release <version>         Releases the version (see Releaser.cs).
 //   pack <version>            Builds a released version from its tag and packs it, with the .NET
 //                             library, as the NuGet package, in packages/ (see Exporter.cs).
 //   export <version> <dir>[;<dir>...] [<dir>...]
@@ -69,7 +67,7 @@ try
             break;
 
         case "release":
-            await Releaser.RunAsync(commandArgs.FirstOrDefault(), GetOption(commandArgs, "--branch"), publisher);
+            await Releaser.RunAsync(commandArgs.FirstOrDefault(), publisher);
             break;
 
         case "pack":
@@ -91,14 +89,6 @@ catch (BuildException e)
 {
     Log.Error(e.Message);
     return 1;
-}
-
-// Gets the value given with the specified option, or null when it isn't given.
-static string? GetOption(string[] args, string name)
-{
-    var index = Array.IndexOf(args, name);
-
-    return index >= 0 && index < args.Length - 1 ? args[index + 1] : null;
 }
 
 // Gets the folders given with --statics.

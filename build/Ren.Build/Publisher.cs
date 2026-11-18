@@ -5,11 +5,11 @@ namespace Ren.Build;
 
 /// <summary>
 /// Writes ren.manifest.json beside the built files, saying which version and commit they were
-/// built from, whether that's a release, which branch they're for (see BuildIdentity), and each
-/// file's SHA-256 hash.  A host keeps the manifest
-/// with its copy of the files, so it can tell which Ren it has, and check the files haven't changed
-/// since.  The hashes are of each file's text with CRLF line endings changed to LF, so a host whose
-/// git converts line endings on checkout still gets the same hashes.
+/// built from, whether that's a release, the branch for a development build (see BuildIdentity),
+/// and each file's SHA-256 hash.  A host keeps the manifest with its copy of the files, so it can
+/// tell which Ren it has, and check the files haven't changed since.  The hashes are of each file's
+/// text with CRLF line endings changed to LF, so a host whose git converts line endings on checkout
+/// still gets the same hashes.
 /// </summary>
 internal static class Manifest
 {
