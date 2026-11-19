@@ -232,6 +232,18 @@ public class FormattingMenuTests : BrowserTest
         await ExpectCellTextAsync("Amount", 4, "1.0m");
     }
 
+    // The thousands formats state every figure in thousands, however large or small.
+
+    [TestMethod]
+    public Task CurrencyThousands_Applied_StatesEachFigureInThousands() =>
+        SetAndExpectAsync(AbbreviatedFixture, "Amount", "#format-as-currency", "#format-as-currency-thousands",
+            (2, "£1k"), (3, "£32k"), (5, "£1,450k"), (6, "£2,500,000k"));
+
+    [TestMethod]
+    public Task NumberThousands_Applied_StatesEachFigureInThousands() =>
+        SetAndExpectAsync(AbbreviatedFixture, "Amount", "#format-as-number", "#format-as-number-thousands",
+            (2, "1k"), (3, "32k"), (4, "1000k"), (5, "1450k"));
+
     // The formats that only restate a NULL are offered only where the column has a NULL in it.
 
     [TestMethod]

@@ -121,6 +121,12 @@ Ren.ContextMenuItems_Formatting = (setFormatFunction, options) => {
             text: `Abbreviated, auto DP (${currencyText("1.5m")}, ${currencyText("32k")})`,
             id: "format-as-currency-abbreviated-auto-dp",
             name: "currency-abbreviated-auto-dp"
+        },
+        {
+            section: "Currency",
+            text: `Thousands (${currencyText("32k")})`,
+            id: "format-as-currency-thousands",
+            name: "currency-thousands"
         }
     ];
 
@@ -149,6 +155,12 @@ Ren.ContextMenuItems_Formatting = (setFormatFunction, options) => {
             text: "Abbreviated, auto DP (1.5m, 32k)",
             id: "format-as-number-abbreviated-auto-dp",
             name: "number-abbreviated-auto-dp"
+        },
+        {
+            section: "Number",
+            text: "Thousands (32k)",
+            id: "format-as-number-thousands",
+            name: "number-thousands"
         }
     ];
 

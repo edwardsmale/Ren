@@ -497,6 +497,25 @@ Ren.ValueFormatter = (() => {
         numberAbbreviatedNoDPFormatter
     );
 
+    /**
+     * Formats a value in thousands, whatever its size, with no decimal places ("£32k", and
+     * "£1,450k" rather than "£1.5m"), or returns it as it is where it is not a number.
+     */
+    const formatThousands = (value, formatter) => {
+
+        if (value == null || value === "") return "";
+
+        const float = Number(value);
+
+        if (isNaN(float)) return value;
+
+        return formatter(roundToDecimalPlaces(float / 1000, 0)) + "k";
+    };
+
+    const formatCurrencyThousands = value => formatThousands(value, currencyNoDPFormatter);
+
+    const formatNumberThousands = value => formatThousands(value, integerFormatter);
+
     const formatNumberPlusNoDP = value => {
 
         const formattedNumber = formatNumber(value, integerPlusFormatter);
@@ -661,6 +680,8 @@ Ren.ValueFormatter = (() => {
         formatNumberAbbreviated1DP,
         formatCurrencyAbbreviatedAutoDP,
         formatNumberAbbreviatedAutoDP,
+        formatCurrencyThousands,
+        formatNumberThousands,
         formatNumberPlusNoDP,
         formatNumberPlus2DP,
         formatPercentageNoDP,

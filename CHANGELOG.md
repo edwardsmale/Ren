@@ -33,6 +33,7 @@ Add a settings cog beside each filter module item's heading, opening a window of
 Start a new filter module item with the last item's value settings.
 Make a hierarchical filter module item's Sort toggle sort all its levels.
 Move a filter module item's "Group by" into its menu's Values section, with "Invert grouping" and "Ungroup" in its submenu.
+Add "Thousands" Number and Currency formats, showing every figure in thousands (£32k).
 
 ## 1.1.20 (2026-11-20)
 

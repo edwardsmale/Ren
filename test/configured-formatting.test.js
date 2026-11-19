@@ -85,6 +85,13 @@ describe("Format labels with configured formatting", () => {
             .toBe("Abbreviated, auto DP (1.5m€, 32k€)");
     });
 
+    test("getMenuItems_CurrencyThousands_LabelUsesTheConfiguredSymbol", () => {
+
+        const items = Ren.ContextMenuItems_Formatting(() => {}, {}).getMenuItems(0, 0);
+
+        expect(findById(items, "format-as-currency-thousands").text).toBe("Thousands (32k€)");
+    });
+
     test("getFormatOptions_AbbreviatedCurrency_LabelsUseTheConfiguredSymbol", () => {
 
         const options = Ren.DataGroupingSettingsEditorFunctionSpecs.getFormatOptions();

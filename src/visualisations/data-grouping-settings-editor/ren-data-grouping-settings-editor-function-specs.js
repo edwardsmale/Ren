@@ -120,6 +120,7 @@ Ren.DataGroupingSettingsEditorFunctionSpecs = (() => {
                 value: "name:number-abbreviated-auto-dp",
                 label: "Number abbreviated, auto DP (1.5m, 32k)"
             },
+            { value: "name:number-thousands", label: "Number in thousands (32k)" },
             { value: "name:currency", label: "Currency" },
             { value: "name:currency-no-dp", label: "Currency (no DP)" },
             {
@@ -134,6 +135,10 @@ Ren.DataGroupingSettingsEditorFunctionSpecs = (() => {
                 value: "name:currency-abbreviated-auto-dp",
                 label: "Currency abbreviated, auto DP "
                     + `(${currencyText("1.5m")}, ${currencyText("32k")})`
+            },
+            {
+                value: "name:currency-thousands",
+                label: `Currency in thousands (${currencyText("32k")})`
             },
             { value: "name:percentage-no-dp", label: "Percentage (no DP)" },
             { value: "name:percentage-2-dp", label: "Percentage (2 DP)" },
