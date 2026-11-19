@@ -25,6 +25,7 @@ Let charts set how many subdivisions each bar or slice shows, with "Subdivisions
 Mark the settings a split series shares with the others split from its column.
 Put those on the All Series tab instead where the data are split from one column.
 Keep a date/value chart's Group by when its date column is set to None and back.
+Move "Date column" to the Dates section, before "Group by".
 
 ## 1.1.20 (2026-11-20)
 

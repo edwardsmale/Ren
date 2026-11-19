@@ -984,7 +984,6 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             markExtremesMenuItem,
             previousYearMenuItem,
             addDataSeriesMenuItem,
-            dateColumnMenuItem,
             splitDataMenuItem,
             seriesLimitMenuItem,
             crossFilteringMenuItem,
@@ -1284,7 +1283,8 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
 
             // Everything the date axis decides, kept together so that there is one place to look
             // for a date: how the dates are binned, which of them are drawn, and what they are
-            // annotated with.
+            // annotated with, after the column they are of.
+            dateColumnMenuItem,
             changeDateGroupingMenuItem,
             dateRangeMenuItem,
             showDateFilterMenuItem,

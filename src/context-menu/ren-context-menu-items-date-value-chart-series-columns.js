@@ -1048,7 +1048,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
     };
 
     const dateColumnMenuItem = {
-        section: "Chart data",
+        section: "Dates",
         text: "Date column",
         id: "date-column",
         visible: () => !!visualisation.chartDataGroupingSettings && !!tabularData?.columnResolver,
