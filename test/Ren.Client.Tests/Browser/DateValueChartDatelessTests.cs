@@ -84,6 +84,21 @@ public class DateValueChartDatelessTests : BrowserTest
         await Poll(ValuesAsync).ToEqual(new[] { TotalOrderLines });
     }
 
+    [TestMethod("setting the date column to none and back keeps how its dates were grouped")]
+    public async Task SettingTheDateColumnToNoneAndBackKeepsHowItsDatesWereGrouped()
+    {
+        await CreateChartAsync("Order Date", "Order Lines");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Group by", "Quarter");
+        await Poll(async () => (await DateValueChart.DatesWithValuesAsync(Ren)).Length).ToBe(4);
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Date column", "None");
+        await Poll(ValuesAsync).ToEqual(new[] { TotalOrderLines });
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Date column", "Order Date");
+        await Poll(async () => (await DateValueChart.DatesWithValuesAsync(Ren)).Length).ToBe(4);
+    }
+
     [TestMethod("changing the date column groups the chart by the new column's dates")]
     public async Task ChangingTheDateColumnGroupsTheChartByTheNewColumnsDates()
     {

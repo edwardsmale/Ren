@@ -6,6 +6,8 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
     const { tabularData, visualisation, props } = chart;
 
+    const removedDateEntries = Ren.ContextMenuItems_DateValueChart_SeriesColumns.removedDateEntries;
+
     const {
         getTargetSeriesIndexes,
         getTargetSeriesIndex,
@@ -969,18 +971,36 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
     /**
      * Groups the chart by a column's dates, or by none when passed null, drawing it as an all-time
-     * chart.  A chart gaining a date column is binned by day, or by quarter for quarters.
+     * chart.  A chart gaining a date column is grouped as it was before it lost one, if it did and
+     * the column is of days alike, or else by day, or by quarter for quarters.
      */
     const setDateColumn = (columnIndex, isQuarter) => {
 
         if (!visualisation.chartDataGroupingSettings) return;
 
-        Ren.DateValueChart_GroupingEntries.setDateColumn(
+        // A column of quarters offers no finer grouping, so only one of the same kind takes it on.
+        const removed = removedDateEntries.get(visualisation);
+        const currentColumnIndex = getCurrentDateColumnIndex();
+
+        const removedEntry = Ren.DateValueChart_GroupingEntries.setDateColumn(
             visualisation.chartDataGroupingSettings,
             columnIndex,
             tabularData?.columnResolver,
-            isQuarter ? "date-quarter-start" : "date-day-start"
+            isQuarter ? "date-quarter-start" : "date-day-start",
+            removed && removed.isQuarter === !!isQuarter ? removed.entry : null
         );
+
+        if (removedEntry) {
+
+            const isRemovedQuarter = Ren.DateValueChart_InputColumns.getDateColumns(tabularData)
+                .some(column => column.columnIndex === currentColumnIndex && column.isQuarter);
+
+            removedDateEntries.set(visualisation, { entry: removedEntry, isQuarter: isRemovedQuarter });
+        }
+        else if (columnIndex != null) {
+
+            removedDateEntries.delete(visualisation);
+        }
 
         rebuildVisualisation();
     };
@@ -1056,3 +1076,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         columnPickers
     };
 };
+
+// The date entry each chart last had before its date column was taken away, kept outside the menu
+// items as those are built afresh on every draw.  Not saved, so lasts while the page is open.
+Ren.ContextMenuItems_DateValueChart_SeriesColumns.removedDateEntries = new WeakMap();

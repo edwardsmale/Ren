@@ -122,13 +122,14 @@ Ren.DateValueChart_GroupingEntries = (() => {
      *
      * A chart that already has a date column keeps its period and any relative date range; an
      * absolute range named dates of the old column, so is dropped.  A chart gaining a date column
-     * bins it by the calc function given.
+     * bins it by the calc function given, or as previousEntry did, the entry this returned when the
+     * chart lost its date column, so that taking the date column away and back keeps its period.
      */
-    const setDateColumn = (settings, columnIndex, columnResolver, calcFunctionName) => {
+    const setDateColumn = (settings, columnIndex, columnResolver, calcFunctionName, previousEntry) => {
 
         const entries = getEntries(settings);
 
-        if (!entries) return;
+        if (!entries) return null;
 
         const dateEntry = getDateEntry(settings);
 
@@ -136,7 +137,7 @@ Ren.DateValueChart_GroupingEntries = (() => {
 
             if (dateEntry) removeEntry(settings, dateEntry);
 
-            return;
+            return dateEntry;
         }
 
         const columnKey = columnResolver?.getColumnIdOrHeading(columnIndex);
@@ -151,17 +152,42 @@ Ren.DateValueChart_GroupingEntries = (() => {
 
             if (range && !(range.lastPeriodCount > 0) && !range.preset) delete dateEntry.dateRange;
 
-            return;
+            return null;
         }
 
-        const entry = {
-            groupByColumnIndexes: [columnIndex],
-            groupByCalcFunctions: [{ name: calcFunctionName }]
-        };
+        const entry = previousEntry
+            ? getRestoredDateEntry(previousEntry, columnIndex, columnKey)
+            : {
+                groupByColumnIndexes: [columnIndex],
+                groupByCalcFunctions: [{ name: calcFunctionName }]
+            };
 
         if (columnKey) entry.groupByColumns = [columnKey];
 
         insertEntry(settings, 0, entry);
+
+        return null;
+    };
+
+    /**
+     * Gets a date entry for the given column like one the chart had before, keeping its period
+     * and its options other than the aggregation settings, which stay where they are.  An absolute
+     * range named dates of its own column, so is kept only for the same column.
+     */
+    const getRestoredDateEntry = (previousEntry, columnIndex, columnKey) => {
+
+        const entry = Ren.ObjectUtils.clone(previousEntry);
+
+        delete entry.columns;
+
+        const isSameColumn = columnKey && previousEntry.groupByColumns?.[0] === columnKey;
+        const range = entry.dateRange;
+
+        if (!isSameColumn && range && !(range.lastPeriodCount > 0) && !range.preset) delete entry.dateRange;
+
+        entry.groupByColumnIndexes = [columnIndex];
+
+        return entry;
     };
 
     /**
