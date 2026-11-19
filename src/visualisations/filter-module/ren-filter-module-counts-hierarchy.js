@@ -391,7 +391,8 @@ Ren.FilterModule_Counts_Hierarchy = (s, counts) => {
         // Populated once per level, as one pass covers every group of the parents' grouping.
         const levelsWithPopulatedStats = new Set();
 
-        // The "Sort" toggle is keyed on the leaf and switches only its level's sort.
+        // The "Sort" toggle switches every level's sort, so it changes the order where it would
+        // reorder any level's nodes.
         let sortToggleChangesOrder = false;
 
         const buildNodes = (groupsMap, depth, parentKey, ancestorValues, parentGroup) => {
@@ -530,7 +531,7 @@ Ren.FilterModule_Counts_Hierarchy = (s, counts) => {
                 nodes.push(node);
             });
 
-            const unsortedNodes = isLeaf && !sortToggleChangesOrder
+            const unsortedNodes = !sortToggleChangesOrder
                 ? nodes.slice()
                 : null;
 

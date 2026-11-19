@@ -202,16 +202,20 @@ Ren.FilterModule_HierarchyView = (s) => {
 
                 sortGroup.title = s.SORT_TOGGLE_TITLE;
 
-                const sortToggle = Ren.ToggleSwitch.create(
-                    !itemSettings.isSortedByValue(leafColumn.columnIdOrHeading)
+                // Each level sorts by its own setting, so the toggle reads as the top level, the
+                // one seen first, and sets every level alike.
+                const isSortedByAggregation =
+                    !itemSettings.isSortedByValue(topColumn.columnIdOrHeading);
+
+                const toggleSortMode = () => itemSettings.setSortModeOfColumns(
+                    hierarchyColumns.map((column) => column.columnIdOrHeading),
+                    isSortedByAggregation
                 );
 
-                sortToggle.onClick(() => itemSettings.toggleSortMode(leafColumn.columnIdOrHeading));
+                const sortToggle = Ren.ToggleSwitch.create(isSortedByAggregation);
 
-                sortLabel.addEventListener(
-                    "click",
-                    () => itemSettings.toggleSortMode(leafColumn.columnIdOrHeading)
-                );
+                sortToggle.onClick(toggleSortMode);
+                sortLabel.addEventListener("click", toggleSortMode);
 
                 sortGroup.appendChild(sortToggle.element);
             }

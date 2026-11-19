@@ -568,17 +568,14 @@ Ren.FilterModule_Settings = (s) => {
     };
 
     // Leaves any aggregated sort stored, so toggling "Sort" back on restores it.
-    const setSortByValue = (columnIdOrHeading) => {
+    const storeSortByValue = (columnIdOrHeading) => {
 
-        const entry = getOrCreateColumnOverride(columnIdOrHeading);
-
-        entry.sortByValue = true;
+        getOrCreateColumnOverride(columnIdOrHeading).sortByValue = true;
 
         counts.invalidateCountsForColumn(columnIdOrHeading);
-        view.render();
     };
 
-    const setSortByAggregation = (columnIdOrHeading) => {
+    const storeSortByAggregation = (columnIdOrHeading) => {
 
         const entry = columnOverrides[columnIdOrHeading];
         if (!entry && !sortsByValueByDefault(columnIdOrHeading)) return;
@@ -587,6 +584,32 @@ Ren.FilterModule_Settings = (s) => {
 
         pruneColumnOverride(columnIdOrHeading);
         counts.invalidateCountsForColumn(columnIdOrHeading);
+    };
+
+    const setSortByValue = (columnIdOrHeading) => {
+
+        storeSortByValue(columnIdOrHeading);
+        view.render();
+    };
+
+    const setSortByAggregation = (columnIdOrHeading) => {
+
+        storeSortByAggregation(columnIdOrHeading);
+        view.render();
+    };
+
+    // Sorts each of several columns by value or by aggregation, as a hierarchy's levels are by
+    // its "Sort" toggle, with one render.
+    const setSortModeOfColumns = (columnIdsOrHeadings, byValue) => {
+
+        for (const columnIdOrHeading of columnIdsOrHeadings) {
+
+            if (isSortedByValue(columnIdOrHeading) === byValue) continue;
+
+            if (byValue) storeSortByValue(columnIdOrHeading);
+            else storeSortByAggregation(columnIdOrHeading);
+        }
+
         view.render();
     };
 
@@ -771,6 +794,7 @@ Ren.FilterModule_Settings = (s) => {
         isColumnIncluded,
         setColumnIncluded,
         toggleColumnInclusion,
+        setSortModeOfColumns,
         setSingleSelect,
         toggleSingleSelect,
         setShowSingleSelectToggle,

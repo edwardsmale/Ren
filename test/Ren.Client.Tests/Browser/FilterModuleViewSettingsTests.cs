@@ -116,6 +116,28 @@ public class FilterModuleViewSettingsTests : BrowserTest
         await Poll(() => FilterModule.OptionTextsAsync(Ren, "Category")).ToEqual(new[] { "Castings", "Structures" });
     }
 
+    // Each level sorts by its own setting, so the toggle switches them all.  The top level, Active,
+    // reads Yes (29) then No (25) by row count, and No then Yes by value.
+    [TestMethod("SortToggle_Hierarchy_SwitchesItsLevelsSort")]
+    public async Task SortToggle_Hierarchy_SwitchesItsLevelsSort()
+    {
+        await OpenWithCategoryItemAsync("FilterModuleTest09");
+        await FilterModule.GroupItemByAsync(Ren, "Category", "Active");
+
+        await FilterModule.ToggleViewSettingAsync(Ren, "Active", "#filter-module-show-sort-toggle");
+
+        var before = await FilterModule.OptionTextsAsync(Ren, "Active");
+        Expect(before.Take(2).ToArray()).ToEqual(new[] { "Yes", "No" });
+
+        await FilterModule.ClickStripToggleAsync(Ren, "Active", "Sort");
+
+        await Poll(async () => (await FilterModule.OptionTextsAsync(Ren, "Active")).Take(2).ToArray()).ToEqual(new[] { "No", "Yes" });
+
+        await FilterModule.ClickStripToggleAsync(Ren, "Active", "Sort");
+
+        await Poll(() => FilterModule.OptionTextsAsync(Ren, "Active")).ToEqual(before);
+    }
+
     // Ascending by row count, the order matches the alphabetical value sort.
     [TestMethod("SortToggle_BothSortsGiveTheSameOrder_IsHidden")]
     public async Task SortToggle_BothSortsGiveTheSameOrder_IsHidden()
