@@ -149,7 +149,7 @@ Ren.FilterModule_Grouping = (s) => {
 
     // Gets the "Group by" menu item.  Every node of a hierarchy targets the same leaf.
     const getGroupByMenuItem = (submenuItems) => ({
-        section: "Grouping",
+        section: "Values",
         text: "Group by",
         id: "filter-module-group-by",
         submenu: submenuItems
@@ -187,7 +187,6 @@ Ren.FilterModule_Grouping = (s) => {
     };
 
     const getUngroupMenuItem = (leafColumnIdOrHeading) => ({
-        section: "Grouping",
         text: "Ungroup",
         id: "filter-module-ungroup",
         action: () => ungroup(leafColumnIdOrHeading)
@@ -225,36 +224,38 @@ Ren.FilterModule_Grouping = (s) => {
     };
 
     const getInvertGroupingMenuItem = (leafColumnIdOrHeading) => ({
-        section: "Grouping",
         text: "Invert grouping",
         id: "filter-module-invert-grouping",
         action: () => invertGrouping(leafColumnIdOrHeading)
     });
 
-    // Gets the "Grouping" section's items.  None are offered on a grouping level, as a hierarchy
+    // Gets the "Group by" item ending the "Values" section, with "Invert grouping" and "Ungroup"
+    // at the foot of its submenu, or none.  None is offered on a grouping level, as a hierarchy
     // filters on value combinations, which a grouping level doesn't honour.
     const getGroupingMenuItems = (item) => {
 
         if (filterTarget.isGroupingTarget) return [];
 
         const leafColumnIdOrHeading = columnInfo.getLeafColumnIdOrHeading(item);
-        const groupBySubmenuItems = buildGroupBySubmenuItems(leafColumnIdOrHeading);
-        const items = [];
-
-        if (groupBySubmenuItems.length > 0) items.push(getGroupByMenuItem(groupBySubmenuItems));
+        const submenuItems = buildGroupBySubmenuItems(leafColumnIdOrHeading);
+        const groupingItems = [];
 
         // Offered whenever there are parent groupings to undo, even if no more can be added.
         if (hasManualParentGroupings(leafColumnIdOrHeading)) {
 
             // A derived level can't become the leaf, as its values come from the column beneath.
             if (!hasDerivedParentGroupings(leafColumnIdOrHeading)) {
-                items.push(getInvertGroupingMenuItem(leafColumnIdOrHeading));
+                groupingItems.push(getInvertGroupingMenuItem(leafColumnIdOrHeading));
             }
 
-            items.push(getUngroupMenuItem(leafColumnIdOrHeading));
+            groupingItems.push(getUngroupMenuItem(leafColumnIdOrHeading));
         }
 
-        return items;
+        if (submenuItems.length > 0 && groupingItems.length > 0) submenuItems.push(Ren.MENU_SEPARATOR);
+
+        const allItems = submenuItems.concat(groupingItems);
+
+        return allItems.length > 0 ? [getGroupByMenuItem(allItems)] : [];
     };
 
     return {

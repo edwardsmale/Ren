@@ -92,8 +92,9 @@ Ren.ContextMenuItemSorter = () => {
             // above whatever the thing inside it that was clicked has to offer.
             "View settings", "Html content", "Uploaded files", "Key/Value Grid",
             "Group Controls", "Download Report", "Menu item", "Visualisations",
-            // A filter module's column: what its items show, then how they read and group.
-            "Values", "Total value", "Labels", "Grouping",
+            // A filter module's column: what its items show (and the levels they nest in), then
+            // how they read.
+            "Values", "Total value", "Labels",
             // What the clicked cell holds: the kind of thing it is, in the host's cellMenuSections
             // (spliced in here), then the searches any value at all offers.  The reports it is
             // marked up for are unsectioned, so lead the menu.

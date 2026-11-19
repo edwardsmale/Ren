@@ -289,13 +289,14 @@ Ren.FilterModule_HierarchyView = (s) => {
             // No binning links: a hierarchy has no column of its own to bin.
             null,
             // Each level above the leaf has its own value, label and sort settings, set from a
-            // right-click on its options.
+            // right-click on its options.  "Group by" is left out, as every level's acts on the
+            // leaf, which the heading's menu already reaches.
             () => hierarchyColumns.slice(0, -1).map(column => menu.buildColumnActionMenuItems(
                 menuItem(column.columnIdOrHeading, column.columnIndex),
                 true,
                 true,
                 false
-            ))
+            ).filter((levelItem) => levelItem.id !== "filter-module-group-by"))
         );
 
         // Held against the whole row rather than the heading, which is only as wide as its text.

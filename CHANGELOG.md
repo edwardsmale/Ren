@@ -32,6 +32,7 @@ Add "Gap between periods" to the chart's bar layout, to set periods apart.
 Add a settings cog beside each filter module item's heading, opening a window of its settings or all items'.
 Start a new filter module item with the last item's value settings.
 Make a hierarchical filter module item's Sort toggle sort all its levels.
+Move a filter module item's "Group by" into its menu's Values section, with "Invert grouping" and "Ungroup" in its submenu.
 
 ## 1.1.20 (2026-11-20)
 

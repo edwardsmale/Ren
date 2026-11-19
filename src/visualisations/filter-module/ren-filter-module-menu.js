@@ -803,7 +803,8 @@ Ren.FilterModule_Menu = (s) => {
             getValueColumnMenuItem(item),
             getValueAggregationMenuItem(item),
             getValueWithRespectToMenuItem(item),
-            getFormatMenuItem(item)
+            getFormatMenuItem(item),
+            ...grouping.getGroupingMenuItems(item)
         ];
 
         if (includeTotalValueItems) {
@@ -833,7 +834,7 @@ Ren.FilterModule_Menu = (s) => {
 
         if (includeAddColumn) items.push(getStackInColumnsMenuItem());
 
-        return items.concat(grouping.getGroupingMenuItems(item));
+        return items;
     };
 
     return {

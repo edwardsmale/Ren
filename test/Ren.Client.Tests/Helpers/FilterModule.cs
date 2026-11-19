@@ -498,23 +498,25 @@ public static class FilterModule
     }
 
     /// <summary>
-    /// Clicks "Invert grouping" on a hierarchical item's heading menu, and waits for the item to
-    /// show under the heading of its new top level.
+    /// Clicks "Invert grouping" at the foot of a hierarchical item's "Group by" submenu, and waits
+    /// for the item to show under the heading of its new top level.
     /// </summary>
     public static async Task InvertGroupingAsync(RenContext ren, string itemHeading, string newTopColumnHeading)
     {
         await ShowItemHeadingMenuAsync(ren, itemHeading);
+        await ren.Root.MouseOverAsync("#filter-module-group-by");
         await ren.Root.ClickAsync("#filter-module-invert-grouping");
         await ExpectItemExistsAsync(ren, newTopColumnHeading);
     }
 
     /// <summary>
-    /// Clicks "Ungroup" on a hierarchical item's heading menu, and waits for the item to be headed
-    /// by its leaf column again.
+    /// Clicks "Ungroup" at the foot of a hierarchical item's "Group by" submenu, and waits for the
+    /// item to be headed by its leaf column again.
     /// </summary>
     public static async Task UngroupItemAsync(RenContext ren, string itemHeading, string leafColumnHeading)
     {
         await ShowItemHeadingMenuAsync(ren, itemHeading);
+        await ren.Root.MouseOverAsync("#filter-module-group-by");
         await ren.Root.ClickAsync("#filter-module-ungroup");
         await ExpectItemExistsAsync(ren, leafColumnHeading);
     }
