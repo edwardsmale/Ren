@@ -13,6 +13,10 @@ Ren.VisualisationTypes_DateValueChart = {
         selectedColumns: "Array",
         barNarrowingRatio: "Number",
 
+        // The screen pixels left clear between periods, half at either side of each, narrowing
+        // its bars to keep one period's apart from the next's.  0 by default.
+        periodGap: "Number",
+
         // How several line series are drawn together: "Overlayed" (the default) or "Stacked", per
         // Ren.LineLayoutEnum.  Shaded, each line is filled down to the line below it, or to zero
         // where they are overlayed, at lineShadingOpacity (0 to 1, 0.25 by default).
@@ -275,6 +279,10 @@ Ren.VisualisationTypes_DateValueChart = {
         {
             name: "barNarrowingRatio",
             transform: (barNarrowingRatio) => Math.round(barNarrowingRatio * 10000) / 10000
+        },
+        {
+            name: "periodGap",
+            transform: (periodGap) => periodGap > 0 ? periodGap : undefined
         },
         {
             name: "barLayout",

@@ -606,7 +606,7 @@ Ren.DateValueChart_Render = (() => {
                             return d => {
 
                                 const centerDate = crossValueFn(d);
-                                const periodWidth = Ren.DateValueChartCalculator.periodWidth(props, d[props.dateHeading]);
+                                const periodWidth = Ren.DateValueChartCalculator.paddedPeriodWidth(props, d[props.dateHeading]);
                                 const availableWidth = periodWidth * (1 - 0.04);
                                 const barPixelWidth = availableWidth / slotCount;
                                 const barPixelOffset = (slot - (slotCount - 1) / 2) * barPixelWidth;

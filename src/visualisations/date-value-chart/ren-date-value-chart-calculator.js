@@ -76,6 +76,19 @@ Ren.DateValueChartCalculator = (() => {
     };
 
     /**
+     * The width of a period the bars standing for it share: the period's width less the gap the
+     * chart leaves between periods (periodGap, in screen pixels), half of it at either side, so
+     * that one period's bars stand clear of the next's.
+     */
+    const paddedPeriodWidth = (props, date) => {
+
+        const gapPx = Number(props.periodGap) || 0;
+        const gap = gapPx > 0 ? gapPx / (props.scaleX || 1) : 0;
+
+        return Math.max(0, periodWidth(props, date) - gap);
+    };
+
+    /**
      * The date halfway through the part of a period the axis shows, which is where the mark drawn
      * for that period is centred.
      */
@@ -252,6 +265,7 @@ Ren.DateValueChartCalculator = (() => {
         axisPeriodSpan,
         startOfAxisPeriod,
         periodWidth,
+        paddedPeriodWidth,
         periodCentre,
         getTimeInterval,
         getSubDayPeriodMilliseconds,

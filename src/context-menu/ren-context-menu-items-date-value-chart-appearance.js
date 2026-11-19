@@ -473,6 +473,35 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         { visible: () => Ren.DateValueChartCalculator.isSplitFromSeveralColumns(props) }
     );
 
+    // The widest gap offered between periods, beyond which their bars would be lost.
+    const MAX_PERIOD_GAP = 80;
+
+    const periodGapMenuItem = {
+        text: "Gap between periods...",
+        id: "period-gap",
+        title: "Leaves space between one period's bars and the next's, narrowing them, to set the "
+            + "periods apart",
+        action: () => {
+
+            Ren.CreateNumberEditorPopupWindow(
+                "Gap Between Periods",
+                props.periodGap || 0,
+                gap => setChartProperty("periodGap", gap, props.redrawChart),
+                {
+                    label: "Gap (px)",
+                    min: 0,
+                    max: MAX_PERIOD_GAP,
+                    step: 1,
+                    width: 200,
+                    height: 90,
+                    showSlider: true,
+                    centredOnPoint: Ren.LastRightClickPosition,
+                    closeWhenFocusLost: true
+                }
+            );
+        }
+    };
+
     const barLayoutMenuItem = {
         text: "Bar layout",
         id: "bar-layout",
@@ -505,7 +534,9 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
                 "Overlayed (per split)",
                 Ren.BarLayoutEnum.OverlayedPerSplit
             ),
-            buildPerSplitBarLayoutOption("Stacked (per split)", Ren.BarLayoutEnum.StackedPerSplit)
+            buildPerSplitBarLayoutOption("Stacked (per split)", Ren.BarLayoutEnum.StackedPerSplit),
+            Ren.MENU_SEPARATOR,
+            periodGapMenuItem
         ]
     };
 

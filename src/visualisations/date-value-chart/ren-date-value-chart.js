@@ -1198,6 +1198,9 @@ Ren.CreateDateValueChart = (() => {
 
         props.barLayout = visualisation.barLayout || Ren.BarLayoutEnum.SideBySide;
 
+        // The screen pixels left clear between one period's bars and the next's; none by default.
+        props.periodGap = visualisation.periodGap > 0 ? Number(visualisation.periodGap) : 0;
+
         // A <ren-date-value-chart> attribute states the enum by name.
         props.lineLayout = typeof visualisation.lineLayout === "string"
             ? Ren.ObjectUtils.getEnumValue(Ren.LineLayoutEnum, visualisation.lineLayout)

@@ -5,8 +5,9 @@ Ren.ChartBarSeries = (() => {
     };
 
     /**
-     * The width a bar standing for a period is drawn at: the width of the period itself, less the
-     * padding that keeps one period's bars clear of the next's, narrowed by the ratio the chart
+     * The width a bar standing for a period is drawn at: the width of the period itself, less any
+     * gap the chart leaves between periods, less the share that keeps one period's bars
+     * clear of the next's, narrowed by the ratio the chart
      * holds.  That ratio carries both the share of the period a side-by-side series' bars take and
      * any width the bars have been dragged to, so neither is applied again here.
      *
@@ -20,7 +21,7 @@ Ren.ChartBarSeries = (() => {
      */
     const getBarWidth = (props, date, barPadding) => {
 
-        const periodWidth = Ren.DateValueChartCalculator.periodWidth(props, date);
+        const periodWidth = Ren.DateValueChartCalculator.paddedPeriodWidth(props, date);
         const width = periodWidth * (1 - (barPadding ?? defaultOptions.barPadding));
 
         return props.barNarrowingRatio ? width * props.barNarrowingRatio : width;
