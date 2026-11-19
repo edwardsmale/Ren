@@ -852,6 +852,18 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
     const setSubdivideColumn = (column) => {
 
+        const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
+        const previousInitialFormat = Subdivisions.getInitialNameFormatFunction(props.subdivideColumn);
+
+        // A name format made for the previous column, untouched, would misname the new one's.
+        if (column !== props.subdivideColumn
+            && (!visualisation.subdivisionNameFormatFunction
+                || JSON.stringify(visualisation.subdivisionNameFormatFunction)
+                    === JSON.stringify(previousInitialFormat))) {
+
+            visualisation.subdivisionNameFormatFunction = Subdivisions.getInitialNameFormatFunction(column);
+        }
+
         visualisation.subdivideColumn = column ?? undefined;
         props.subdivideColumn = column;
 

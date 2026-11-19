@@ -36,6 +36,7 @@ Move a filter module item's "Group by" into its menu's Values section, with "Inv
 Add "Thousands" Number and Currency formats, showing every figure in thousands (£32k).
 Keep a date/value chart's "Split data" and "Subdivide by" settings as one dropdown each.
 Add "Subdivision name format" and "Subdivision value format" to date/value charts.
+Name a date/value chart's subdivisions "Is …" and "Not …" when it is subdivided by an "Is…" column.
 
 ## 1.1.20 (2026-11-20)
 

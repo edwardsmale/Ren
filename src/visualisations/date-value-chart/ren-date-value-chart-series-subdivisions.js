@@ -1165,7 +1165,29 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         ];
     };
 
+    // A yes/no column named as a question, such as IsGiftOrder, its thing named after "Is".
+    const IS_COLUMN_PATTERN = /^Is([A-Z][A-Za-z0-9]*)$/;
+
+    /**
+     * Gets the name format a column's subdivisions start with, or undefined where they start with
+     * none: for a yes/no column named as a question, such as IsGiftOrder, a custom function
+     * naming them "Is Gift Order" and "Not Gift Order" in place of 1 and 0.
+     */
+    const getInitialNameFormatFunction = (column) => {
+
+        const match = IS_COLUMN_PATTERN.exec(column ?? "");
+
+        if (!match) return undefined;
+
+        const thing = match[1].replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+
+        return [
+            `return [true, 1, "1", "true", "True", "TRUE"].includes(value) ? ${JSON.stringify("Is " + thing)} : ${JSON.stringify("Not " + thing)};`
+        ];
+    };
+
     return {
+        getInitialNameFormatFunction,
         BAR_MARK_CLASS,
         PIE_MARK_CLASS,
         GROOVE_CLASS,

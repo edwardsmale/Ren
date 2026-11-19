@@ -812,4 +812,31 @@ describe("Ren.DateValueChart_InputColumns subdivisions", () => {
         expect(Ren.DateValueChart_SeriesSubdivisions.getLabelText(props, 0, subdivision)).toBe("32k");
     });
 
+    test("getInitialNameFormatFunction_IsColumn_NamesItsValuesIsAndNot", () => {
+
+        const Subdivisions = Ren.DateValueChart_SeriesSubdivisions;
+
+        const props = {
+            subdivisionLabels: "names",
+            valueColumnFormats: [Ren.SpreadsheetColumnFormatEnum.Number],
+            visualisation: { subdivisionNameFormatFunction: Subdivisions.getInitialNameFormatFunction("IsGiftOrder") }
+        };
+
+        const labelFor = (columnValue) => Subdivisions.getLabelText(props, 0,
+            { label: String(columnValue), value: 5, columnValue, columnValues: [String(columnValue)] });
+
+        expect(labelFor(1)).toBe("Is Gift Order");
+        expect(labelFor(0)).toBe("Not Gift Order");
+        expect(labelFor(true)).toBe("Is Gift Order");
+        expect(labelFor("0")).toBe("Not Gift Order");
+    });
+
+    // "Island" is a word, not a question.
+    test("getInitialNameFormatFunction_OtherColumns_None", () => {
+
+        for (const column of ["Island", "Region", "Is", "", null]) {
+
+            expect(Ren.DateValueChart_SeriesSubdivisions.getInitialNameFormatFunction(column)).toBeUndefined();
+        }
+    });
 });
