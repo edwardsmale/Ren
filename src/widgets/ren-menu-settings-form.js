@@ -472,8 +472,13 @@ Ren.MenuSettingsForm = (container, options) => {
 
         if (key !== null) group._attr("data-group-key", key);
 
-        // Each level down is set in a little further.
-        if (depth > 0) group._addClass(CLASS_NAME + "__group--nested");
+        // Each level down is set in a little further, its labels' column narrowed to match so that
+        // its controls line up with the rest.
+        if (depth > 0) {
+
+            group._addClass(CLASS_NAME + "__group--nested");
+            group.style.setProperty("--ren-menu-settings-form-depth", String(depth));
+        }
 
         return group;
     };
