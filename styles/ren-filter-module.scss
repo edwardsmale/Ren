@@ -274,6 +274,52 @@ $busySpinnerGap: 2px;
         min-width: 0;
     }
 
+    /* The cog opening the item's settings window, just after its heading.  It takes the row's spare
+       width in the heading's place, so the other buttons stay at the row's right-hand end.  It is
+       shown only while the item is hovered, but keeps its room, so the item doesn't change width. */
+    &__item-heading-row > &__item-heading:has(+ .ren-filter-module__item-settings),
+    &__checkbox-heading:has(+ .ren-filter-module__item-settings)
+    {
+        margin-right: 0;
+    }
+
+    &__item-settings
+    {
+        flex-shrink: 0;
+        margin-left: -0.5rem;
+        margin-right: auto;
+        padding: 0;
+        border: none;
+        background: transparent;
+        line-height: 0;
+        color: #BBBBBB;
+        cursor: pointer;
+        opacity: 0;
+
+        &:hover
+        {
+            color: #888888;
+        }
+
+        &:focus-visible
+        {
+            opacity: 1;
+        }
+    }
+
+    &__item:hover &__item-settings
+    {
+        opacity: 1;
+    }
+
+    &__item-settings-icon
+    {
+        display: block;
+        width: 11px;
+        height: 11px;
+        fill: currentColor;
+    }
+
     /* Nudged down a pixel: centring the boxes leaves the bold text looking slightly high beside
        the checkbox. */
     &__checkbox-heading > &__item-heading

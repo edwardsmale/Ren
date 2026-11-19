@@ -11,8 +11,8 @@
  *                  settings are of one of several things, such as one of a chart's series, has
  *                  subjects, { label, getOptions }, where getOptions gets [{ key, label }]: a
  *                  dropdown above its settings chooses which, and its key is passed to buildModel
- *                  and the tab's runAction.  A tab whose subjects are fixed, such as all of a
- *                  chart's series, has { label, text } instead, shown in a header like the
+ *                  and the tab's runAction.  subjects.initialKey, if given, is chosen at
+ *                  first.  A tab whose subjects are fixed, such as all of a chart's series, has { label, text } instead, shown in a header like the
  *                  dropdown's, so the window keeps its layout as tabs are switched.
  *   runAction    - runs what a control does, as the menu would have run it, where a tab has no
  *                  runAction of its own.
@@ -119,6 +119,11 @@ Ren.MenuSettingsWindow = (() => {
 
             // The key of what each tab with subjects has chosen, by tab title.
             const subjectKeys = new Map();
+
+            options.tabs.forEach(tab => {
+
+                if (tab.subjects?.initialKey != null) subjectKeys.set(tab.title, String(tab.subjects.initialKey));
+            });
 
             // The dropdown of each tab with subjects, by tab title.
             const subjectSelects = new Map();

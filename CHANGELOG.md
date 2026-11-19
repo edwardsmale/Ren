@@ -29,6 +29,7 @@ Move "Date column" to the Dates section, before "Group by".
 Line up the chart settings window's checkboxes with its radio buttons.
 Mark a series' highest and lowest at its last period's estimate, where it has one.
 Add "Gap between periods" to the chart's bar layout, to set periods apart.
+Add a settings cog beside each filter module item's heading, opening a window of its settings or all items'.
 
 ## 1.1.20 (2026-11-20)
 

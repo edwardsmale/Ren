@@ -283,7 +283,15 @@ Ren.FilterModule_HierarchyView = (s) => {
             headingElement,
             menuItem(leafColumn.columnIdOrHeading, leafColumn.columnIndex),
             // No binning links: a hierarchy has no column of its own to bin.
-            null
+            null,
+            // Each level above the leaf has its own value, label and sort settings, set from a
+            // right-click on its options.
+            () => hierarchyColumns.slice(0, -1).map(column => menu.buildColumnActionMenuItems(
+                menuItem(column.columnIdOrHeading, column.columnIndex),
+                true,
+                true,
+                false
+            ))
         );
 
         // Held against the whole row rather than the heading, which is only as wide as its text.

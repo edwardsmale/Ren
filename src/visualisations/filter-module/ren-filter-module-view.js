@@ -223,13 +223,27 @@ Ren.FilterModule_View = (s) => {
         if (filterHeadingTooltip) headingElement.title = filterHeadingTooltip;
     };
 
-    const buildHeadingRow = (headingElement, item, itemLinks) => {
+    /**
+     * Builds an item's heading row.  getLevelMenus, for a hierarchy, gets the menus of its levels
+     * above the leaf, so that its settings window sets theirs too (see
+     * Ren.FilterModule_SettingsWindow.addSettingsButton).
+     */
+    const buildHeadingRow = (headingElement, item, itemLinks, getLevelMenus) => {
 
         const headingRow = Ren.HtmlUtils.create("div")
             ._addClass("ren-filter-module__item-heading-row")
             ._append(headingElement);
 
         if (itemLinks) headingRow._append(itemLinks);
+
+        // Just after the heading, so it reads as the heading's own.
+        Ren.FilterModule_SettingsWindow.addSettingsButton(
+            s.visualisation,
+            headingRow,
+            headingElement,
+            item.columnIdOrHeading,
+            getLevelMenus
+        );
 
         return headingRow._append(
             includeWhenSaving.buildToggleButton(item),
