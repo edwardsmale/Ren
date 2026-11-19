@@ -50,6 +50,19 @@ Ren.DateValueChart_Extremes = (() => {
     };
 
     /**
+     * Gets the values a series' extremes are found among, one per row: the last period's estimate
+     * in place of its value so far, where the series estimates it, as so far it would read as a
+     * low that the period won't be.
+     */
+    const getMarkedValues = (props, rows, seriesIndex) => {
+
+        const heading = props.valueHeadings[seriesIndex];
+        const estimate = Ren.DateValueChart_LastPeriodEstimate.getRefreshedEstimate(props, seriesIndex);
+
+        return rows.map(row => estimate && row === estimate.row ? estimate.estimatedValue : row[heading]);
+    };
+
+    /**
      * Marks one value: a ring, and a label beside it, level with the highest value, clear of the
      * value label above it, and a little below the lowest.  Both are counter-scaled about the
      * value's point within their wrapper to keep their size.
@@ -226,9 +239,9 @@ Ren.DateValueChart_Extremes = (() => {
 
             if (!axis?.yScale) continue;
 
-            const heading = props.valueHeadings[i];
-            const values = rows.map(row => row[heading]);
+            const values = getMarkedValues(props, rows, i);
             const indexes = getExtremeIndexes(values);
+            const estimate = Ren.DateValueChart_LastPeriodEstimate.getRefreshedEstimate(props, i);
 
             if (indexes.highest === null) continue;
 
@@ -253,20 +266,30 @@ Ren.DateValueChart_Extremes = (() => {
                 if (mark.index === null) continue;
 
                 const row = rows[mark.index];
+                const isEstimate = !!estimate && row === estimate.row;
                 const valueText = formatValue(values[mark.index]);
                 const bar = props.barPlacements?.[i];
+                const shownMark = isEstimate
+                    ? Object.assign({}, mark, { text: mark.text + " (est.)" })
+                    : mark;
 
                 if (bar) {
 
                     const isUp = values[mark.index] >= 0;
-                    const end = bar.getEnd(row, mark.index, isUp);
+
+                    // An overlayed estimate's bar is drawn apart from the series' own, which
+                    // stands at the value so far; plotted, the series' bar is the estimate's.
+                    const end = isEstimate
+                        && !Ren.DateValueChart_LastPeriodEstimate.isEstimatePlotted(props, i)
+                        ? { value: estimate.estimatedValue, seriesIndex: i }
+                        : bar.getEnd(row, mark.index, isUp);
 
                     renderBarMark(
                         group,
                         props.xScale.getPixel(bar.crossValueFn(row)),
                         axis.yScale.getPixel(end.value),
                         isUp,
-                        mark,
+                        shownMark,
                         valueText,
                         i,
                         end.seriesIndex ?? i,
@@ -286,7 +309,7 @@ Ren.DateValueChart_Extremes = (() => {
                     group,
                     props.xScale.getPixel(date),
                     axis.yScale.getPixel(values[mark.index]),
-                    mark,
+                    shownMark,
                     valueText,
                     i,
                     series.colour
@@ -300,6 +323,7 @@ Ren.DateValueChart_Extremes = (() => {
         buildValueStyle,
         clearBarValueLabels,
         getExtremeIndexes,
+        getMarkedValues,
         render
     };
 })();

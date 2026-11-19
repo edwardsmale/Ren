@@ -631,6 +631,7 @@ Ren.DateValueChart_LastPeriodEstimate = (() => {
         refreshEstimates,
         getRefreshedEstimate,
         applyEstimatedValue,
+        isEstimatePlotted,
         getExtentValue,
         getSeriesTypeString,
         renderForSeries

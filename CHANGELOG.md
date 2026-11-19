@@ -27,6 +27,7 @@ Put those on the All Series tab instead where the data are split from one column
 Keep a date/value chart's Group by when its date column is set to None and back.
 Move "Date column" to the Dates section, before "Group by".
 Line up the chart settings window's checkboxes with its radio buttons.
+Mark a series' highest and lowest at its last period's estimate, where it has one.
 
 ## 1.1.20 (2026-11-20)
 

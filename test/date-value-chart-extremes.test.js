@@ -27,4 +27,22 @@ describe("Ren.DateValueChart_Extremes", () => {
 
         expect(Extremes.getExtremeIndexes([null, "x"])).toEqual({ highest: null, lowest: null });
     });
+
+    test("getMarkedValues_LastPeriodEstimated_EstimateInPlaceOfValueSoFar", () => {
+
+        const rows = [{ v: 10 }, { v: 8 }, { v: 3 }];
+        const props = {
+            valueHeadings: ["v"],
+            lastPeriodEstimates: [{ row: rows[2], estimatedValue: 12 }]
+        };
+
+        expect(Extremes.getMarkedValues(props, rows, 0)).toEqual([10, 8, 12]);
+    });
+
+    test("getMarkedValues_NoEstimate_ValuesAsTheyAre", () => {
+
+        const rows = [{ v: 10 }, { v: 3 }];
+
+        expect(Extremes.getMarkedValues({ valueHeadings: ["v"] }, rows, 0)).toEqual([10, 3]);
+    });
 });
