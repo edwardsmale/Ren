@@ -81,14 +81,15 @@ Ren.MenuSettingsForm = (container, options) => {
 
     const isFocused = (element) => document.activeElement === element;
 
-    const createRow = (node, control, isWide) => {
+    // The label column is left empty where the control carries its own text, as a checkbox does.
+    const createRow = (node, control, isWide, label = node.label) => {
 
         const row = create("div", "row");
 
         if (node.title) row.title = node.title;
 
         if (isWide) row._addClass(CLASS_NAME + "__row--wide");
-        else row._append(create("label", "label")._textContent(node.label || ""));
+        else row._append(create("label", "label")._textContent(label || ""));
 
         return row._append(control);
     };
@@ -113,7 +114,8 @@ Ren.MenuSettingsForm = (container, options) => {
         control._append(checkbox, create("span", "toggle-text")._textContent(node.label));
 
         return {
-            row: createRow(node, control, true),
+            // In the control column, its text beside it, so it lines up with the other controls.
+            row: createRow(node, control, false, ""),
             inputs: [checkbox],
             show: (newNode) => {
 
@@ -161,7 +163,8 @@ Ren.MenuSettingsForm = (container, options) => {
         });
 
         return {
-            row: createRow(node, control, !node.label)._addClass(CLASS_NAME + "__row--radios"),
+            // Kept in the control column even where unlabelled, so every choice's buttons line up.
+            row: createRow(node, control, false)._addClass(CLASS_NAME + "__row--radios"),
             // Each is disabled with its option (see show).
             inputs: [],
             show: (newNode) => {
@@ -479,6 +482,8 @@ Ren.MenuSettingsForm = (container, options) => {
 
         const group = createGroupElement(node.key, depth);
 
+        if (node.isScope) group._addClass(CLASS_NAME + "__group--scope");
+
         if (node.heading) {
 
             const heading = create("div", "heading")._textContent(node.heading);
@@ -589,7 +594,8 @@ Ren.MenuSettingsForm = (container, options) => {
      */
     const getSubtabs = (model) => {
 
-        const isSection = (node) => node.type === "group" && !!node.heading;
+        // A group setting apart what acts on a scope (see Ren.MenuSettingsModel) is not a section.
+        const isSection = (node) => node.type === "group" && !!node.heading && !node.isScope;
         const sections = model.children.filter(isSection);
 
         if (sections.length < 2) return null;

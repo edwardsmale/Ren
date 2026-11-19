@@ -363,7 +363,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Line style",
         id: "series-line-style",
         // Offered where any of the series is drawn as a line; the others keep the style for if
-        // they are made lines.
+        // they are made lines.  Left out of a settings form otherwise, rather than greyed out.
+        omitWhenHidden: true,
         visible: () => getTargetSeriesIndexes().some(
             seriesIndex => getSeriesPropertyAt(seriesIndex, "chartType", null)
                 === Ren.SeriesChartTypeEnum.Line
@@ -392,7 +393,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Dot size",
         id: "series-dot-size",
         // Offered where any of the series is drawn as dots; the others keep the size for if they
-        // are made dots.
+        // are made dots.  Left out of a settings form otherwise, rather than greyed out.
+        omitWhenHidden: true,
         visible: () => getTargetSeriesIndexes().some(
             seriesIndex => getSeriesPropertyAt(seriesIndex, "chartType", null)
                 === Ren.SeriesChartTypeEnum.Dot
@@ -896,11 +898,13 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     // are that series', and the layouts follow under the whole chart's heading.  Where the series
     // are drawn as a mixture, none of the kinds is ticked.  The series drawn as pies share a pie
     // per period, drawn over the plot's top half where other series are drawn as bars, lines or
-    // dots.
+    // dots.  In a settings form the kinds lead the line style and dot size, set in beneath them, so
+    // that "Draw as" stays in the same place whichever kind is chosen.
     const chartTypeMenuItem = {
         section: "Appearance",
         text: "Draw as",
         id: "chart-type",
+        isChoiceLed: true,
         submenu: [
             targetSeriesHeadingMenuItem,
             buildSeriesChartTypeOption("Bars", "chart-type-bars", Ren.SeriesChartTypeEnum.Bar),

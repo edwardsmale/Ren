@@ -137,3 +137,25 @@ test("update_NumberField_ShowsItsValue", () => {
     expect(container.querySelector("input[type=range]").value).toBe("7");
     expect(container.querySelector("." + CLASS_NAME + "__unit").textContent).toBe("px");
 });
+
+test("update_ScopeGroup_IsMarkedOffAndNotASubtab", () => {
+
+    const { container, form } = createForm();
+    const shared = option("Show labels", false, { id: "labels", section: "Appearance" });
+
+    shared.ticked = () => {
+        Ren.MenuItemProbe.noteDependency("shared");
+        return false;
+    };
+
+    form.update(Ren.MenuSettingsModel.build(
+        [option("Show legend", true, { id: "legend", section: "Appearance" }), shared],
+        { includeHidden: true, getScope: control => control.dependencies.has("shared") ? "Shared" : null }
+    ));
+
+    const scopeGroup = container.querySelector("." + CLASS_NAME + "__group--scope");
+
+    expect(scopeGroup.querySelector("input[type=checkbox]")).toBe(findKeyed(container, "labels"));
+    expect(Array.from(container.querySelectorAll("." + CLASS_NAME + "__subtab")).map(t => t.textContent))
+        .not.toContain("Shared");
+});

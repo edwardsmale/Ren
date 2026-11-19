@@ -52,6 +52,12 @@
  * are shown, such as whether a run is a choice or toggles, which otherwise depend in part on which
  * are ticked.
  *
+ * options.getScope, if given, is passed { item, dependencies } for each control, where dependencies
+ * are those noted while its tick was read or its editor opened, and says what, beyond what the
+ * form is for, the control acts on, if anything, such as every series split from the same column.
+ * Controls acting on the same scope are set apart from the rest of their section or submenu, in a
+ * group headed by it (isScope), unless that is all of it.
+ *
  * options.include, if given, is passed { item, dependencies } for each control and says whether to
  * keep it, where dependencies are the names noted by Ren.MenuItemProbe.noteDependency while the
  * item was looked at, e.g. that it acts on a chart's series.
@@ -206,7 +212,8 @@ Ren.MenuSettingsModel = (() => {
         title: source.title,
         selected: !!selected,
         isHidden: !!source.isHidden,
-        item: source.item
+        item: source.item,
+        scope: source.scope || null
     });
 
     /**
@@ -244,7 +251,8 @@ Ren.MenuSettingsModel = (() => {
         isAlone,
         isOptionAlone: isAlone && OPTION_WORDS.test(leaf.label),
         tickedSource: leaf.tickedSource,
-        exclusiveGroup: leaf.exclusiveGroup
+        exclusiveGroup: leaf.exclusiveGroup,
+        scope: leaf.scope
     });
 
     /**
@@ -373,6 +381,7 @@ Ren.MenuSettingsModel = (() => {
                 title: null,
                 selected: !selected,
                 isHidden: isAllHidden(options),
+                scope: getCommonScope(options),
                 item: selected
                     ? { action: () => selected.item.action.apply(null, selected.item.actionParameters ?? []) }
                     : null
@@ -454,6 +463,63 @@ Ren.MenuSettingsModel = (() => {
         }
 
         return joined;
+    };
+
+    /**
+     * Gets the scope every one of the given nodes or options has, or null where they differ.
+     */
+    const getCommonScope = (nodes) => {
+
+        const scopes = nodes.map(node => getScope(node));
+
+        return scopes.length && scopes[0] && scopes.every(scope => scope === scopes[0]) ? scopes[0] : null;
+    };
+
+    /**
+     * Gets what a node acts on beyond what the form is for (see options.getScope): what all its
+     * options or children do, or else nothing.  A group that sets a scope apart has none itself.
+     */
+    function getScope(node) {
+
+        if (node.isScope) return null;
+        if (node.type === "choice") return getCommonScope(node.options);
+        if (node.type === "group") return getCommonScope(node.children);
+
+        return node.scope || null;
+    }
+
+    /**
+     * Sets apart the nodes acting on a scope, in a group headed by it, after the rest, in each
+     * group too.  Where all of a submenu's nodes act on the same scope, they are left together,
+     * for the submenu to be set apart as a whole; the top of a section is always divided.
+     */
+    const setApartScopes = (nodes, parentKey, isTop) => {
+
+        nodes.forEach(node => {
+            if (node.type === "group") node.children = setApartScopes(node.children, node.key, false);
+        });
+
+        const scopes = nodes.map(getScope);
+
+        if (!scopes.some(Boolean) || (!isTop && getCommonScope(nodes))) return nodes;
+
+        const nodesByScope = new Map();
+
+        nodes.forEach((node, index) => {
+
+            const scope = scopes[index];
+
+            if (!scope) return;
+            if (!nodesByScope.has(scope)) nodesByScope.set(scope, []);
+
+            nodesByScope.get(scope).push(node);
+        });
+
+        const scopeGroups = Array.from(nodesByScope, ([scope, children]) =>
+            Object.assign(createGroup(scope, null, parentKey + "/scope:" + scope, children), { isScope: true })
+        );
+
+        return nodes.filter((node, index) => !scopes[index]).concat(scopeGroups);
     };
 
     const createGroup = (heading, title, key, children) =>
@@ -546,6 +612,8 @@ Ren.MenuSettingsModel = (() => {
             return described;
         };
 
+        const getItemScope = (item, dependencies) => settings.getScope({ item, dependencies }) || null;
+
         const describeShown = (item, parentKey, looked) => {
 
             const dependencies = looked.dependencies;
@@ -568,6 +636,7 @@ Ren.MenuSettingsModel = (() => {
 
                 return {
                     kind: "tickable",
+                    scope: getItemScope(item, ticked.dependencies),
                     item,
                     id,
                     label,
@@ -588,7 +657,12 @@ Ren.MenuSettingsModel = (() => {
                 if (!nodes.length) return null;
 
                 if (countControls(nodes) > MAX_INLINE_CONTROLS) {
-                    return { kind: "node", node: createMenuNode(item, label, title, key, nodes) };
+
+                    const node = createMenuNode(item, label, title, key, nodes);
+
+                    node.scope = getCommonScope(nodes);
+
+                    return { kind: "node", node };
                 }
 
                 return {
@@ -608,6 +682,8 @@ Ren.MenuSettingsModel = (() => {
                 if (!probed.value || !isIncluded()) return null;
 
                 const node = createOpenerNode(item, probed.value, label, title, key);
+
+                if (node) node.scope = getItemScope(item, probed.dependencies);
 
                 return node ? { kind: "node", node } : null;
             }
@@ -705,7 +781,9 @@ Ren.MenuSettingsModel = (() => {
 
                 const section = sections[i];
                 const key = section.name ? parentKey + "/section:" + section.name : parentKey;
-                const children = buildList(section.items, key);
+                let children = buildList(section.items, key);
+
+                if (isRoot) children = setApartScopes(children, key, true);
 
                 if (!children.length) continue;
 
@@ -735,12 +813,14 @@ Ren.MenuSettingsModel = (() => {
 
     /**
      * Builds the settings a root menu's items offer, as a group with no heading.  Options:
-     * { include({ item, dependencies }), isTechMode, includeHidden, memory }.
+     * { include({ item, dependencies }), getScope({ item, dependencies }), isTechMode,
+     * includeHidden, memory }.
      */
     const build = (menuItems, options) => {
 
         const settings = {
             include: (options && options.include) || (() => true),
+            getScope: (options && options.getScope) || (() => null),
             isTechMode: !!(options && options.isTechMode),
             includeHidden: !!(options && options.includeHidden),
             memory: (options && options.memory) || null

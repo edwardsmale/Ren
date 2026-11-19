@@ -84,12 +84,23 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
 
         // Heads the items in a submenu that act on the series clicked, naming them, and the items
         // after them that act on the whole chart.  Away from every series both act on the whole
-        // chart, so neither heading is shown.
+        // chart, so neither heading is shown.  Where the data are split, the items it heads act on
+        // every series split from the same column, so it names those instead.
         const targetSeriesHeadingMenuItem = {
 
             get heading() {
 
                 const seriesIndexes = getTargetSeriesIndexes();
+
+                if (isSplitActive()) {
+
+                    const columns = seriesIndexes
+                        .map(seriesIndex => getSeriesSourceHeading(seriesIndex - 1))
+                        .filter((column, index, all) => column && all.indexOf(column) === index);
+
+                    if (columns.length === 1) return "All \"" + columns[0] + "\" series";
+                    if (columns.length > 1) return "All series of " + columns.length + " columns";
+                }
 
                 if (seriesIndexes.length > 1) return seriesIndexes.length + " series";
 
@@ -188,9 +199,15 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
          * Gets a value indicating whether the chart is split and the property is one that every
          * series split from a value column shares.
          */
-        const isSharedSeriesProperty = (propertyName) => isSplitActive()
-            && Ren.DateValueChart_SeriesSplit.SHARED_SERIES_PROPERTIES
-                .indexOf(propertyName) !== -1;
+        const isSharedSeriesProperty = (propertyName) => {
+
+            const isShared = isSplitActive()
+                && Ren.DateValueChart_SeriesSplit.SHARED_SERIES_PROPERTIES.indexOf(propertyName) !== -1;
+
+            if (isShared) noteActsOnSourceColumn();
+
+            return isShared;
+        };
 
         /**
          * Gets the given series' indexes, in series order, together with those of every series
@@ -466,6 +483,18 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         /**
          * Gets the column a series' values are aggregated from.
          */
+        /**
+         * Marks the item being looked at as acting on the value column a split series is split
+         * from, and so on every series split from it, which the chart's settings window sets apart
+         * from what is the series' own.
+         */
+        const noteActsOnSourceColumn = () => {
+
+            if (!isSplitActive()) return;
+
+            Ren.MenuItemProbe.noteDependency(Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY);
+        };
+
         const getSeriesSourceHeading = (arrayIndex) =>
             props.seriesSourceHeadings?.[arrayIndex] ?? props.valueHeadings?.[arrayIndex];
 
@@ -747,6 +776,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             buildSeriesOptionItems,
             getValueColumnsFromData,
             isSplitActive,
+            noteActsOnSourceColumn,
             getSeriesSourceHeading,
             getBaseValueHeadings,
             regroupData,
@@ -1278,3 +1308,6 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         addShowWindowsMenuItems
     };
 };
+
+// Noted on items acting on the value column a split series is split from (see noteActsOnSourceColumn).
+Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY = "source-column";

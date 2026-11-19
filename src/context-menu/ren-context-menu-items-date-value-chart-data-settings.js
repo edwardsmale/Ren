@@ -10,7 +10,7 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
 
     const { tabularData, visualisation, props } = chart;
 
-    const { getTargetSeriesIndexes, getTargetSeriesIndex, getSeriesSourceHeading } = chart;
+    const { getTargetSeriesIndexes, getTargetSeriesIndex, getSeriesSourceHeading, noteActsOnSourceColumn } = chart;
 
     const { regroupData, commitRedraw, rebuildVisualisation } = chart;
 
@@ -28,6 +28,8 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
         const heading = getSeriesSourceHeading(arrayIndex);
 
         if (!heading) return null;
+
+        noteActsOnSourceColumn();
 
         const colResolver = tabularData?.columnResolver;
 

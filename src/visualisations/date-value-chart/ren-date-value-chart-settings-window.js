@@ -5,7 +5,9 @@
  * are known by their reading the series the menu acts on (see Ren.MenuItemProbe).  Those are on
  * the series tabs: All Series has them as the menu offers them away from every series, acting on
  * them all, and Individual Series as the chart's menu and the series' own menu offer them on the
- * series chosen there, as a series' colour, axis and so on are only on its own.
+ * series chosen there, as a series' colour, axis and so on are only on its own.  Where the data
+ * are split, what a split series shares with the others split from its column, such as how it is
+ * drawn and aggregated, is set apart there under a heading naming them all.
  */
 Ren.DateValueChart_SettingsWindow = (() => {
 
@@ -114,12 +116,13 @@ Ren.DateValueChart_SettingsWindow = (() => {
      * Builds the settings of a tab from the chart's menu items, as the menu offers them when run
      * by runMenu, keeping those include picks.
      */
-    const buildModel = (visualisation, runMenu, include, memory, isForSeries) => runMenu(() =>
+    const buildModel = (visualisation, runMenu, include, memory, isForSeries, getScope) => runMenu(() =>
 
         Ren.MenuSettingsModel.build(
             collectMenuItems(visualisation, include === isForSeriesTab, isForSeries),
             {
                 include,
+                getScope,
                 isTechMode: Ren.UrlContext.onEditorPage(),
                 // So that controls a change hides are greyed out where they are, not taken away.
                 includeHidden: true,
@@ -146,6 +149,20 @@ Ren.DateValueChart_SettingsWindow = (() => {
     const isForChart = (control) => !actsOnSeries(control) || isChartWideSeriesItem(control);
 
     const isForSeriesTab = (control) => actsOnSeries(control) && !isChartWideSeriesItem(control);
+
+    /**
+     * Gets what a split series' control acts on beyond the series: every series split from its
+     * column, where the menu notes it does, as for how they are drawn and aggregated.
+     */
+    const getSplitSeriesScope = (visualisation, seriesIndex) => (control) => {
+
+        if (!control.dependencies.has(Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY)) return null;
+
+        const props = latestPropsByVisualisation.get(visualisation);
+        const column = props?.seriesSourceHeadings?.[seriesIndex - 1];
+
+        return column ? "Shared by all \"" + column + "\" series" : null;
+    };
 
     const open = (visualisation) => {
 
@@ -196,7 +213,8 @@ Ren.DateValueChart_SettingsWindow = (() => {
                             fn => runAsSeriesMenu(visualisation, seriesIndex, fn),
                             isForSeriesTab,
                             getSeriesMemory(seriesIndex),
-                            true
+                            true,
+                            getSplitSeriesScope(visualisation, seriesIndex)
                         );
                     },
                     runAction: (fn, seriesKey) => runAsSeriesMenu(visualisation, Number(seriesKey), fn)

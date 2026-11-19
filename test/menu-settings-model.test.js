@@ -318,3 +318,62 @@ test("build_UnnamedOptionsTickedByMembership_AreTogglesThoughOneIsTicked", () =>
 
     expect(nodes[0].children.map(n => n.type)).toEqual(["toggle", "toggle", "toggle"]);
 });
+
+// An item whose tick notes the "shared" dependency, as a split series' shared settings do.
+const sharedOption = (text, isTicked, extra) => Object.assign(option(text, isTicked, extra), {
+    ticked: () => {
+        Ren.MenuItemProbe.noteDependency("shared");
+        return isTicked;
+    }
+});
+
+const getSharedScope = control => control.dependencies.has("shared") ? "Shared" : null;
+
+test("build_GetScope_SetsApartWhatActsOnAScopeAfterTheRest", () => {
+
+    const nodes = build(
+        [
+            option("Show legend", true, { id: "legend", section: "Appearance" }),
+            sharedOption("Show labels", false, { id: "labels", section: "Appearance" }),
+            option("Show grid", false, { id: "grid", section: "Appearance" })
+        ],
+        { getScope: getSharedScope }
+    );
+
+    const children = nodes[0].children;
+
+    expect(children.map(n => n.label || n.heading)).toEqual(["Show legend", "Show grid", "Shared"]);
+    expectFields(children[2], { type: "group", isScope: true });
+    expect(children[2].children.map(n => n.label)).toEqual(["Show labels"]);
+});
+
+test("build_GetScope_SubmenuAllActingOnAScope_IsSetApartWhole", () => {
+
+    const nodes = build(
+        [
+            option("Show legend", true, { id: "legend", section: "Appearance" }),
+            {
+                text: "Draw as",
+                id: "draw",
+                section: "Appearance",
+                submenu: [sharedOption("Bars", true), sharedOption("Lines", false)]
+            }
+        ],
+        { getScope: getSharedScope }
+    );
+
+    const scopeGroup = nodes[0].children[1];
+
+    expectFields(scopeGroup, { heading: "Shared", isScope: true });
+    expectFields(scopeGroup.children[0], { type: "choice", label: "Draw as" });
+});
+
+test("build_NoGetScope_SetsNothingApart", () => {
+
+    const nodes = build([
+        option("Show legend", true, { id: "legend", section: "Appearance" }),
+        sharedOption("Show labels", false, { id: "labels", section: "Appearance" })
+    ]);
+
+    expect(nodes[0].children.some(n => n.isScope)).toBe(false);
+});

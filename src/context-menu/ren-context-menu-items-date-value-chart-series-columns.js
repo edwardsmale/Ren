@@ -15,6 +15,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         buildSeriesOptionItems,
         getValueColumnsFromData,
         isSplitActive,
+        noteActsOnSourceColumn,
         getSeriesSourceHeading,
         getBaseValueHeadings,
         regroupData,
@@ -246,6 +247,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
                 const seriesIndex = getTargetSeriesIndex();
                 if (!seriesIndex || !props.valueHeadings) return false;
+                noteActsOnSourceColumn();
                 return getSeriesSourceHeading(seriesIndex - 1) === column;
             }
         }));

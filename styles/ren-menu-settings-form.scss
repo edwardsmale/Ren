@@ -109,6 +109,16 @@
         margin-left: 8px;
     }
 
+    // Settings acting on more than the form is for, such as every series split from one column,
+    // marked off from the rest.
+    &__group--scope
+    {
+        margin-top: 10px;
+        padding: 0 6px 4px 8px;
+        border-left: solid 3px #b9cfe6;
+        background-color: #f5f9fd;
+    }
+
     &__heading
     {
         margin: 4px 0 2px;
