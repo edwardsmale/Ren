@@ -80,7 +80,7 @@ Ren.DateValueChart_ValueFormats = (() => {
     };
 
     /**
-     * Gets the formats that show a format's values abbreviated, as £1.5m or 32k, or null where its
+     * Gets the formats that show a format's values abbreviated, as Â£1.5m or 32k, or null where its
      * values aren't numbers or currency.
      */
     const getAbbreviatedFormats = (props, format) => {

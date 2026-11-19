@@ -57,7 +57,7 @@ public class DateValueChartSettingsWindowTests : BrowserTest
         var window = Page.Locator(".ren-menu-settings-window");
 
         await window.GetByText("All Series", new() { Exact = true }).ClickAsync();
-        await window.Locator(".ren-menu-settings-form__subtab:visible", new() { HasTextString = "Appearance" }).First.ClickAsync();
+        await window.Locator(".ren-menu-settings-form__subtab:visible:text-is('Series')").ClickAsync();
 
         var kinds = window.Locator(".ren-menu-settings-form__radios:visible", new() { Has = Page.Locator(".ren-menu-settings-form__radio-text:text-is('Bars')") });
 
@@ -74,6 +74,7 @@ public class DateValueChartSettingsWindowTests : BrowserTest
         var window = Page.Locator(".ren-menu-settings-window");
 
         await window.GetByText("All Series", new() { Exact = true }).ClickAsync();
+        await window.Locator(".ren-menu-settings-form__subtab:visible:text-is('Chart data')").ClickAsync();
 
         var aggregation = window.Locator(".ren-menu-settings-form__row:visible", new() { Has = Page.Locator(":text-is('Aggregation')") }).Locator("select");
         var shown = await aggregation.EvaluateAsync<string>("select => select.selectedOptions[0]?.textContent ?? ''");
