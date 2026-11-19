@@ -27,6 +27,45 @@ public class FilterModuleValueTests : BrowserTest
         Expect(await FilterModule.OptionCountAsync(Ren, "Category", "Structures")).ToBe("18");
     }
 
+    // A new item starts with the "Values" settings of the last item shown.
+    [TestMethod("ValueColumn_NewItem_TakesTheLastItemsValueSettings")]
+    public async Task ValueColumn_NewItem_TakesTheLastItemsValueSettings()
+    {
+        await Ren.OpenAsync("ported/FilterModuleTest12.html");
+        await FilterModule.CreateFromColumnHeaderAsync(Ren, "Id");
+        await FilterModule.AddFirstItemForColumnAsync(Ren, "Active");
+        await FilterModule.SetValueColumnAsync(Ren, "Active", "Id", "CountDistinct");
+
+        await FilterModule.AddItemForColumnAsync(Ren, "Active", "Category");
+
+        await Poll(() => FilterModule.OptionCountAsync(Ren, "Category", "Castings")).ToBe("16");
+        Expect(await FilterModule.OptionCountAsync(Ren, "Category", "Structures")).ToBe("18");
+    }
+
+    // A hierarchy shows each level's own values, so it's its top level's that a new item takes.
+    [TestMethod("ValueColumn_NewItemAfterAHierarchy_TakesItsTopLevelsValueSettings")]
+    public async Task ValueColumn_NewItemAfterAHierarchy_TakesItsTopLevelsValueSettings()
+    {
+        await Ren.OpenAsync("ported/FilterModuleTest12.html");
+        await FilterModule.CreateFromColumnHeaderAsync(Ren, "Id");
+        await FilterModule.AddFirstItemForColumnAsync(Ren, "Product Code");
+        await FilterModule.GroupItemByAsync(Ren, "Product Code", "Active");
+
+        await FilterModule.RightClickOptionTextAsync(Ren, "Active", "Yes");
+        await Ren.Root.MouseOverAsync("#filter-module-value-column");
+        await FilterModule.ClickMenuItemByTextAsync(Ren, "Id");
+        await Ren.WaitUntilLoadedAsync();
+        await FilterModule.RightClickOptionTextAsync(Ren, "Active", "Yes");
+        await Ren.Root.MouseOverAsync("#filter-module-value-aggregation");
+        await FilterModule.ClickMenuItemByTextAsync(Ren, "CountDistinct");
+        await Ren.WaitUntilLoadedAsync();
+
+        await FilterModule.AddItemForColumnAsync(Ren, "Active", "Category");
+
+        await Poll(() => FilterModule.OptionCountAsync(Ren, "Category", "Castings")).ToBe("16");
+        Expect(await FilterModule.OptionCountAsync(Ren, "Category", "Structures")).ToBe("18");
+    }
+
     // The totals row aggregates the row-count column, each row counting one, so averaging gives 1.
     // The caption reads as the aggregation in effect, and the options keep their own values.
     [TestMethod("TotalAggregation_Average_ChangesTheTotalsRowsLabelAndFigure")]

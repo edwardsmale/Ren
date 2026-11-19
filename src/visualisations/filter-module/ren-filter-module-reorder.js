@@ -259,7 +259,11 @@ Ren.FilterModule_Reorder = (s) => {
     element.addEventListener("dragover", onContainerDragOver);
     element.addEventListener("drop", onContainerDrop);
 
+    // Gets the keys of the top-level items as last shown, in order.
+    const getDisplayedKeys = () => displayedKeys.slice();
+
     return {
+        getDisplayedKeys,
         orderReorderableItems,
         retargetOrderKey,
         decorateItemForReorder

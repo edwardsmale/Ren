@@ -8,7 +8,7 @@ Ren.FilterModule_Settings = (s) => {
     const { columnOverrides } = s;
 
     // Held as whole facets because a facet is only filled in once its module is wired in.
-    const { columnInfo, counts, filterTarget, filtering, view } = s;
+    const { columnInfo, counts, filterTarget, filtering, reorder, view } = s;
 
     const getOrCreateColumnOverride = (columnIdOrHeading) =>
         columnOverrides[columnIdOrHeading] ?? (columnOverrides[columnIdOrHeading] = {});
@@ -213,7 +213,57 @@ Ren.FilterModule_Settings = (s) => {
         view.render();
     };
 
-    const toggleColumnInclusion = (column) => setColumnIncluded(column, !isColumnIncluded(column));
+    // The settings of an item's "Values" menu section.
+    const VALUE_SETTING_NAMES = [
+        "valueColumn",
+        "valueAggregationType",
+        "valueAggregateWithRespectToColumn",
+        "valueFormatFunction"
+    ];
+
+    // Gets the key holding the values an item shows: a hierarchy's top level's, as each level
+    // shows its own and its leaf's, which its heading menu sets, are seen only once expanded.
+    const getShownValuesKey = (itemKey) => {
+
+        const leafColumn = columnInfo.findEligibleColumn(itemKey);
+        if (!leafColumn) return itemKey;
+
+        const ancestors = counts.getAncestorColumnsForLeaf(leafColumn, counts.getHierarchyColumns());
+
+        return ancestors.length ? ancestors[0].columnIdOrHeading : itemKey;
+    };
+
+    // Gives a column the "Values" settings of the last item shown, so that a new item's values
+    // read as its neighbours' do.
+    const copyValueSettingsFromLastItem = (columnIdOrHeading) => {
+
+        const lastKey = reorder.getDisplayedKeys()
+            .filter((key) => key !== columnIdOrHeading && columnOverrides[key]?.included === true)
+            .pop();
+
+        if (lastKey === undefined) return;
+
+        const source = columnOverrides[getShownValuesKey(lastKey)] ?? {};
+        const entry = getOrCreateColumnOverride(columnIdOrHeading);
+
+        for (const name of VALUE_SETTING_NAMES) {
+
+            if (source[name] === undefined) delete entry[name];
+            else entry[name] = Ren.ObjectUtils.cloneDeep(source[name]);
+        }
+
+        counts.invalidateCountsForColumn(columnIdOrHeading);
+    };
+
+    // Adding an item from the menu starts it with the last item's "Values" settings.
+    const toggleColumnInclusion = (column) => {
+
+        const include = !isColumnIncluded(column);
+
+        if (include) copyValueSettingsFromLastItem(column.columnIdOrHeading);
+
+        setColumnIncluded(column, include);
+    };
 
     const setSingleSelect = (columnIdOrHeading, isSingle) =>
         setColumnFlag(columnIdOrHeading, "singleSelect", isSingle, false);
