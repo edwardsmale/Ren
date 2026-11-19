@@ -36,8 +36,12 @@
  *   - Sections become groups headed by the section's name: always in a root menu, and in a
  *     submenu where it has more than one, as the menu shows their headings.
  *   - Items that only do something once, such as Download or Copy, are not settings and are left
- *     out, as are links and the items only shown in tech mode.
+ *     out, as are links and the items only shown in tech mode.  An item with isSettingAction,
+ *     which changes a setting each time it is run, such as flipping a sort order, is a button.
  * Within a group, its controls come before its subgroups, and are otherwise in menu order.
+ *
+ * A submenu with isChoice is one choice of its options, however its ticks read, for options
+ * whose ticks call out rather than compare, and of which none may be ticked by default.
  *
  * A submenu with isChoiceLed, whose first run is a choice and whose other items are settings for
  * what it chooses, is that choice, labelled with the submenu's text, with those settings as its
@@ -652,7 +656,7 @@ Ren.MenuSettingsModel = (() => {
             if (item.submenu) {
 
                 const submenu = Ren.MenuItemProbe.track(() => item.submenu).value || [];
-                const nodes = buildSections(submenu, key, false);
+                const nodes = buildSections(submenu, key, false, !!item.isChoice);
 
                 if (!nodes.length) return null;
 
@@ -688,6 +692,17 @@ Ren.MenuSettingsModel = (() => {
                 return node ? { kind: "node", node } : null;
             }
 
+            if (item.action && item.isSettingAction) {
+
+                if (!isIncluded()) return null;
+
+                const node = { type: "button", label, title, key, item };
+
+                node.scope = getItemScope(item, dependencies);
+
+                return { kind: "node", node };
+            }
+
             // Anything else is done once rather than set, such as Download or Copy.
             return null;
         };
@@ -695,7 +710,7 @@ Ren.MenuSettingsModel = (() => {
         /**
          * Builds the nodes for a list of items, which separators and headings divide into runs.
          */
-        const buildList = (items, parentKey) => {
+        const buildList = (items, parentKey, isChoiceList) => {
 
             const nodes = [];
             let run = [];
@@ -704,7 +719,7 @@ Ren.MenuSettingsModel = (() => {
 
                 if (!run.length) return;
 
-                const isChoice = remember(
+                const isChoice = (isChoiceList && run.length > 1) || remember(
                     "run:" + run.map(leaf => leaf.key).join(","),
                     () => scoreAsChoice(run) > 0
                 );
@@ -752,7 +767,7 @@ Ren.MenuSettingsModel = (() => {
          * each, where there is more than one section, or always for a root menu.  Items in no
          * section come first, ungrouped.
          */
-        const buildSections = (items, parentKey, isRoot) => {
+        const buildSections = (items, parentKey, isRoot, isChoiceList) => {
 
             const sections = [];
 
@@ -773,7 +788,7 @@ Ren.MenuSettingsModel = (() => {
                 else sections.push({ name: sectionName, items: [item] });
             }
 
-            if (!isRoot && sections.length < 2) return buildList(items, parentKey);
+            if (!isRoot && sections.length < 2) return buildList(items, parentKey, isChoiceList);
 
             const nodes = [];
 

@@ -27,6 +27,33 @@ test("build_UnnamedOptionsOneTicked_IsAChoice", () => {
     expect(nodes[0].options.map(o => o.selected)).toEqual([true, false]);
 });
 
+// Named options whose ticks call out, none of them ticked, read as toggles but for isChoice.
+test("build_SubmenuWithIsChoice_IsAChoiceWhateverItsTicks", () => {
+
+    const isColumn = () => false;
+
+    const nodes = build([{
+        text: "Value column",
+        isChoice: true,
+        submenu: ["Id", "Name", "Total"].map(text =>
+            option(text, false, { id: "column-" + text, ticked: () => isColumn(text) }))
+    }]);
+
+    expect(nodes.length).toBe(1);
+    expect(nodes[0].type).toBe("choice");
+    expect(nodes[0].label).toBe("Value column");
+    expect(nodes[0].options.map(o => o.selected)).toEqual([false, false, false]);
+});
+
+test("build_ActionWithIsSettingAction_IsAButton", () => {
+
+    const flip = { text: "Flip sort order", id: "flip", isSettingAction: true, action: () => {} };
+    const nodes = build([flip, { text: "Download", id: "download", action: () => {} }]);
+
+    expect(nodes.length).toBe(1);
+    expectFields(nodes[0], { type: "button", label: "Flip sort order", item: flip });
+});
+
 test("build_NamedItemsStartingWithShow_AreToggles", () => {
 
     const nodes = build([{

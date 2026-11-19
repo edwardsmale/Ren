@@ -489,6 +489,8 @@ Ren.FilterModule_Menu = (s) => {
         section: "Values",
         text: "Value column",
         id: "filter-module-value-column",
+        // One column at a time, though none is ticked while the options are counted.
+        isChoice: true,
         submenu: buildValueColumnSubmenuItems(item)
     });
 
@@ -513,6 +515,7 @@ Ren.FilterModule_Menu = (s) => {
             itemSettings.getValueAggregationType(item.columnIdOrHeading)
         ),
         id: "filter-module-value-with-respect-to",
+        isChoice: true,
         submenu: buildWithRespectToSubmenuItems(
             () => itemSettings.getValueAggregationType(item.columnIdOrHeading),
             (withRespectToColumn) => itemSettings.isValueAggregateWithRespectToColumn(
@@ -559,6 +562,7 @@ Ren.FilterModule_Menu = (s) => {
                 itemSettings.getTotalAggregationType(columnIdOrHeading)
             ),
             id: "filter-module-total-with-respect-to",
+            isChoice: true,
             submenu: buildWithRespectToSubmenuItems(
                 () => itemSettings.getTotalAggregationType(columnIdOrHeading),
                 (withRespectToColumn) => itemSettings.isTotalAggregateWithRespectToColumn(
@@ -783,6 +787,8 @@ Ren.FilterModule_Menu = (s) => {
         section: "Sort",
         text: "Flip sort order",
         id: "filter-module-flip-sort-order",
+        // A button in the settings window (see Ren.MenuSettingsModel).
+        isSettingAction: true,
         action: () => itemSettings.flipSortOrder(item.columnIdOrHeading)
     });
 
