@@ -918,12 +918,17 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
         };
 
         // Read as the chart is clicked, so nothing needs drawing again.  An ad hoc chart reads
-        // every row, so has no settings to filter.
+        // every row, so has no settings to filter.  Only a split series or a subdivision stands
+        // for a value to filter by, so it is offered only on a split or subdivided chart, or
+        // while ticked, so it can still be turned off.
         const crossFilteringMenuItem = {
             section: "Chart data",
             text: "Enable cross filtering",
             id: "enable-cross-filtering",
-            visible: () => !visualisation?.isAdHoc,
+            visible: () => !visualisation?.isAdHoc && (
+                !!props.seriesSplit?.columnKey
+                || Ren.DateValueChart_SeriesSubdivisions.isActive(props)
+                || props.enableCrossFiltering === true),
             ticked: () => props.enableCrossFiltering === true,
             title: "Clicking a split series or a subdivision filters the reports sharing the "
                 + "chart's filters to its value",
@@ -952,9 +957,9 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             dateColumnMenuItem,
             splitDataMenuItem,
             seriesLimitMenuItem,
+            crossFilteringMenuItem,
             subdivideDataMenuItem,
             filterByMenuItem,
-            crossFilteringMenuItem,
             { section: "Chart data", text: "-" },
             showAllSeriesMenuItem,
             showOtherSeriesMenuItem,
