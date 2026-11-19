@@ -80,4 +80,36 @@ public class DateValueChartSettingsWindowTests : BrowserTest
 
         Assert.AreNotEqual("", shown.Trim());
     }
+
+    // Split from one column, every series shares what a split series shares with the others split
+    // from its column, so All Series has it, without the heading naming them, and Individual
+    // Series doesn't.
+    [TestMethod("a chart split from one column: offers what the series share on All Series")]
+    public async Task SplitFromOneColumn_OffersWhatTheSeriesShareOnAllSeries()
+    {
+        await Ren.OpenAsync(Fixture);
+        await Ren.Report.SelectColumnsAsync("CreatedOn", "Unique Searches Per Day");
+        await DateValueChart.CreateFromColumnHeadingAsync(Ren, "CreatedOn");
+        await DateValueChart.SplitDataAsync(Ren, "Search Terms");
+        await Poll(() => DateValueChart.SeriesCountAsync(Ren)).ToBeGreaterThan(1);
+
+        await Ren.Root.ClickAsync(".ren-date-value-chart-column-pickers__settings");
+
+        var window = Page.Locator(".ren-menu-settings-window");
+
+        await window.GetByText("All Series", new() { Exact = true }).ClickAsync();
+
+        await window.Locator(".ren-menu-settings-form__subtab:visible:text-is('Series')").ClickAsync();
+        await Expect(window.Locator(":visible:text-is('Assign axis')").First).ToBeVisibleAsync();
+
+        await window.Locator(".ren-menu-settings-form__subtab:visible:text-is('Chart data')").ClickAsync();
+        await Expect(window.Locator(":visible:text-is('Aggregation')").First).ToBeVisibleAsync();
+
+        await window.GetByText("Individual Series", new() { Exact = true }).ClickAsync();
+
+        await Expect(window.Locator(":text-matches('^Shared by all')")).ToHaveCountAsync(0);
+        await window.Locator(".ren-menu-settings-form__subtab:visible:text-is('Series')").ClickAsync();
+        await Expect(window.Locator(":visible:text-is('Assign axis')")).ToHaveCountAsync(0);
+        await Expect(window.Locator(":visible:text-is('Colour')").First).ToBeVisibleAsync();
+    }
 }

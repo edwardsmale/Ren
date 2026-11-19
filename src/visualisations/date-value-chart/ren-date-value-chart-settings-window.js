@@ -7,7 +7,8 @@
  * them all, and Individual Series as the chart's menu and the series' own menu offer them on the
  * series chosen there, as a series' colour, axis and so on are only on its own.  Where the data
  * are split, what a split series shares with the others split from its column, such as how it is
- * drawn and aggregated, is set apart there under a heading naming them all.
+ * drawn and aggregated, is set apart there under a heading naming them all.  Where the data are
+ * split from one column only, every series shares those, so they are on All Series instead.
  */
 Ren.DateValueChart_SettingsWindow = (() => {
 
@@ -94,35 +95,85 @@ Ren.DateValueChart_SettingsWindow = (() => {
         return copy;
     };
 
+    // The items only a series' own menu offers, as copied onto All Series (see markSeriesOnly),
+    // and those of their submenus, so that only what every series shares is kept of them there.
+    const seriesOnlyItems = new WeakSet();
+
+    /**
+     * Copies an item only a series' own menu offers, and the items of its submenu as they are
+     * read, noting each copy as one.
+     */
+    const markSeriesOnly = (item) => {
+
+        const copy = Object.defineProperties({}, Object.getOwnPropertyDescriptors(item));
+
+        if ("submenu" in item) {
+
+            Object.defineProperty(copy, "submenu", {
+                get: () => {
+
+                    const submenu = item.submenu;
+
+                    return Array.isArray(submenu) ? submenu.map(markSeriesOnly) : submenu;
+                },
+                enumerable: true,
+                configurable: true
+            });
+        }
+
+        seriesOnlyItems.add(copy);
+
+        return copy;
+    };
+
+    const getItemIds = (items) => new Set(items.map(item => item.id).filter(id => typeof id === "string"));
+
     /**
      * Gets the chart's menu items and, for a series, the series' own, which stand in for the
-     * chart's of the same id as they do on the series' menu.
+     * chart's of the same id as they do on the series' menu.  withSeriesOnly adds instead those
+     * of the series' own the chart's menu lacks, marked as such (see markSeriesOnly).
      */
-    const collectMenuItems = (visualisation, isSeriesTab, isForSeries) => {
+    const collectMenuItems = (visualisation, isSeriesTab, isForSeries, withSeriesOnly) => {
 
         let items = Ren.ContextMenuRegistry.collectItemsForElements(getMenuElements(visualisation));
 
         if (isSeriesTab) items = items.map(inSeriesSection);
 
-        if (!isForSeries) return items;
+        if (!isForSeries && !withSeriesOnly) return items;
 
         const seriesItems = latestPropsByVisualisation.get(visualisation)?.seriesMenuItems || [];
-        const seriesItemIds = new Set(seriesItems.map(item => item.id).filter(id => typeof id === "string"));
 
-        return items.filter(item => !seriesItemIds.has(item.id)).concat(seriesItems);
+        if (isForSeries) {
+
+            const seriesItemIds = getItemIds(seriesItems);
+
+            return items.filter(item => !seriesItemIds.has(item.id)).concat(seriesItems);
+        }
+
+        const itemIds = getItemIds(items);
+
+        return items.concat(seriesItems
+            .filter(item => typeof item.id === "string" && !itemIds.has(item.id))
+            .map(markSeriesOnly));
     };
 
     /**
      * Builds the settings of a tab from the chart's menu items, as the menu offers them when run
-     * by runMenu, keeping those include picks.
+     * by runMenu, keeping those include picks.  options: { isSeriesTab, isForSeries,
+     * withSeriesOnly, getScope } (see collectMenuItems and Ren.MenuSettingsModel).
      */
-    const buildModel = (visualisation, runMenu, include, memory, isForSeries, getScope) => runMenu(() =>
+    const buildModel = (visualisation, runMenu, include, memory, options) => runMenu(() =>
 
         Ren.MenuSettingsModel.build(
-            collectMenuItems(visualisation, include === isForSeriesTab, isForSeries),
+            collectMenuItems(
+                visualisation,
+                !!options?.isSeriesTab,
+                !!options?.isForSeries,
+                !!options?.withSeriesOnly
+            ),
             {
                 include,
-                getScope,
+                getScope: options?.getScope || undefined,
                 isTechMode: Ren.UrlContext.onEditorPage(),
                 // So that controls a change hides are greyed out where they are, not taken away.
                 includeHidden: true,
@@ -150,13 +201,36 @@ Ren.DateValueChart_SettingsWindow = (() => {
 
     const isForSeriesTab = (control) => actsOnSeries(control) && !isChartWideSeriesItem(control);
 
+    const sharesSourceColumn = (control) =>
+        control.dependencies.has(Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY);
+
+    /**
+     * Gets a value indicating whether the chart's data are split from one value column only, so
+     * that what a split series shares with those split from its column, every series shares.
+     */
+    const isSplitFromOneColumn = (visualisation) => {
+
+        const props = latestPropsByVisualisation.get(visualisation);
+        const headings = props?.seriesSourceHeadings;
+
+        return !!props?.seriesSplit && !!headings?.length &&
+            headings.every(heading => heading === headings[0]);
+    };
+
+    // All Series has what only a series' own menu offers where every series shares it.
+    const isForAllSeriesTab = (control) => isForSeriesTab(control) &&
+        (!seriesOnlyItems.has(control.item) || sharesSourceColumn(control));
+
+    // A series' own tab leaves out what All Series sets for every series alike.
+    const isForSeriesOfOneColumn = (control) => isForSeriesTab(control) && !sharesSourceColumn(control);
+
     /**
      * Gets what a split series' control acts on beyond the series: every series split from its
      * column, where the menu notes it does, as for how they are drawn and aggregated.
      */
     const getSplitSeriesScope = (visualisation, seriesIndex) => (control) => {
 
-        if (!control.dependencies.has(Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY)) return null;
+        if (!sharesSourceColumn(control)) return null;
 
         const props = latestPropsByVisualisation.get(visualisation);
         const column = props?.seriesSourceHeadings?.[seriesIndex - 1];
@@ -199,7 +273,18 @@ Ren.DateValueChart_SettingsWindow = (() => {
                 {
                     title: "All Series",
                     subjects: { label: "Series", text: "All" },
-                    buildModel: () => buildModel(visualisation, runAsChartMenu, isForSeriesTab, allSeriesMemory)
+                    buildModel: () => {
+
+                        const isOneColumn = isSplitFromOneColumn(visualisation);
+
+                        return buildModel(
+                            visualisation,
+                            runAsChartMenu,
+                            isOneColumn ? isForAllSeriesTab : isForSeriesTab,
+                            allSeriesMemory,
+                            { isSeriesTab: true, withSeriesOnly: isOneColumn }
+                        );
+                    }
                 },
                 {
                     title: "Individual Series",
@@ -207,14 +292,18 @@ Ren.DateValueChart_SettingsWindow = (() => {
                     buildModel: (seriesKey) => {
 
                         const seriesIndex = Number(seriesKey);
+                        const isOneColumn = isSplitFromOneColumn(visualisation);
 
                         return buildModel(
                             visualisation,
                             fn => runAsSeriesMenu(visualisation, seriesIndex, fn),
-                            isForSeriesTab,
+                            isOneColumn ? isForSeriesOfOneColumn : isForSeriesTab,
                             getSeriesMemory(seriesIndex),
-                            true,
-                            getSplitSeriesScope(visualisation, seriesIndex)
+                            {
+                                isSeriesTab: true,
+                                isForSeries: true,
+                                getScope: isOneColumn ? null : getSplitSeriesScope(visualisation, seriesIndex)
+                            }
                         );
                     },
                     runAction: (fn, seriesKey) => runAsSeriesMenu(visualisation, Number(seriesKey), fn)

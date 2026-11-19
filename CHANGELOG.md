@@ -23,6 +23,7 @@ Add a Reset link to the chart settings window, undoing changes made since it was
 Offer "Subdivide by" and "Series shown" on the chart's menu and settings window, as the pickers do.
 Let charts set how many subdivisions each bar or slice shows, with "Subdivisions shown".
 Mark the settings a split series shares with the others split from its column.
+Put those on the All Series tab instead where the data are split from one column.
 
 ## 1.1.20 (2026-11-20)
 
