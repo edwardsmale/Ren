@@ -213,24 +213,54 @@ Ren.FilterModule_Settings = (s) => {
         view.render();
     };
 
-    // The settings of an item's "Values" menu section.
-    const VALUE_SETTING_NAMES = [
-        "valueColumn",
-        "valueAggregationType",
-        "valueAggregateWithRespectToColumn",
-        "valueFormatFunction"
-    ];
+    const itemLevels = Ren.FilterModule_ItemLevels;
 
-    // Gets the key holding the values an item shows: a hierarchy's top level's, as each level
-    // shows its own and its leaf's, which its heading menu sets, are seen only once expanded.
-    const getShownValuesKey = (itemKey) => {
+    /**
+     * Gets the keys of an item's columns, top to leaf, from the key it is known by, its leaf's:
+     * a hierarchy's levels, or a flat item's one column.  Code acting on an item goes through this,
+     * or through getItemSettingKeys, so that a hierarchy's levels are never missed.
+     */
+    const getItemLevelKeys = (itemKey) => {
 
         const leafColumn = columnInfo.findEligibleColumn(itemKey);
-        if (!leafColumn) return itemKey;
+        if (!leafColumn) return [itemKey];
 
-        const ancestors = counts.getAncestorColumnsForLeaf(leafColumn, counts.getHierarchyColumns());
+        return counts.getAncestorColumnsForLeaf(leafColumn, counts.getHierarchyColumns())
+            .map(column => column.columnIdOrHeading)
+            .concat(itemKey);
+    };
 
-        return ancestors.length ? ancestors[0].columnIdOrHeading : itemKey;
+    // Gets the keys of the columns of an item a setting is held on (see Ren.FilterModule_ItemLevels).
+    const getItemSettingKeys = (itemKey, settingName) =>
+        itemLevels.getSettingKeys(getItemLevelKeys(itemKey), settingName);
+
+    // Gets the key of the column of an item a setting is read from: for one each of a hierarchy's
+    // levels has, its top level's, the one seen first.
+    const getItemShownSettingKey = (itemKey, settingName) =>
+        itemLevels.getShownSettingKey(getItemLevelKeys(itemKey), settingName);
+
+    /**
+     * Gives an item the settings another shows, each held where the item holds it: one each level
+     * has is read from the other's top level and set on every one of the item's.  Its counts are
+     * invalidated, as the settings may be ones they are aggregated by; nothing is drawn.
+     */
+    const copyItemSettings = (fromItemKey, toItemKey, settingNames) => {
+
+        for (const name of settingNames) {
+
+            const value = columnOverrides[getItemShownSettingKey(fromItemKey, name)]?.[name];
+
+            for (const key of getItemSettingKeys(toItemKey, name)) {
+
+                const entry = getOrCreateColumnOverride(key);
+
+                if (value === undefined) delete entry[name];
+                else entry[name] = Ren.ObjectUtils.cloneDeep(value);
+
+                pruneColumnOverride(key);
+                counts.invalidateCountsForColumn(key);
+            }
+        }
     };
 
     // Gives a column the "Values" settings of the last item shown, so that a new item's values
@@ -243,16 +273,7 @@ Ren.FilterModule_Settings = (s) => {
 
         if (lastKey === undefined) return;
 
-        const source = columnOverrides[getShownValuesKey(lastKey)] ?? {};
-        const entry = getOrCreateColumnOverride(columnIdOrHeading);
-
-        for (const name of VALUE_SETTING_NAMES) {
-
-            if (source[name] === undefined) delete entry[name];
-            else entry[name] = Ren.ObjectUtils.cloneDeep(source[name]);
-        }
-
-        counts.invalidateCountsForColumn(columnIdOrHeading);
+        copyItemSettings(lastKey, columnIdOrHeading, itemLevels.LEVEL_SETTINGS_BY_SECTION.Values);
     };
 
     // Adding an item from the menu starts it with the last item's "Values" settings.
@@ -586,23 +607,16 @@ Ren.FilterModule_Settings = (s) => {
         counts.invalidateCountsForColumn(columnIdOrHeading);
     };
 
-    const setSortByValue = (columnIdOrHeading) => {
+    // Gets a value indicating whether an item's options are sorted by their own value, as shown:
+    // a hierarchy's top level's.
+    const isItemSortedByValue = (itemKey) =>
+        isSortedByValue(getItemShownSettingKey(itemKey, "sortByValue"));
 
-        storeSortByValue(columnIdOrHeading);
-        view.render();
-    };
+    // Sorts an item by value or by aggregation, as its "Sort" toggle does: every level of a
+    // hierarchy alike, with one render.
+    const setItemSortMode = (itemKey, byValue) => {
 
-    const setSortByAggregation = (columnIdOrHeading) => {
-
-        storeSortByAggregation(columnIdOrHeading);
-        view.render();
-    };
-
-    // Sorts each of several columns by value or by aggregation, as a hierarchy's levels are by
-    // its "Sort" toggle, with one render.
-    const setSortModeOfColumns = (columnIdsOrHeadings, byValue) => {
-
-        for (const columnIdOrHeading of columnIdsOrHeadings) {
+        for (const columnIdOrHeading of getItemSettingKeys(itemKey, "sortByValue")) {
 
             if (isSortedByValue(columnIdOrHeading) === byValue) continue;
 
@@ -611,17 +625,6 @@ Ren.FilterModule_Settings = (s) => {
         }
 
         view.render();
-    };
-
-    const toggleSortMode = (columnIdOrHeading) => {
-
-        if (isSortedByValue(columnIdOrHeading)) {
-            setSortByAggregation(columnIdOrHeading);
-        }
-        else {
-
-            setSortByValue(columnIdOrHeading);
-        }
     };
 
     // Flips the direction of the active sort mode only.
@@ -794,7 +797,12 @@ Ren.FilterModule_Settings = (s) => {
         isColumnIncluded,
         setColumnIncluded,
         toggleColumnInclusion,
-        setSortModeOfColumns,
+        getItemLevelKeys,
+        getItemSettingKeys,
+        getItemShownSettingKey,
+        copyItemSettings,
+        isItemSortedByValue,
+        setItemSortMode,
         setSingleSelect,
         toggleSingleSelect,
         setShowSingleSelectToggle,
@@ -840,7 +848,6 @@ Ren.FilterModule_Settings = (s) => {
         isSortedBy,
         isSortedByValue,
         setSortBy,
-        toggleSortMode,
         flipSortOrder,
         getValueConfig,
         isValueColumn,

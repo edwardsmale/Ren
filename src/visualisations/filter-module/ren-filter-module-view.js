@@ -763,8 +763,11 @@ Ren.FilterModule_View = (s) => {
                     stripElement,
                     "Sort",
                     s.SORT_TOGGLE_TITLE,
-                    !itemSettings.isSortedByValue(item.columnIdOrHeading),
-                    () => itemSettings.toggleSortMode(item.columnIdOrHeading),
+                    !itemSettings.isItemSortedByValue(item.columnIdOrHeading),
+                    () => itemSettings.setItemSortMode(
+                        item.columnIdOrHeading,
+                        !itemSettings.isItemSortedByValue(item.columnIdOrHeading)
+                    ),
                     true
                 );
             }

@@ -205,12 +205,10 @@ Ren.FilterModule_HierarchyView = (s) => {
                 // Each level sorts by its own setting, so the toggle reads as the top level, the
                 // one seen first, and sets every level alike.
                 const isSortedByAggregation =
-                    !itemSettings.isSortedByValue(topColumn.columnIdOrHeading);
+                    !itemSettings.isItemSortedByValue(leafColumn.columnIdOrHeading);
 
-                const toggleSortMode = () => itemSettings.setSortModeOfColumns(
-                    hierarchyColumns.map((column) => column.columnIdOrHeading),
-                    isSortedByAggregation
-                );
+                const toggleSortMode = () =>
+                    itemSettings.setItemSortMode(leafColumn.columnIdOrHeading, isSortedByAggregation);
 
                 const sortToggle = Ren.ToggleSwitch.create(isSortedByAggregation);
 
@@ -289,14 +287,13 @@ Ren.FilterModule_HierarchyView = (s) => {
             // No binning links: a hierarchy has no column of its own to bin.
             null,
             // Each level above the leaf has its own value, label and sort settings, set from a
-            // right-click on its options.  "Group by" is left out, as every level's acts on the
-            // leaf, which the heading's menu already reaches.
+            // right-click on its options (see Ren.FilterModule_ItemLevels).
             () => hierarchyColumns.slice(0, -1).map(column => menu.buildColumnActionMenuItems(
                 menuItem(column.columnIdOrHeading, column.columnIndex),
                 true,
                 true,
                 false
-            ).filter((levelItem) => levelItem.id !== "filter-module-group-by"))
+            ))
         );
 
         // Held against the whole row rather than the heading, which is only as wide as its text.

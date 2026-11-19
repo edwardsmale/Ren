@@ -52,11 +52,11 @@ Ren.FilterModule_Columns = (s) => {
     // collide with the raw column's; anything addressing the data uses getDataColumnId instead.
 
     // A parent grouping entry is a column identifier or { column, calcFunction }.
-    const getEntryColumnIdOrHeading = (entry) =>
-        typeof entry === "string" ? entry : entry?.column ?? null;
+    const getEntryColumnIdOrHeading = (parentGrouping) =>
+        typeof parentGrouping === "string" ? parentGrouping : parentGrouping?.column ?? null;
 
-    const getEntryCalcFunction = (entry) =>
-        typeof entry === "string" ? null : entry?.calcFunction ?? null;
+    const getEntryCalcFunction = (parentGrouping) =>
+        typeof parentGrouping === "string" ? null : parentGrouping?.calcFunction ?? null;
 
     // Gets the column a hierarchy's settings are keyed on, which for a plain item is its own.
     const getLeafColumnIdOrHeading = (item) =>

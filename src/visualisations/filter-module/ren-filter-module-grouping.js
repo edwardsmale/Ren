@@ -147,9 +147,11 @@ Ren.FilterModule_Grouping = (s) => {
         return items.concat(columnItems);
     };
 
-    // Gets the "Group by" menu item.  Every node of a hierarchy targets the same leaf.
+    // Gets the "Group by" menu item.  Every node of a hierarchy targets the same leaf, so it is not
+    // one of the "Values" settings each level has its own of.
     const getGroupByMenuItem = (submenuItems) => ({
         section: "Values",
+        perLevel: false,
         text: "Group by",
         id: "filter-module-group-by",
         submenu: submenuItems

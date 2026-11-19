@@ -6,7 +6,8 @@
  *
  * A hierarchy's levels above its leaf each have their own value, label and sort settings, set from
  * a right-click on their options rather than from the heading, which sets the leaf's.  Its window
- * sets those of every level, so that what it sets is seen whichever levels are shown.
+ * sets those of every level, so that what it sets is seen whichever levels are shown.  Which menu
+ * items set such a setting is decided by Ren.FilterModule_ItemLevels.
  *
  * The module draws its items afresh on every change, and is itself built afresh when its data
  * are, so each item's heading row is noted as it is drawn (see addSettingsButton), and the window
@@ -23,9 +24,6 @@ Ren.FilterModule_SettingsWindow = (() => {
     // The dropdown's "All" choice, which no item's key can be, being neither a column's id nor a
     // heading.
     const ALL_KEY = "\u0000all";
-
-    // The sections of a hierarchy's menu whose settings each of its levels has its own of.
-    const LEVEL_SECTIONS = new Set(["Values", "Labels", "Sort"]);
 
     // The modules whose open window is to be built afresh once their items have been drawn.
     const pendingRefreshes = new Set();
@@ -262,14 +260,18 @@ Ren.FilterModule_SettingsWindow = (() => {
      * keepsWindows, and otherwise left out.  Called with the first item's heading row as the menu's
      * opener.
      */
-    const getMenuItemsForAll = (scope, items, parentPath, parentSection) => items.flatMap(item => {
+    const getMenuItemsForAll = (
+        scope, items, parentPath, parentSection, parentReachesLevels
+    ) => items.flatMap(item => {
 
         if (!item || isSeparator(item)) return [item];
 
         const { visualisation, getKeys, cache } = scope;
         const path = parentPath.concat(getPathPart(item));
         const section = parentSection ?? resolve(item.section);
-        const reachesLevels = LEVEL_SECTIONS.has(section);
+        // A submenu's items set what it does, so reach the levels where it does.
+        const reachesLevels =
+            parentReachesLevels ?? Ren.FilterModule_ItemLevels.isPerLevelMenuItem(item, section);
 
         const isTicked = () => isTickedEverywhere(visualisation, getKeys(), path, reachesLevels, cache);
 
@@ -299,7 +301,9 @@ Ren.FilterModule_SettingsWindow = (() => {
             const copy = withOwnProperties(item, item.action ? runsEverywhere : {});
 
             Object.defineProperty(copy, "submenu", {
-                get: () => getMenuItemsForAll(scope, resolve(item.submenu) || [], path, section),
+                get: () => getMenuItemsForAll(
+                    scope, resolve(item.submenu) || [], path, section, reachesLevels
+                ),
                 enumerable: true,
                 configurable: true
             });
