@@ -40,6 +40,9 @@
  *     which changes a setting each time it is run, such as flipping a sort order, is a button.
  * Within a group, its controls come before its subgroups, and are otherwise in menu order.
  *
+ * Ren.MENU_OPTION_GROUP_SEPARATOR divides a run's options into kinds without ending it, so they
+ * are still one choice.
+ *
  * A submenu with isChoice is one choice of its options, however its ticks read, for options
  * whose ticks call out rather than compare, and of which none may be ticked by default.
  *
@@ -736,6 +739,9 @@ Ren.MenuSettingsModel = (() => {
                 const item = items[i];
 
                 if (!item) continue;
+
+                // Options divided only into kinds are still one choice.
+                if (item.keepsChoice) continue;
 
                 if (isSeparator(item) || "heading" in item) {
 

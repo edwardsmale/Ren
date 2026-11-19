@@ -41,3 +41,8 @@ Ren.NotReady = "NotReady";
 
 Ren.MENU_SEPARATOR = { text: "-" };
 Object.freeze(Ren.MENU_SEPARATOR);
+
+// A separator dividing a list of options into kinds, such as columns by the type of their values,
+// which a settings window (Ren.MenuSettingsModel) keeps as one choice rather than one per kind.
+Ren.MENU_OPTION_GROUP_SEPARATOR = { text: "-", keepsChoice: true };
+Object.freeze(Ren.MENU_OPTION_GROUP_SEPARATOR);

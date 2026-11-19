@@ -715,7 +715,8 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
             if (group.length === 0) continue;
 
-            if (!isFirstGroup) items.push(Ren.MENU_SEPARATOR);
+            // So that the settings window keeps the columns one choice, not one per type.
+            if (!isFirstGroup) items.push(Ren.MENU_OPTION_GROUP_SEPARATOR);
 
             for (let index = 0; index < group.length; index++) {
                 items.push(group[index]);
@@ -739,7 +740,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
                 action: () => setSplitColumn(null),
                 ticked: () => getCurrentSplitColumnIndex() == null
             },
-            Ren.MENU_SEPARATOR
+            Ren.MENU_OPTION_GROUP_SEPARATOR
         ];
 
         const columnResolver = tabularData?.columnResolver;
@@ -868,7 +869,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
                 action: () => setSubdivideColumn(null),
                 ticked: () => !props.subdivideColumn
             },
-            Ren.MENU_SEPARATOR
+            Ren.MENU_OPTION_GROUP_SEPARATOR
         ];
 
         const splitColumn = getSplitColumnIdOrHeading();

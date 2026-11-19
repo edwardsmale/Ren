@@ -90,6 +90,27 @@ test("build_NoneSeparatedFromItsOptions_JoinsTheChoice", () => {
     expect(nodes[0].options.map(o => o.label)).toEqual(["None", "Created", "Updated"]);
 });
 
+// Columns listed by the type of their values, a lone one of a type included.
+test("build_OptionsDividedIntoKinds_AreOneChoice", () => {
+
+    const nodes = build([{
+        text: "Split data",
+        submenu: [
+            option("None", false, { id: "none" }),
+            Ren.MENU_OPTION_GROUP_SEPARATOR,
+            option("DepartmentName", true),
+            option("Region", false),
+            Ren.MENU_OPTION_GROUP_SEPARATOR,
+            option("IsBusiness", false)
+        ]
+    }]);
+
+    expect(nodes.length).toBe(1);
+    expect(nodes[0].type).toBe("choice");
+    expect(nodes[0].label).toBe("Split data");
+    expect(nodes[0].options.map(o => o.label)).toEqual(["None", "DepartmentName", "Region", "IsBusiness"]);
+});
+
 test("build_NumberEditorItem_IsANumberField", () => {
 
     const onChange = jest.fn();
