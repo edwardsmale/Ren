@@ -407,6 +407,85 @@ public class DateValueChartSubdivisionsTests : BrowserTest
         await Poll(async () => (await VisibleLabelsAsync()).Length).ToBe(0);
     }
 
+    // The items of the open menus, once the Labels submenu is open.
+    private async Task<string[]> LabelsMenuTextsAsync()
+    {
+        await DateValueChart.HoverMenuPathAsync(Ren, "Labels", "Subdivision labels");
+
+        var texts = await MenuItemTextsAsync();
+
+        await Page.Keyboard.PressAsync("Escape");
+
+        return texts;
+    }
+
+    [TestMethod("only the subdivision formats for what the labels show are offered")]
+    public async Task SubdivisionFormats_OnlyThoseForWhatTheLabelsShowAreOffered()
+    {
+        await CreateChartAsync();
+        await SubdivideByAsync("Search Terms");
+
+        var names = await LabelsMenuTextsAsync();
+
+        Expect(names).ToContain("Subdivision name format");
+        Expect(names).Not.ToContain("Subdivision value format");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision labels", "Values");
+
+        var values = await LabelsMenuTextsAsync();
+
+        Expect(values).Not.ToContain("Subdivision name format");
+        Expect(values).ToContain("Subdivision value format");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision labels", "Names and values");
+
+        var both = await LabelsMenuTextsAsync();
+
+        Expect(both).ToContain("Subdivision name format");
+        Expect(both).ToContain("Subdivision value format");
+    }
+
+    // The shared formats' "Normal" counts an unset format as its own, so isn't ticked beside the
+    // value format's "Same as series", nor offered twice for names.
+    // The menus above the submenu have ticked items of their own, so only these are looked at.
+    [TestMethod("an unset subdivision format ticks one item: Normal for names, Same as series for values")]
+    public async Task UnsetSubdivisionFormats_TickOneItem()
+    {
+        await CreateChartAsync();
+        await SubdivideByAsync("Search Terms");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision labels", "Names and values");
+
+        await DateValueChart.HoverMenuPathAsync(Ren, "Labels", "Subdivision name format");
+        Expect((await DateValueChart.TickedMenuItemsAsync(Ren)).Count(text => text == "Normal")).ToBe(1);
+        await Page.Keyboard.PressAsync("Escape");
+
+        await DateValueChart.HoverMenuPathAsync(Ren, "Labels", "Subdivision value format");
+        var ticked = await DateValueChart.TickedMenuItemsAsync(Ren);
+
+        Expect(ticked).ToContain("Same as series");
+        Expect(ticked).Not.ToContain("Normal");
+    }
+
+    [TestMethod("Subdivision value format formats the bands' labelled values, and is saved")]
+    public async Task SubdivisionValueFormat_FormatsTheLabelledValues()
+    {
+        await CreateChartAsync();
+        await SubdivideByAsync("Search Terms");
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision labels", "Values");
+
+        await Poll(async () => (await VisibleLabelsAsync()).Length).ToBeGreaterThan(0);
+        Expect((await VisibleLabelsAsync()).Any(label => label.EndsWith("k"))).ToBe(false);
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision value format", "Number", "Thousands (32k)");
+
+        await Poll(async () => (await VisibleLabelsAsync()).All(label => label.EndsWith("k"))).ToBe(true);
+        Expect(await SavedSettingsTextAsync()).ToContain("\"subdivisionValueFormatFunction\":[{\"name\":\"number-thousands\"}]");
+
+        await DateValueChart.ClickMenuPathAsync(Ren, "Labels", "Subdivision value format", "Same as series");
+
+        await Poll(async () => (await VisibleLabelsAsync()).Any(label => label.EndsWith("k"))).ToBe(false);
+    }
+
     private record MarksBySeries(int Marks, int Series);
 
     [TestMethod("a split chart subdivides each series' bars by a further column")]

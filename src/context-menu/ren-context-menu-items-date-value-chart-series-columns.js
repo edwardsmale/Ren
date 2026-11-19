@@ -899,7 +899,9 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             items.push(
                 Ren.MENU_SEPARATOR,
                 chart.subdivisionLimitMenuItem,
-                chart.subdivisionLabelsMenuItem
+                chart.subdivisionLabelsMenuItem,
+                chart.subdivisionNameFormatMenuItem,
+                chart.subdivisionValueFormatMenuItem
             );
         }
 

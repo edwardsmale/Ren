@@ -692,6 +692,126 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             ]
         };
 
+        // Offered while the subdivisions' labels show a content, names or values.
+        const areSubdivisionLabelsShowing = (contents) => () =>
+            Ren.DateValueChart_SeriesSubdivisions.isActive(props)
+            && contents.includes(Ren.DateValueChart_SeriesSubdivisions.getLabelContent(props));
+
+        // Ticks none of the shared formats, "Normal" among them, while the setting is unset and
+        // so ticks the item's own unsetText instead.  No format has this name.
+        const UNSET_FORMAT_SPECS = [{ name: "unset" }];
+
+        /**
+         * Builds a format menu item for what the subdivisions' labels show, as the series' Format
+         * offers, its setting a chart property.  The submenu is built as the menu opens, so the
+         * formats offered are those of what is formatted as it then is.  With an unsetText, it
+         * offers that first, to clear the setting; without, the shared "Normal" clears it.
+         */
+        const buildSubdivisionFormatMenuItem = ({
+            text,
+            id,
+            title,
+            propertyName,
+            contents,
+            getFormat,
+            unsetText
+        }) => {
+
+            const getFormatFunction = () => visualisation[propertyName];
+
+            const clearsSetting = (valueFormatFunction) => !valueFormatFunction
+                || (!unsetText
+                    && Ren.FormatFunctionUtils.getFunctionName(valueFormatFunction) === "default");
+
+            // Redrawn, as the labels are formatted as the subdivisions are drawn.
+            const setFormatFunction = (valueFormatFunction) => {
+
+                visualisation[propertyName] = clearsSetting(valueFormatFunction)
+                    ? undefined
+                    : Ren.ArrayUtils.ensureArray(valueFormatFunction);
+
+                commitRedraw();
+            };
+
+            const openCustomEditor = () => {
+
+                Ren.Messages.Requests.functionEditorWindow.notify(
+                    () => Ren.FormatFunctionUtils.getCustomCode(getFormatFunction()),
+                    (customCode) => setFormatFunction(customCode),
+                    null,
+                    null,
+                    { centred: true }
+                );
+            };
+
+            return {
+                text,
+                id,
+                title,
+                visible: areSubdivisionLabelsShowing(contents),
+                // Left out of the settings window while the labels don't show what it formats.
+                omitWhenHidden: true,
+                get submenu() {
+
+                    const items = Ren.ContextMenuItems_Formatting(
+                        (_columnIndex, _rowIndex, valueFormatFunction) =>
+                            setFormatFunction(valueFormatFunction),
+                        {
+                            summaryStatsAvailable: false,
+                            gridContext: false,
+                            columnHasNulls: () => false,
+                            getFormatFunction: unsetText
+                                ? () => getFormatFunction() ?? UNSET_FORMAT_SPECS
+                                : getFormatFunction
+                        }
+                    ).getMenuItems(null, null, null, getFormat());
+
+                    const unsetItems = unsetText
+                        ? [
+                            {
+                                text: unsetText,
+                                id: id + "-unset",
+                                action: () => setFormatFunction(null),
+                                ticked: () => !getFormatFunction()
+                            },
+                            Ren.MENU_SEPARATOR
+                        ]
+                        : [];
+
+                    return unsetItems.concat(items[0]?.submenu || []).concat([
+                        Ren.MENU_SEPARATOR,
+                        {
+                            text: "Custom...",
+                            id: id + "-custom",
+                            ticked: () => !!Ren.FormatFunctionUtils.getCustomCode(
+                                getFormatFunction()
+                            ),
+                            action: () => openCustomEditor()
+                        }
+                    ]);
+                }
+            };
+        };
+
+        const subdivisionNameFormatMenuItem = buildSubdivisionFormatMenuItem({
+            text: "Subdivision name format",
+            id: "subdivision-name-format",
+            title: "The format of the names in the subdivisions' labels",
+            propertyName: "subdivisionNameFormatFunction",
+            contents: [subdivisionContents.Names, subdivisionContents.Both],
+            getFormat: () => props.subdivideColumnFormat
+        });
+
+        const subdivisionValueFormatMenuItem = buildSubdivisionFormatMenuItem({
+            text: "Subdivision value format",
+            id: "subdivision-value-format",
+            title: "The format of the values in the subdivisions' labels",
+            propertyName: "subdivisionValueFormatFunction",
+            contents: [subdivisionContents.Values, subdivisionContents.Both],
+            getFormat: () => props.valueColumnFormats?.[0],
+            unsetText: "Same as series"
+        });
+
         // How many subdivisions each bar or slice is drawn with, the smallest beyond them gathered
         // into one, offered while there are subdivisions.
         const subdivisionLimitMenuItem = {
@@ -783,7 +903,9 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
             commitRedraw,
             rebuildVisualisation,
             subdivisionLimitMenuItem,
-            subdivisionLabelsMenuItem
+            subdivisionLabelsMenuItem,
+            subdivisionNameFormatMenuItem,
+            subdivisionValueFormatMenuItem
         };
 
         const {

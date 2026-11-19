@@ -19,7 +19,9 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         buildSeriesOptionItems,
         targetSeriesHeadingMenuItem,
         chartHeadingMenuItem,
-        subdivisionLabelsMenuItem
+        subdivisionLabelsMenuItem,
+        subdivisionNameFormatMenuItem,
+        subdivisionValueFormatMenuItem
     } = chart;
 
     const seriesColours = [
@@ -1254,6 +1256,8 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
             lineNamesMenuItem,
             pieLabelsMenuItem,
             subdivisionLabelsMenuItem,
+            subdivisionNameFormatMenuItem,
+            subdivisionValueFormatMenuItem,
             Ren.MENU_SEPARATOR,
             valueLabelFontSizeMenuItem,
             seriesNamesInBarsFontSizeMenuItem,

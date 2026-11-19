@@ -756,4 +756,60 @@ describe("Ren.DateValueChart_InputColumns subdivisions", () => {
         // Null means every column is read, which includes it too.
         expect(indexes === null || indexes.indexOf(2) !== -1).toBe(true);
     });
+
+    // A name of 0/1, from a flag column, made words by the chart's Subdivision name format.
+    test("getLabelText_NameFormat_FormatsTheColumnValue", () => {
+
+        const props = {
+            subdivisionLabels: "names",
+            subdivideColumnFormat: Ren.SpreadsheetColumnFormatEnum.Number,
+            valueColumnFormats: [Ren.SpreadsheetColumnFormatEnum.Number],
+            visualisation: { subdivisionNameFormatFunction: [{ name: "number-thousands" }] }
+        };
+
+        const subdivision = { label: "32000", value: 5, columnValue: 32000, columnValues: ["32000"] };
+
+        expect(Ren.DateValueChart_SeriesSubdivisions.getLabelText(props, 0, subdivision)).toBe("32k");
+    });
+
+    test("getLabelText_NoNameFormat_TheLabelAsItIs", () => {
+
+        const props = {
+            subdivisionLabels: "names",
+            valueColumnFormats: [Ren.SpreadsheetColumnFormatEnum.Number],
+            visualisation: {}
+        };
+
+        const subdivision = { label: "32000", value: 5, columnValue: 32000, columnValues: ["32000"] };
+
+        expect(Ren.DateValueChart_SeriesSubdivisions.getLabelText(props, 0, subdivision)).toBe("32000");
+    });
+
+    // The subdivision gathering the smallest has no one value to format.
+    test("getLabelText_NameFormat_LeavesTheGatheredSubdivisionsName", () => {
+
+        const props = {
+            subdivisionLabels: "names",
+            valueColumnFormats: [Ren.SpreadsheetColumnFormatEnum.Number],
+            visualisation: { subdivisionNameFormatFunction: [{ name: "number-thousands" }] }
+        };
+
+        const subdivision = { label: "(other)", value: 5, columnValues: ["1", "2"] };
+
+        expect(Ren.DateValueChart_SeriesSubdivisions.getLabelText(props, 0, subdivision)).toBe("(other)");
+    });
+
+    test("getLabelText_ValueFormat_FormatsTheValue", () => {
+
+        const props = {
+            subdivisionLabels: "values",
+            valueColumnFormats: [Ren.SpreadsheetColumnFormatEnum.Number],
+            visualisation: { subdivisionValueFormatFunction: [{ name: "number-thousands" }] }
+        };
+
+        const subdivision = { label: "A", value: 32000, columnValue: "A", columnValues: ["A"] };
+
+        expect(Ren.DateValueChart_SeriesSubdivisions.getLabelText(props, 0, subdivision)).toBe("32k");
+    });
+
 });

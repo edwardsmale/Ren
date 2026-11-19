@@ -216,14 +216,36 @@ Ren.DateValueChart_ValueFormats = (() => {
      * Gets the formats the pies' totals are shown in where the chart has a pieTotalFormatFunction,
      * or null for the totals to take their slices' format.
      */
-    const getPieTotalFormats = (props, slicesFormat) => {
+    const getPieTotalFormats = (props, slicesFormat) =>
+        getSettingFormats(props, props.visualisation?.pieTotalFormatFunction, slicesFormat);
 
-        const setting = props.visualisation?.pieTotalFormatFunction;
+    /**
+     * Gets the formats the subdivisions' labels show their names in where the chart has a
+     * subdivisionNameFormatFunction, or null for them to be shown as they are.
+     */
+    const getSubdivisionNameFormats = (props, columnFormat) => getSettingFormats(
+        props,
+        props.visualisation?.subdivisionNameFormatFunction,
+        columnFormat
+    );
+
+    /**
+     * Gets the formats the subdivisions' labels show their values in where the chart has a
+     * subdivisionValueFormatFunction, or null for them to take their series' format.
+     */
+    const getSubdivisionValueFormats = (props, seriesFormat) => getSettingFormats(
+        props,
+        props.visualisation?.subdivisionValueFormatFunction,
+        seriesFormat
+    );
+
+    // Gets the formats a format function setting shows values in, or null where it is unset.
+    const getSettingFormats = (props, setting, fallbackFormat) => {
 
         if (!setting) return null;
 
         return {
-            format: getFormatForFunction(setting, slicesFormat),
+            format: getFormatForFunction(setting, fallbackFormat),
             formatFunction: createFormatFunctions(props, setting)
         };
     };
@@ -232,6 +254,8 @@ Ren.DateValueChart_ValueFormats = (() => {
         getAbbreviatedFormats,
         getFormatForFunction,
         getPieTotalFormats,
+        getSubdivisionNameFormats,
+        getSubdivisionValueFormats,
         resolveFormats,
         initialiseAxisFormats
     };

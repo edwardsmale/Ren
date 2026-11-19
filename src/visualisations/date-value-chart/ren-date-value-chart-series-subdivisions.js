@@ -224,7 +224,9 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
             aggregated.push({
                 label: Ren.ValueDisplayLabel(filterValue),
                 value: value,
-                columnValues: [filterValue]
+                columnValues: [filterValue],
+                // As the row holds it, for a name format to be given, the label being text.
+                columnValue: groupRows[0][column]
             });
 
             total += value;
@@ -406,6 +408,50 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
     const formatValue = (props, seriesIndex, value) =>
         Ren.ValueFormatter.formatValueSimple(value, props.valueColumnFormats[seriesIndex]);
 
+    // A value in formats, as plain text, a format function being able to give HTML.
+    const formatAsText = (value, formats) => {
+
+        const formatted = Ren.ValueFormatter.formatValue(
+            value,
+            null,
+            formats.format,
+            formats.formatFunction
+        );
+
+        const text = String(formatted ?? "");
+
+        // A format function can give HTML.
+        return text.indexOf("<") === -1 && text.indexOf("&") === -1
+            ? text
+            : Ren.HtmlUtils.parseHTML(text).body.textContent;
+    };
+
+    // A labelled value, in the chart's Subdivision value format where it has one.
+    const formatLabelValue = (props, seriesIndex, value) => {
+
+        const seriesFormat = props.valueColumnFormats[seriesIndex];
+        const formats =
+            Ren.DateValueChart_ValueFormats.getSubdivisionValueFormats(props, seriesFormat);
+
+        return formats
+            ? formatAsText(value, formats)
+            : Ren.ValueFormatter.formatValueSimple(value, seriesFormat);
+    };
+
+    // A subdivision's name, in the chart's Subdivision name format where it has one.  The
+    // subdivision gathering the smallest is named as it is.
+    const formatName = (props, subdivision) => {
+
+        if (!("columnValue" in subdivision)) return subdivision.label;
+
+        const formats = Ren.DateValueChart_ValueFormats.getSubdivisionNameFormats(
+            props,
+            props.subdivideColumnFormat
+        );
+
+        return formats ? formatAsText(subdivision.columnValue, formats) : subdivision.label;
+    };
+
     /**
      * Gets a subdivision's label text, or null where the chart's subdivisions aren't labelled.
      */
@@ -414,11 +460,13 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         const content = getLabelContent(props);
 
         if (content === LABEL_CONTENTS.None) return null;
-        if (content === LABEL_CONTENTS.Names) return subdivision.label;
+        if (content === LABEL_CONTENTS.Names) return formatName(props, subdivision);
 
-        const value = formatValue(props, seriesIndex, subdivision.value);
+        const value = formatLabelValue(props, seriesIndex, subdivision.value);
 
-        return content === LABEL_CONTENTS.Values ? value : `${subdivision.label} ${value}`;
+        return content === LABEL_CONTENTS.Values
+            ? value
+            : `${formatName(props, subdivision)} ${value}`;
     };
 
     const getMarkTitle = (props, context, subdivision) => {
@@ -427,7 +475,7 @@ Ren.DateValueChart_SeriesSubdivisions = (() => {
         const share = Ren.DateValueChart_PieLabels.formatShare(subdivision.share);
 
         return `${context.dateLabel}\n${context.seriesLabel}\n`
-            + `${subdivision.label}: ${value} (${share})`;
+            + `${formatName(props, subdivision)}: ${value} (${share})`;
     };
 
     /**

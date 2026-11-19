@@ -712,6 +712,15 @@ Ren.CreateDateValueChart = (() => {
 
         props.rawInputData = inputData;
 
+        // The format of the column subdividing the bars or slices, which their names are in.
+        const subdivideColumnIndex = props.subdivideColumn && tabularData?.columnResolver
+            ? tabularData.columnResolver.getColumnIndex(props.subdivideColumn)
+            : null;
+
+        props.subdivideColumnFormat = subdivideColumnIndex == null
+            ? null
+            : tabularData.ColumnModels[subdivideColumnIndex]?.ColumnFormat ?? null;
+
         // What a multi-chart's charts are each detected again from (see drawMultiChartItem).
         props.multiChartDetection = {
             inputData,

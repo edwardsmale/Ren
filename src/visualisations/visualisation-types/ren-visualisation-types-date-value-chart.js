@@ -36,6 +36,12 @@ Ren.VisualisationTypes_DateValueChart = {
         // one.  Unset, there are up to 20.
         subdivisionLimit: "Number",
 
+        // The format function specs the subdivisions' labels show their names in, and their
+        // values in.  Unset, the names are shown as they are, and the values take their series'
+        // format.
+        subdivisionNameFormatFunction: "Array",
+        subdivisionValueFormatFunction: "Array",
+
         // The series drawn as pies (a series' chartType of "Pie") share a pie per period, each a
         // slice of it, with a hole in the middle pieHoleRadius (0 to 0.9 of the pie's radius, 0 by
         // default) across.  showAsPies, which drew every series so, is only read from charts
@@ -313,6 +319,15 @@ Ren.VisualisationTypes_DateValueChart = {
         {
             name: "subdivisionLimit",
             transform: (subdivisionLimit) => subdivisionLimit > 0 ? subdivisionLimit : undefined
+        },
+        {
+            name: "subdivisionNameFormatFunction",
+            transform: (subdivisionNameFormatFunction) => subdivisionNameFormatFunction || undefined
+        },
+        {
+            name: "subdivisionValueFormatFunction",
+            transform: (subdivisionValueFormatFunction) =>
+                subdivisionValueFormatFunction || undefined
         },
         {
             name: "showAsPies",

@@ -35,6 +35,7 @@ Make a hierarchical filter module item's Sort toggle sort all its levels.
 Move a filter module item's "Group by" into its menu's Values section, with "Invert grouping" and "Ungroup" in its submenu.
 Add "Thousands" Number and Currency formats, showing every figure in thousands (£32k).
 Keep a date/value chart's "Split data" and "Subdivide by" settings as one dropdown each.
+Add "Subdivision name format" and "Subdivision value format" to date/value charts.
 
 ## 1.1.20 (2026-11-20)
 
