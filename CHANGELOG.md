@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.1.21 (2026-11-20)
 
 Add a settings window to date/value charts, opened from a cog beside their pickers.
 Let date/value charts draw some series as pies beside others drawn as bars, lines or dots.
