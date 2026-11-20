@@ -17,6 +17,7 @@ Grey out visualisations catching up with a filter change only after half a secon
 Lay out date/value chart labels faster, measuring axis and value labels together.
 Stop naming the released branch in release commits and ren.manifest.json.
 Fix the variations window's buttons for a name with quotes, which broke them or could run script.
+Reload the page when its dates or parameters change if Ren made it the report context, rather than putting it inside itself.
 
 ## 1.1.19 (2026-11-17)
 

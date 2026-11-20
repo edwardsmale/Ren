@@ -27,6 +27,13 @@ Ren.ReportContextUrlUpdater = (() => {
         return null;
     };
 
+    const isRequestedFromPage = (visualisation) => {
+
+        if (Ren.HostUrls.hasReportUrls() || !visualisation.containingReportUrl) return false;
+
+        return new URL(visualisation.containingReportUrl, location.href).pathname === location.pathname;
+    };
+
     /**
      * Sets the URL of a report, causing it to refresh as per the new URL.  Called when the user
      * changes the parameters using a parameters module or a date selector.
@@ -34,6 +41,15 @@ Ren.ReportContextUrlUpdater = (() => {
     const updateReportUrl = (newUrl, visualisation) => {
 
         const reportContext = visualisation.reportContext;
+
+        // A report context Ren made of a page outside the web report layout is requested from the
+        // page's own URL (see Ren.PageReportContext), which gives the whole page rather than the
+        // report alone, so the page is reloaded as a whole, as with reloadsPage.
+        if (isRequestedFromPage(visualisation)) {
+
+            location.href = newUrl;
+            return;
+        }
 
         // A popup report's settings (column visibility, aggregation types etc.) are applied
         // client-side, by the popup's onReportLoaded callback, when it is first opened. This reload

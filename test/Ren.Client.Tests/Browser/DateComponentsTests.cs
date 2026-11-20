@@ -51,4 +51,17 @@ public class DateComponentsTests : BrowserTest
 
         Expect(await SummaryTextAsync(1)).ToBe("Q3 2025");
     }
+
+    // The report context Ren makes of the page was once reloaded in place, from the page's own URL,
+    // putting the whole page inside its body, and the next dates chosen then threw.
+    [TestMethod("On a page Ren made the report context of › choosing dates reloads the page with them")]
+    public async Task OnAPageRenMadeTheReportContextOf_ChoosingDatesReloadsThePageWithThem()
+    {
+        await Ren.OpenAsync("date-components/registered-defaults.html");
+
+        await Page.Locator(".qa-ren-date-range-edit-button").First.ClickAsync();
+        await Page.Locator(".qa-ren-date-selector-date-range-menu-item-Clear").First.ClickAsync();
+
+        await Page.WaitForURLAsync(url => url.Contains("StartDate=2000-01-01"));
+    }
 }
