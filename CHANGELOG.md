@@ -37,6 +37,7 @@ Add "Thousands" Number and Currency formats, showing every figure in thousands (
 Keep a date/value chart's "Split data" and "Subdivide by" settings as one dropdown each.
 Add "Subdivision name format" and "Subdivision value format" to date/value charts.
 Name a date/value chart's subdivisions "Is …" and "Not …" when it is subdivided by an "Is…" column.
+List the filter module's columns as checkboxes on its settings window's Columns tab.
 
 ## 1.1.20 (2026-11-20)
 

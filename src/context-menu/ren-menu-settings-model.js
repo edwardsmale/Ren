@@ -5,7 +5,7 @@
  * how the result is shown).
  *
  * The result is a tree of nodes:
- *   { type: "group", heading, title, key, children }
+ *   { type: "group", heading, title, key, children, isList }
  *   { type: "toggle", label, title, key, checked, item }
  *   { type: "choice", label, title, key, options: [{ label, title, selected, item }], children }
  *   { type: "number", label, title, key, value, min, max, step, unit, showSlider,
@@ -45,6 +45,9 @@
  *
  * A submenu with isChoice is one choice of its options, however its ticks read, for options
  * whose ticks call out rather than compare, and of which none may be ticked by default.
+ *
+ * A submenu with isList, such as the columns a filter module offers, is a list of toggles however
+ * many there are, and however their ticks read: a group with isList, shown as a list of checkboxes.
  *
  * A submenu with isChoiceLed, whose first run is a choice and whose other items are settings for
  * what it chooses, is that choice, labelled with the submenu's text, with those settings as its
@@ -659,9 +662,13 @@ Ren.MenuSettingsModel = (() => {
             if (item.submenu) {
 
                 const submenu = Ren.MenuItemProbe.track(() => item.submenu).value || [];
-                const nodes = buildSections(submenu, key, false, !!item.isChoice);
+                const nodes = buildSections(submenu, key, false, !!item.isChoice, !!item.isList);
 
                 if (!nodes.length) return null;
+
+                if (item.isList) {
+                    return { kind: "node", node: Object.assign(createGroup(label, title, key, nodes), { isList: true }) };
+                }
 
                 if (countControls(nodes) > MAX_INLINE_CONTROLS) {
 
@@ -713,7 +720,7 @@ Ren.MenuSettingsModel = (() => {
         /**
          * Builds the nodes for a list of items, which separators and headings divide into runs.
          */
-        const buildList = (items, parentKey, isChoiceList) => {
+        const buildList = (items, parentKey, isChoiceList, isToggleList) => {
 
             const nodes = [];
             let run = [];
@@ -722,10 +729,10 @@ Ren.MenuSettingsModel = (() => {
 
                 if (!run.length) return;
 
-                const isChoice = (isChoiceList && run.length > 1) || remember(
+                const isChoice = !isToggleList && ((isChoiceList && run.length > 1) || remember(
                     "run:" + run.map(leaf => leaf.key).join(","),
                     () => scoreAsChoice(run) > 0
-                );
+                ));
 
                 // A choice can't have more than one option selected, whatever it was before.
                 if (isChoice && run.filter(leaf => leaf.ticked).length <= 1) nodes.push(createChoice(run));
@@ -773,7 +780,7 @@ Ren.MenuSettingsModel = (() => {
          * each, where there is more than one section, or always for a root menu.  Items in no
          * section come first, ungrouped.
          */
-        const buildSections = (items, parentKey, isRoot, isChoiceList) => {
+        const buildSections = (items, parentKey, isRoot, isChoiceList, isToggleList) => {
 
             const sections = [];
 
@@ -794,7 +801,7 @@ Ren.MenuSettingsModel = (() => {
                 else sections.push({ name: sectionName, items: [item] });
             }
 
-            if (!isRoot && sections.length < 2) return buildList(items, parentKey, isChoiceList);
+            if (!isRoot && sections.length < 2) return buildList(items, parentKey, isChoiceList, isToggleList);
 
             const nodes = [];
 

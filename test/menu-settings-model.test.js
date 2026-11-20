@@ -425,3 +425,15 @@ test("build_NoGetScope_SetsNothingApart", () => {
 
     expect(nodes[0].children.some(n => n.isScope)).toBe(false);
 });
+
+test("build_IsListSubmenuOfManyOptions_IsAListOfToggles", () => {
+
+    const columns = Array.from({ length: 20 }, (_, i) => option("Column " + i, i === 3, { id: "column-" + i }));
+
+    const nodes = build([{ text: "Add filter", id: "add", isList: true, submenu: columns }]);
+
+    expectFields(nodes[0], { type: "group", heading: "Add filter", isList: true });
+    expect(nodes[0].children.length).toBe(20);
+    expect(nodes[0].children.every(n => n.type === "toggle")).toBe(true);
+    expect(nodes[0].children[3].checked).toBe(true);
+});

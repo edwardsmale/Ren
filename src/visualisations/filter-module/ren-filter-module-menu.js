@@ -199,6 +199,8 @@ Ren.FilterModule_Menu = (s) => {
         section: "Columns",
         text: "Add filter",
         id: "filter-module-add-column",
+        // Shown in the settings window as checkboxes, however many columns there are.
+        isList: true,
         submenu: buildAddColumnSubmenuItems()
     });
 

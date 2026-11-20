@@ -12,6 +12,9 @@
  * Where the model has more than one section, each section is a subtab, so that only one section's
  * settings are shown at a time.  Settings in no section come first, under "General".
  *
+ * A list group (isList) is its checkboxes in a box of their own, which scrolls where they would
+ * make it too tall.
+ *
  * A menu node is a row showing what is set in a submenu too big to lay out, with a pencil opening
  * the submenu itself, as a context menu.
  *
@@ -498,7 +501,13 @@ Ren.MenuSettingsForm = (container, options) => {
             group._append(heading);
         }
 
-        renderChildren(group, node.children, depth + 1);
+        // A list's checkboxes scroll in a box of their own, where there are too many to show.
+        if (node.isList) {
+            group._append(renderChildren(create("div", "list")._attr("data-list-key", node.key), node.children, depth + 1));
+        }
+        else {
+            renderChildren(group, node.children, depth + 1);
+        }
 
         // Its heading is greyed out with its controls, where all of them are hidden.
         const update = (newNode) =>
@@ -696,6 +705,10 @@ Ren.MenuSettingsForm = (container, options) => {
         const found = findAnchor(anchors);
         const anchorTop = found ? found.element.getBoundingClientRect().top : null;
 
+        // Each list scrolled as it was.
+        const listScrollTops = new Map(Array.from(container.querySelectorAll("[data-list-key]"))
+            .map(list => [list.getAttribute("data-list-key"), list.scrollTop]));
+
         updaters = new Map();
 
         const form = Ren.HtmlUtils.create("div")._addClass(CLASS_NAME);
@@ -706,6 +719,13 @@ Ren.MenuSettingsForm = (container, options) => {
         else renderChildren(form, model.children, 0);
 
         Ren.HtmlUtils.enrich(container)._content(form);
+
+        listScrollTops.forEach((listScrollTop, key) => {
+
+            const list = findByAttribute("data-list-key", key);
+
+            if (list) list.scrollTop = listScrollTop;
+        });
 
         if (scroller) {
 

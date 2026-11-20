@@ -167,6 +167,34 @@ $control-inset: 9px;
         }
     }
 
+    // A list group's checkboxes, each taking the whole row, scrolling where there are many.
+    &__list
+    {
+        max-height: 20rem;
+        overflow-y: auto;
+        padding: 2px 0;
+        border: solid 1px #d8d8d8;
+        border-radius: 3px;
+
+        > .ren-menu-settings-form__row
+        {
+            grid-template-columns: minmax(0, 1fr);
+            min-height: 22px;
+
+            > .ren-menu-settings-form__label
+            {
+                display: none;
+            }
+        }
+
+        .ren-menu-settings-form__toggle-text
+        {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
     &__label
     {
         overflow: hidden;
