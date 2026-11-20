@@ -386,10 +386,12 @@ Ren.MessageBus = (() => {
 
     const sendQueuedMessages = () => {
 
+        // Called by a listener, the batch it's in already sends what is queued, in order.  Sending
+        // it from here would give the listeners after this one later messages before this one.
+        if (isSendingQueuedMessages) return;
+
         stopInterval();
         dispatchDepth++;
-
-        const wasSendingQueuedMessages = isSendingQueuedMessages;
         isSendingQueuedMessages = true;
 
         try {
@@ -398,11 +400,11 @@ Ren.MessageBus = (() => {
         }
         finally {
 
-            isSendingQueuedMessages = wasSendingQueuedMessages;
+            isSendingQueuedMessages = false;
             dispatchDepth--;
 
             // So that, if a throw ended the batch early, what is left in the queue is still sent.
-            if (!isSendingQueuedMessages && messageQueue.length) startInterval();
+            if (messageQueue.length) startInterval();
         }
 
         sweepListenersIfNotDispatching();

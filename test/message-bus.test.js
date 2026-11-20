@@ -188,4 +188,29 @@ describe("Ren.MessageBus", () => {
             setIntervalSpy.mockRestore();
         }
     });
+
+    test("SendQueuedMessages_FromListenerDuringBatch_LeavesBatchToSendInOrder", () => {
+
+        const first = Ren.MessageBus.createMessageType(["name"]);
+        const second = Ren.MessageBus.createMessageType(["name"]);
+
+        const received = [];
+
+        handle(first, name => {
+
+            received.push(name);
+            second.notify(name + "-after");
+            Ren.MessageBus.sendQueuedMessages();
+        });
+
+        handle(second, name => { received.push(name); });
+
+        first.notify("a");
+        second.notify("b");
+        first.notify("c");
+
+        expect(() => Ren.MessageBus.sendQueuedMessages()).not.toThrow();
+        expect(received).toEqual(["a", "b", "c", "a-after", "c-after"]);
+        expect(Ren.MessageBus.isIdle()).toBe(true);
+    });
 });
