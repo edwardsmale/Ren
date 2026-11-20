@@ -307,6 +307,10 @@ Ren.DateValueChart_RenderValueLabels = (() => {
             try {
 
                 const value = mainValueFn(d);
+                const y = yScale.getPixel(value);
+
+                // A value with no point, such as the first period's change, has no label.
+                if (y === undefined) return;
 
                 appendValueLabel(
                     props,
@@ -315,7 +319,7 @@ Ren.DateValueChart_RenderValueLabels = (() => {
                     config,
                     {
                         x: props.xScale.getPixel(crossValueFn(d)),
-                        y: yScale.getPixel(value),
+                        y,
                         value,
                         date: d[props.dateHeading]
                     },

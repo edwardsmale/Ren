@@ -94,6 +94,25 @@ public class DateValueChartChangeTests : BrowserTest
         Expect(await SavedSettingsTextAsync()).ToContain("\"showAsChange\":true");
     }
 
+    // The first period has no change, whose label was once put at translate(x, undefined).
+    [TestMethod("labels only the periods that have a change")]
+    public async Task LabelsOnlyThePeriodsThatHaveAChange()
+    {
+        await CreateChartAsync();
+        await DateValueChart.ClickMenuPathAsync(Ren, "Values", "Change on period before");
+
+        await Poll(async () =>
+        {
+            var plotted = (await PlottedValuesAsync()).Count(IsNumber);
+
+            var transforms = await Ren.Root.Locator(".ren-value-labels-layer .ren-text-wrapper")
+                .EvaluateAllAsync<string[]>("wrappers => wrappers.map(wrapper => wrapper.getAttribute('transform'))");
+
+            return transforms.Length == plotted && transforms.All(transform => !transform.Contains("undefined") && !transform.Contains("NaN"));
+
+        }).ToBe(true);
+    }
+
     [TestMethod("leaves the hovered values without a change of a change")]
     public async Task LeavesTheHoveredValuesWithoutAChangeOfAChange()
     {
