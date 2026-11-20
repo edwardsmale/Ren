@@ -5,14 +5,14 @@ using Microsoft.Playwright;
 namespace Ren.Client.Tests.Browser;
 
 // These tests cover the series Colour menu on a multi-chart of pies, whose charts share one legend
-// and each number only the series their own period holds.  In the fixture 2024 has Amazon and
-// Direct, and 2025 has Amazon, Other and Direct, so Direct is numbered differently in each.
+// and each number only the series their own period holds.  In the fixture 2024 has Affiliate and
+// Direct, and 2025 has Affiliate, Other and Direct, so Direct is numbered differently in each.
 [TestClass]
 public class DateValueChartMultiChartColoursTests : BrowserTest
 {
     private const string Fixture = "multi-chart-colours/channel-sales.html";
 
-    private const string AmazonBlue = "rgb(48, 70, 184)";
+    private const string AffiliateBlue = "rgb(48, 70, 184)";
     private const string Gold = "rgb(199, 145, 0)";
     private const string Teal = "rgb(0, 121, 107)";
 
@@ -156,15 +156,15 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var before = await ReadColoursAsync();
 
-        Expect(before["2024 Amazon"]).ToBe(AmazonBlue);
+        Expect(before["2024 Affiliate"]).ToBe(AffiliateBlue);
 
-        await PickColourOnSliceAsync(2024, "Amazon", "Gold");
+        await PickColourOnSliceAsync(2024, "Affiliate", "Gold");
 
         var after = await ReadColoursAsync();
 
-        Expect(after["2024 Amazon"]).ToBe(Gold);
-        Expect(after["2025 Amazon"]).ToBe(Gold);
-        Expect(after["legend Amazon"]).ToBe(Gold);
+        Expect(after["2024 Affiliate"]).ToBe(Gold);
+        Expect(after["2025 Affiliate"]).ToBe(Gold);
+        Expect(after["legend Affiliate"]).ToBe(Gold);
         Expect(after["2024 Direct"]).ToBe(before["2024 Direct"]);
         Expect(after["2025 Other"]).ToBe(before["2025 Other"]);
         Expect(after["legend Direct"]).ToBe(before["legend Direct"]);
@@ -199,9 +199,9 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
     {
         await CreateMultiChartAsync();
 
-        await PickColourOnSliceAsync(2024, "Amazon", "Gold");
+        await PickColourOnSliceAsync(2024, "Affiliate", "Gold");
 
-        await RightClickSliceAsync(2025, "Amazon");
+        await RightClickSliceAsync(2025, "Affiliate");
         await HoverColourMenuAsync();
 
         Expect(await DateValueChart.TickedMenuItemsAsync(Ren)).ToContain("Gold");
@@ -214,15 +214,15 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var before = await ReadColoursAsync();
 
-        await RightClickSliceAsync(2024, "Amazon");
+        await RightClickSliceAsync(2024, "Affiliate");
         await HoverColourMenuAsync();
         await MenuItem("Teal").HoverAsync();
 
         var previewed = await ReadColoursAsync();
 
-        Expect(previewed["2024 Amazon"]).ToBe(Teal);
-        Expect(previewed["2025 Amazon"]).ToBe(Teal);
-        Expect(previewed["legend Amazon"]).ToBe(Teal);
+        Expect(previewed["2024 Affiliate"]).ToBe(Teal);
+        Expect(previewed["2025 Affiliate"]).ToBe(Teal);
+        Expect(previewed["legend Affiliate"]).ToBe(Teal);
         Expect(previewed["2024 Direct"]).ToBe(before["2024 Direct"]);
         Expect(previewed["2025 Other"]).ToBe(before["2025 Other"]);
         Expect(previewed["legend Other"]).ToBe(before["legend Other"]);
@@ -239,7 +239,7 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var before = await ReadColoursAsync();
 
-        await RightClickSliceAsync(2024, "Amazon");
+        await RightClickSliceAsync(2024, "Affiliate");
         await HoverColourMenuAsync();
         await Page.Locator("#series-colour-variants").First.HoverAsync();
 
@@ -252,8 +252,8 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var previewed = await ReadColoursAsync();
 
-        Expect(previewed["2024 Amazon"]).ToBe(Teal);
-        Expect(previewed["2025 Amazon"]).ToBe(Teal);
+        Expect(previewed["2024 Affiliate"]).ToBe(Teal);
+        Expect(previewed["2025 Affiliate"]).ToBe(Teal);
         Expect(previewed["2024 Direct"]).ToBe(before["2024 Direct"]);
         Expect(previewed["2025 Other"]).ToBe(before["2025 Other"]);
 
@@ -261,9 +261,9 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var after = await ReadColoursAsync();
 
-        Expect(after["2024 Amazon"]).ToBe(Gold);
-        Expect(after["2025 Amazon"]).ToBe(Gold);
-        Expect(after["legend Amazon"]).ToBe(Gold);
+        Expect(after["2024 Affiliate"]).ToBe(Gold);
+        Expect(after["2025 Affiliate"]).ToBe(Gold);
+        Expect(after["legend Affiliate"]).ToBe(Gold);
         Expect(after["2024 Direct"]).ToBe(before["2024 Direct"]);
         Expect(after["2025 Other"]).ToBe(before["2025 Other"]);
     }
@@ -273,7 +273,7 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
     {
         await CreateMultiChartAsync();
 
-        await RightClickSliceAsync(2024, "Amazon");
+        await RightClickSliceAsync(2024, "Affiliate");
         await HoverColourMenuAsync();
 
         // Applied and so redrawn while still previewed.
@@ -285,9 +285,9 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var colours = await ReadColoursAsync();
 
-        Expect(colours["2024 Amazon"]).ToBe(AmazonBlue);
-        Expect(colours["2025 Amazon"]).ToBe(AmazonBlue);
-        Expect(colours["legend Amazon"]).ToBe(AmazonBlue);
+        Expect(colours["2024 Affiliate"]).ToBe(AffiliateBlue);
+        Expect(colours["2025 Affiliate"]).ToBe(AffiliateBlue);
+        Expect(colours["legend Affiliate"]).ToBe(AffiliateBlue);
     }
 
     [TestMethod("Opened from settings_hovering previews only the clicked series")]
@@ -306,8 +306,8 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
         Expect(previewed["2024 Direct"]).ToBe(Teal);
         Expect(previewed["2025 Direct"]).ToBe(Teal);
         Expect(previewed["legend Direct"]).ToBe(Teal);
-        Expect(previewed["2024 Amazon"]).ToBe(before["2024 Amazon"]);
-        Expect(previewed["2025 Amazon"]).ToBe(before["2025 Amazon"]);
+        Expect(previewed["2024 Affiliate"]).ToBe(before["2024 Affiliate"]);
+        Expect(previewed["2025 Affiliate"]).ToBe(before["2025 Affiliate"]);
         Expect(previewed["2025 Other"]).ToBe(before["2025 Other"]);
 
         await Page.Mouse.MoveAsync(0, 0);
@@ -329,7 +329,7 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
         Expect(after["2024 Direct"]).ToBe(Gold);
         Expect(after["2025 Direct"]).ToBe(Gold);
         Expect(after["legend Direct"]).ToBe(Gold);
-        Expect(after["2024 Amazon"]).ToBe(before["2024 Amazon"]);
+        Expect(after["2024 Affiliate"]).ToBe(before["2024 Affiliate"]);
         Expect(after["2025 Other"]).ToBe(before["2025 Other"]);
     }
 
@@ -340,15 +340,15 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var before = await ReadColoursAsync();
 
-        await RightClickBandAsync(2025, "Amazon", "Acme");
+        await RightClickBandAsync(2025, "Affiliate", "Acme");
         await HoverColourMenuAsync();
         await MenuItem("Teal").HoverAsync();
 
         var previewed = await ReadColoursAsync();
 
-        Expect(previewed["2024 Amazon"]).ToBe(Teal);
-        Expect(previewed["2025 Amazon"]).ToBe(Teal);
-        Expect(previewed["legend Amazon"]).ToBe(Teal);
+        Expect(previewed["2024 Affiliate"]).ToBe(Teal);
+        Expect(previewed["2025 Affiliate"]).ToBe(Teal);
+        Expect(previewed["legend Affiliate"]).ToBe(Teal);
         Expect(previewed["2024 Direct"]).ToBe(before["2024 Direct"]);
         Expect(previewed["2025 Direct"]).ToBe(before["2025 Direct"]);
         Expect(previewed["2025 Other"]).ToBe(before["2025 Other"]);
@@ -365,15 +365,15 @@ public class DateValueChartMultiChartColoursTests : BrowserTest
 
         var before = await ReadColoursAsync();
 
-        await RightClickBandAsync(2025, "Amazon", "Zenith");
+        await RightClickBandAsync(2025, "Affiliate", "Zenith");
         await HoverColourMenuAsync();
         await MenuItem("Gold").ClickAsync();
 
         var after = await ReadColoursAsync();
 
-        Expect(after["2024 Amazon"]).ToBe(Gold);
-        Expect(after["2025 Amazon"]).ToBe(Gold);
-        Expect(after["legend Amazon"]).ToBe(Gold);
+        Expect(after["2024 Affiliate"]).ToBe(Gold);
+        Expect(after["2025 Affiliate"]).ToBe(Gold);
+        Expect(after["legend Affiliate"]).ToBe(Gold);
         Expect(after["2025 Direct"]).ToBe(before["2025 Direct"]);
         Expect(after["2025 Other"]).ToBe(before["2025 Other"]);
     }

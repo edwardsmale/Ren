@@ -13,19 +13,19 @@ public class GroupingTests : BrowserTest
         "CustomerRef|ProductCodes|LastEditedBy|PricingMethod|MarginPercentage|" +
         "DiscountPercentage|CreatedOn|UpdatedOn|FindCustomerLink|ViewCustomerReportLink";
 
-    private const string TotalsRow = "|||Markup|25.44%|||||";
+    private const string TotalsRow = "|||Markup|30.20%|||||";
 
     private static readonly Dictionary<string, string> AccountRows = new()
     {
-        ["A10001"] = "A10001||Jess|Markup|30.33%||||A10001|A10001",
-        ["A10002"] = "A10002|ZZ24425|Alexis|Markup|55.00%||01/02/2024 13:15:42|01/02/2024 13:15:42|A10002|A10002",
-        ["B20001"] = "B20001|YG46552|Jess|Markup|35.00%||31/01/2024 11:56:00|31/01/2024 11:56:08|B20001|B20001",
-        ["B20002"] = "B20002||Jess|Markup|4.25%||29/01/2024 17:16:27||B20002|B20002",
-        ["B20003"] = "B20003||Jess|Markup|29.88%||||B20003|B20003",
-        ["C30001"] = "C30001|YG45075|Jess|Markup|27.50%|||24/01/2024 10:55:00|C30001|C30001",
-        ["C30002"] = "C30002|VV34902|Jess|Markup|33.50%||22/01/2024 12:04:35|22/01/2024 12:04:35|C30002|C30002",
-        ["C30003"] = "C30003||Sami|Markup|23.20%||||C30003|C30003",
-        ["C30004"] = "C30004|XS23446|Jess|Markup|22.00%||12/02/2024 14:53:07|12/02/2024 14:53:07|C30004|C30004"
+        ["A10001"] = "A10001||Jess|Markup|33.50%||||A10001|A10001",
+        ["A10002"] = "A10002|PRD9505|Alexis|Markup|53.00%||01/02/2024 13:15:42|01/02/2024 13:15:42|A10002|A10002",
+        ["B20001"] = "B20001|PRD7333|Jess|Markup|47.00%||31/01/2024 11:56:00|31/01/2024 11:56:08|B20001|B20001",
+        ["B20002"] = "B20002||Jess|Markup|5.13%||29/01/2024 17:16:27||B20002|B20002",
+        ["B20003"] = "B20003||Jess|Markup|35.50%||||B20003|B20003",
+        ["C30001"] = "C30001|PRD7019|Jess|Markup|28.50%|||24/01/2024 10:55:00|C30001|C30001",
+        ["C30002"] = "C30002|PRD4564|Jess|Markup|40.50%||22/01/2024 12:04:35|22/01/2024 12:04:35|C30002|C30002",
+        ["C30003"] = "C30003||Sami|Markup|31.00%||||C30003|C30003",
+        ["C30004"] = "C30004|PRD6059|Jess|Markup|26.00%||12/02/2024 14:53:07|12/02/2024 14:53:07|C30004|C30004"
     };
 
     private static string[] AllRowsFor(params string[] accountRefs) =>
@@ -81,14 +81,14 @@ public class GroupingTests : BrowserTest
         await Poll(async () => Tsv(await Ren.Report.SelectedTextAsync())).ToBe(Tsv("""
             CustomerRef|ProductCodes
             A10001|
-            A10002|ZZ24425
-            B20001|YG46552
+            A10002|PRD9505
+            B20001|PRD7333
             B20002|
             B20003|
-            C30001|YG45075
-            C30002|VV34902
+            C30001|PRD7019
+            C30002|PRD4564
             C30003|
-            C30004|XS23446
+            C30004|PRD6059
             |
             """));
     }
@@ -106,9 +106,9 @@ public class GroupingTests : BrowserTest
     }
 
     [TestMethod]
-    [DataRow("ascending", new[] { "B20002", "C30004", "C30003", "C30001", "B20003", "A10001", "C30002", "B20001", "A10002" },
+    [DataRow("ascending", new[] { "B20002", "C30004", "C30001", "C30003", "A10001", "B20003", "C30002", "B20001", "A10002" },
         DisplayName = "sorting groups: groups sorted ascending are copied in order")]
-    [DataRow("descending", new[] { "A10002", "B20001", "C30002", "A10001", "B20003", "C30001", "C30003", "C30004", "B20002" },
+    [DataRow("descending", new[] { "A10002", "B20001", "C30002", "B20003", "A10001", "C30003", "C30001", "C30004", "B20002" },
         DisplayName = "sorting groups: groups sorted descending are copied in order")]
     public async Task SortingGroups_CopiedInOrder(string direction, string[] accountRefs)
     {
@@ -133,16 +133,16 @@ public class GroupingTests : BrowserTest
         await ExpectAllTextAsync(
             AllHeadings,
             AccountRows["A10001"],
-            "A10001|ZX53979|Jess|Markup|20.00%|||08/02/2024 07:43:01|A10001|A10001",
-            "A10001|XS23446|Jess|Markup|21.00%|||08/02/2024 07:41:40|A10001|A10001",
-            "A10001|XS74471|Jess|Markup|50.00%|||08/02/2024 07:42:03|A10001|A10001",
+            "A10001|PRD8265|Jess|Markup|23.00%|||08/02/2024 07:43:01|A10001|A10001",
+            "A10001|PRD6059|Jess|Markup|25.00%|||08/02/2024 07:41:40|A10001|A10001",
+            "A10001|PRD6417|Jess|Markup|52.50%|||08/02/2024 07:42:03|A10001|A10001",
             AccountRows["A10002"],
             AccountRows["B20001"],
             AccountRows["B20002"],
-            "B20002|VS49547|Jess|Markup|4.00%||29/01/2024 17:16:27|29/01/2024 17:17:10|B20002|B20002",
-            "B20002|VS90894|Jess|Markup|4.00%||29/01/2024 17:16:27|29/01/2024 17:17:20|B20002|B20002",
-            "B20002|VS93175|Jess|Markup|4.00%||29/01/2024 17:16:27|29/01/2024 17:17:29|B20002|B20002",
-            "B20002|VT28248|Jess|Markup|5.00%||29/01/2024 17:16:27|29/01/2024 17:17:55|B20002|B20002",
+            "B20002|PRD3194|Jess|Markup|3.50%||29/01/2024 17:16:27|29/01/2024 17:17:10|B20002|B20002",
+            "B20002|PRD3278|Jess|Markup|3.50%||29/01/2024 17:16:27|29/01/2024 17:17:20|B20002|B20002",
+            "B20002|PRD3567|Jess|Markup|3.50%||29/01/2024 17:16:27|29/01/2024 17:17:29|B20002|B20002",
+            "B20002|PRD4488|Jess|Markup|10.00%||29/01/2024 17:16:27|29/01/2024 17:17:55|B20002|B20002",
             AccountRows["B20003"],
             AccountRows["C30001"],
             AccountRows["C30002"],
@@ -237,15 +237,15 @@ public class GroupingTests : BrowserTest
         await ExpectColumnTextAsync(
             "ProductCodes",
             "ProductCodes",
-            "XS23446, XS74471, ZX53979",
-            "ZZ24425",
-            "YG46552",
-            "VT28248, VS49547, VS90894, VS93175",
-            "ZX53979, XK95574, XN62725, ZZ12354, XS74471, XH84100, ZZ51667, ZV55859",
-            "YG45075",
-            "VV34902",
-            "ZN16333, TJ17553, TH86730, UD95892, UD79126",
-            "XS23446");
+            "PRD6059, PRD6417, PRD8265",
+            "PRD9505",
+            "PRD7333",
+            "PRD4488, PRD3194, PRD3278, PRD3567",
+            "PRD8265, PRD5896, PRD5899, PRD8651, PRD6417, PRD5811, PRD9962, PRD7953",
+            "PRD7019",
+            "PRD4564",
+            "PRD7840, PRD2446, PRD1876, PRD3068, PRD2738",
+            "PRD6059");
     }
 
     private const string NumOrdersFixture = "ported/GroupTestsWithNumOrders.html";

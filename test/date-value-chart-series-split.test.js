@@ -270,14 +270,14 @@ describe("Ren.DateValueChart_SeriesSplit", () => {
 
             GroupingEntries.resolveColumnIndexes(
                 settings,
-                createColumnResolver(["Id", "Date", "Sales", "Added", "Amazon / Non-Amazon"]),
+                createColumnResolver(["Id", "Date", "Sales", "Added", "Gift / Non-Gift"]),
                 "Date"
             );
 
             const entries = settings.groupings.entries;
 
             expect(entries[0].groupByColumns).toEqual(["Date"]);
-            expect(entries[1].groupByColumns).toEqual(["Amazon / Non-Amazon"]);
+            expect(entries[1].groupByColumns).toEqual(["Gift / Non-Gift"]);
             expect(entries[1].groupByColumnIndexes).toEqual([4]);
             expect(entries[2].groupByColumns).toEqual([]);
 

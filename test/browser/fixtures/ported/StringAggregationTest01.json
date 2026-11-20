@@ -31,7 +31,7 @@
                             "CategoryName": {
                                 "aggregationType": "ExpandIcon"
                             },
-                            "AmazonASIN": {
+                            "ExternalCode": {
                                 "aggregationType": "SingleValuesOnly"
                             }
                         },
@@ -44,7 +44,7 @@
                             "CategoryName": {
                                 "aggregationType": "DistinctValuesWithCounts"
                             },
-                            "AmazonASIN": {
+                            "ExternalCode": {
                                 "aggregationType": "CountDistinct"
                             }
                         },
@@ -61,7 +61,7 @@
                 "CategoryName",
                 "ProductCode",
                 "ProductName",
-                "AmazonASIN"
+                "ExternalCode"
             ]
         }
     }

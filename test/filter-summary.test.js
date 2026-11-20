@@ -41,16 +41,16 @@ describe("Ren.FilterSummary", () => {
 
     test("getText_ColumnFilter_NamesColumnAndValues", () => {
 
-        const filters = createFilters({ Brand: createColumnFilter(["Acco", "Bic"]) });
+        const filters = createFilters({ Brand: createColumnFilter(["Alder", "Birch"]) });
 
-        expect(Summary.getText(filters, tabularData)).toBe("Brand: Acco; Bic");
+        expect(Summary.getText(filters, tabularData)).toBe("Brand: Alder; Birch");
     });
 
     test("getText_NegatedColumnFilter_NamesValuesLeftOut", () => {
 
-        const filters = createFilters({ Brand: createColumnFilter(["Acco"], true) });
+        const filters = createFilters({ Brand: createColumnFilter(["Alder"], true) });
 
-        expect(Summary.getText(filters, tabularData)).toBe("Brand: not Acco");
+        expect(Summary.getText(filters, tabularData)).toBe("Brand: not Alder");
     });
 
     test("getText_ColumnFilterLettingNothingThrough_None", () => {
@@ -95,11 +95,11 @@ describe("Ren.FilterSummary", () => {
 
         const filters = createFilters({
             "New / Returning": createColumnFilter(["New customers"]),
-            "Amazon / Non-Amazon": createColumnFilter(["Amazon orders", "Non-Amazon orders"])
+            "Gift / Non-Gift": createColumnFilter(["Gift orders", "Non-Gift orders"])
         });
 
         expect(Summary.getText(filters, tabularData))
-            .toBe("New customers  |  Amazon orders; Non-Amazon orders");
+            .toBe("New customers  |  Gift orders; Non-Gift orders");
     });
 
     test("getText_PluralValueUnderSingularHeading_HeadingLeftOut", () => {
@@ -177,22 +177,22 @@ describe("Ren.FilterSummary", () => {
 
     test("getText_SeveralFilters_SeparatedByBars", () => {
 
-        const filters = createFilters({ Brand: createColumnFilter(["Acco"]) }, [{
+        const filters = createFilters({ Brand: createColumnFilter(["Alder"]) }, [{
             type: "includeCombinations",
             columns: ["Top-Level Category", "Sub Category"],
             tuples: [["Paper"]]
         }]);
 
         expect(Summary.getText(filters, tabularData))
-            .toBe("Brand: Acco  |  Top-Level Category: Paper");
+            .toBe("Brand: Alder  |  Top-Level Category: Paper");
     });
 
     test("getText_HeadingGiven_HeadedByIt", () => {
 
-        const filters = createFilters({ Brand: createColumnFilter(["Acco"]) });
+        const filters = createFilters({ Brand: createColumnFilter(["Alder"]) });
 
         expect(Summary.getText(filters, tabularData, 6, { Brand: { heading: "Make" } }))
-            .toBe("Make: Acco");
+            .toBe("Make: Alder");
     });
 
     test("getText_BooleanColumnFilter_ValuesReadAsYesAndNo", () => {
@@ -233,7 +233,7 @@ describe("Ren.FilterSummary", () => {
     test("getParts_LeadingColumns_TheirEntriesFirstAndMarked", () => {
 
         const filters = createFilters({
-            Brand: createColumnFilter(["Acco"]),
+            Brand: createColumnFilter(["Alder"]),
             Sales: createColumnFilter(["10"])
         });
 
@@ -242,7 +242,7 @@ describe("Ren.FilterSummary", () => {
             { text: "10", isValue: true, column: "Sales" },
             { text: "  |  ", isValue: false, isSeparator: true },
             { text: "Brand: ", isValue: false },
-            { text: "Acco", isValue: true }
+            { text: "Alder", isValue: true }
         ]);
     });
 });

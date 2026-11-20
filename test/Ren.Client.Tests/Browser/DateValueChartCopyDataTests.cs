@@ -68,7 +68,7 @@ public class DateValueChartCopyDataTests : BrowserTest
     [TestMethod("copies every period and series from a chart of a multi-chart")]
     public async Task CopiesEveryPeriodAndSeriesFromAChartOfAMultiChart()
     {
-        // 2024 has Amazon and Direct, and 2025 has Amazon, Other and Direct.
+        // 2024 has Affiliate and Direct, and 2025 has Affiliate, Other and Direct.
         await Ren.OpenAsync("multi-chart-colours/channel-sales.html");
         await Ren.Report.SelectColumnsAsync("OrderDate", "Sales");
         await DateValueChart.CreateFromColumnHeadingAsync(Ren, "OrderDate");
@@ -84,7 +84,7 @@ public class DateValueChartCopyDataTests : BrowserTest
         var lines = await CaughtLinesAsync();
         var otherColumn = Array.IndexOf(lines[0], "Other");
 
-        Expect(Text.Sorted(lines[0])).ToEqual(Text.Sorted(new[] { "Amazon", "Direct", "Other", "OrderDate" }));
+        Expect(Text.Sorted(lines[0])).ToEqual(Text.Sorted(new[] { "Affiliate", "Direct", "Other", "OrderDate" }));
         Expect(lines.Length).ToBe(3);
         Expect(lines[1][0][..4]).ToBe("2024");
         Expect(lines[1][otherColumn]).ToBe("");

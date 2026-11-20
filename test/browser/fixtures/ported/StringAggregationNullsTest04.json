@@ -6,7 +6,7 @@
                 "entries": [
                     {
                         "columns": {
-                            "AmazonASIN": {
+                            "ExternalCode": {
                                 "aggregationType": "DistinctValues"
                             }
                         },
@@ -16,7 +16,7 @@
                     },
                     {
                         "columns": {
-                            "AmazonASIN": {
+                            "ExternalCode": {
                                 "aggregationType": "DistinctValuesWithCounts"
                             }
                         },
@@ -31,7 +31,7 @@
             "showRowAndColumnHeadings": true,
             "visibleColumns": [
                 "ParentCategoryName",
-                "AmazonASIN"
+                "ExternalCode"
             ]
         }
     }

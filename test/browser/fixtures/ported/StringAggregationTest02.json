@@ -12,7 +12,7 @@
                             "CategoryName": {
                                 "aggregationType": "CountDistinct"
                             },
-                            "AmazonASIN": {
+                            "ExternalCode": {
                                 "aggregationType": "CountDistinct"
                             }
                         },
@@ -29,7 +29,7 @@
                 "CategoryName",
                 "ProductCode",
                 "ProductName",
-                "AmazonASIN"
+                "ExternalCode"
             ]
         }
     }

@@ -28,19 +28,19 @@ public class StringAggregationTests : BrowserTest
             .ToMatch(new Regex("^<span[^>]*>multiple values</span>$"));
     }
 
-    [TestMethod("DistinctValues_CollapsedGroups_ShowNoAmazonAsinValues")]
-    public async Task DistinctValues_CollapsedGroups_ShowNoAmazonAsinValues()
+    [TestMethod("DistinctValues_CollapsedGroups_ShowNoExternalCodeValues")]
+    public async Task DistinctValues_CollapsedGroups_ShowNoExternalCodeValues()
     {
         await Ren.OpenAsync("ported/StringAggregationTest01.html");
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 2)).ToBe("");
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 3)).ToBe("");
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 4)).ToBe("");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 2)).ToBe("");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 3)).ToBe("");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 4)).ToBe("");
 
         // Expanding a group reveals the underlying values.
         await Ren.Report.ExpandCollapseGroupAsync(3);
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 5)).ToBe("B0X1T28G7S");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 5)).ToBe("XC-106");
     }
 
     [TestMethod("CountDistinct_SeveralColumns_CountsAreCorrect")]
@@ -50,17 +50,17 @@ public class StringAggregationTests : BrowserTest
 
         Expect(await Ren.Report.CellTextAsync("ParentCategoryName", 14)).ToBe("3");
         Expect(await Ren.Report.CellTextAsync("CategoryName", 14)).ToBe("6");
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 14)).ToBe("7");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 14)).ToBe("7");
     }
 
-    // 12 rows across 3 groups; 6 rows have a non-null AmazonASIN and 6 rows have NULL.  CountDistinct
+    // 12 rows across 3 groups; 6 rows have a non-null ExternalCode and 6 rows have NULL.  CountDistinct
     // counts null as a distinct value, so the result is 7 (6 non-null plus 1 null).
     [TestMethod("CountDistinct_ColumnContainsNulls_IncludesNullAsDistinctValue")]
     public async Task CountDistinct_ColumnContainsNulls_IncludesNullAsDistinctValue()
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest01.html");
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 5)).ToBe("7");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 5)).ToBe("7");
     }
 
     // The Tools & Accessories group has CategoryName ['Tools & Accessories' ×3, NULL ×1].  MostCommon
@@ -83,17 +83,17 @@ public class StringAggregationTests : BrowserTest
     }
 
     // DistinctValuesIncludingEmpty renders the values joined by a fullwidth comma "，", not as an
-    // expand/collapse button like DistinctValues does.  Each group has 2 non-null ASINs and 2 null
-    // ASINs; the joined text includes the nulls as empty strings between separators.
+    // expand/collapse button like DistinctValues does.  Each group has 2 non-null external codes and 2 null
+    // external codes; the joined text includes the nulls as empty strings between separators.
     [TestMethod("DistinctValuesIncludingEmpty_GroupContainsNulls_JoinsTheValues")]
     public async Task DistinctValuesIncludingEmpty_GroupContainsNulls_JoinsTheValues()
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest03.html");
 
-        var html = await Ren.Report.CellHtmlAsync("AmazonASIN", 3);
+        var html = await Ren.Report.CellHtmlAsync("ExternalCode", 3);
 
-        Expect(html).ToContain("B0UFLPDKK5");
-        Expect(html).ToContain("B0X1T28G7S");
+        Expect(html).ToContain("XC-105");
+        Expect(html).ToContain("XC-106");
     }
 
     // SingleValuesOnly counts null rows as "", a distinct value from 'Tools & Accessories'.  Even
@@ -116,7 +116,7 @@ public class StringAggregationTests : BrowserTest
         Expect(await Ren.Report.CellTextAsync("CategoryName", 2)).ToBe("");
     }
 
-    // Tools & Accessories (row 3) has two NULL ASINs.  DistinctValuesIncludingEmpty keeps the
+    // Tools & Accessories (row 3) has two NULL external codes.  DistinctValuesIncludingEmpty keeps the
     // compressed-null slot (dictionary index 0 → sentinel "\x01"), which must be converted to the
     // display label "NULL" by the render layer.
     [TestMethod("DistinctValuesIncludingEmpty_GroupContainsNulls_NullRendersAsNullLabel")]
@@ -124,39 +124,39 @@ public class StringAggregationTests : BrowserTest
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest03.html");
 
-        Expect((await Ren.Report.CellHtmlAsync("AmazonASIN", 3)).ToLowerInvariant()).ToContain("null");
+        Expect((await Ren.Report.CellHtmlAsync("ExternalCode", 3)).ToLowerInvariant()).ToContain("null");
     }
 
-    // Across all 12 rows, 6 have a NULL AmazonASIN.  The totals (row 5) use
+    // Across all 12 rows, 6 have a NULL ExternalCode.  The totals (row 5) use
     // DistinctValuesIncludingEmptyWithCounts; the null entry must show as "NULL ᵡ 6".
     [TestMethod("DistinctValuesIncludingEmptyWithCounts_TotalsRow_ShowsNullCount")]
     public async Task DistinctValuesIncludingEmptyWithCounts_TotalsRow_ShowsNullCount()
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest03.html");
 
-        Expect(await Ren.Report.CellHtmlAsync("AmazonASIN", 5)).ToContain("NULL ᵡ 6");
+        Expect(await Ren.Report.CellHtmlAsync("ExternalCode", 5)).ToContain("NULL ᵡ 6");
     }
 
-    // The Nuts group has 2 null and 2 non-null ASINs.  DistinctValues must omit the null entry, which
+    // The Nuts group has 2 null and 2 non-null external codes.  DistinctValues must omit the null entry, which
     // decompresses to the null sentinel ("\x01").
     [TestMethod("DistinctValues_NutsGroupContainsNulls_ExcludesTheNull")]
     public async Task DistinctValues_NutsGroupContainsNulls_ExcludesTheNull()
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest04.html");
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 2)).ToBe("B03AT0W0QG，B0SGTV10ZR");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 2)).ToBe("XC-101，XC-104");
     }
 
-    // The Tools & Accessories group has 2 null and 2 non-null ASINs.
+    // The Tools & Accessories group has 2 null and 2 non-null external codes.
     [TestMethod("DistinctValues_ToolsGroupContainsNulls_ExcludesTheNull")]
     public async Task DistinctValues_ToolsGroupContainsNulls_ExcludesTheNull()
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest04.html");
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 3)).ToBe("B0UFLPDKK5，B0X1T28G7S");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 3)).ToBe("XC-105，XC-106");
     }
 
-    // 6 of the 12 rows have a null ASIN; the 6 distinct non-null ASINs each appear once.  The null
+    // 6 of the 12 rows have a null external code; the 6 distinct non-null external codes each appear once.  The null
     // entry must be excluded.  Values are sorted by compressed-dictionary index descending, all
     // counts being equal at 1.
     [TestMethod("DistinctValuesWithCounts_TotalsRowContainsNulls_ExcludesTheNull")]
@@ -164,8 +164,8 @@ public class StringAggregationTests : BrowserTest
     {
         await Ren.OpenAsync("ported/StringAggregationNullsTest04.html");
 
-        Expect(await Ren.Report.CellTextAsync("AmazonASIN", 5)).ToBe(
-            "B0X1T28G7S ᵡ 1，B0UFLPDKK5 ᵡ 1，B0SGTV10ZR ᵡ 1，" +
-            "B0KFEZT2V5 ᵡ 1，B0CYE61DUH ᵡ 1，B03AT0W0QG ᵡ 1");
+        Expect(await Ren.Report.CellTextAsync("ExternalCode", 5)).ToBe(
+            "XC-106 ᵡ 1，XC-105 ᵡ 1，XC-104 ᵡ 1，" +
+            "XC-103 ᵡ 1，XC-102 ᵡ 1，XC-101 ᵡ 1");
     }
 }

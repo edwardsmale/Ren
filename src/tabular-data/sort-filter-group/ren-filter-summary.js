@@ -10,7 +10,7 @@
  *
  * An entry whose values each say what they are, by holding a word of its heading, names them
  * without the heading: "New / Returning" filtered to "New customers" reads "New customers", where
- * "Brand" filtered to "Acco" still reads "Brand: Acco".
+ * "Brand" filtered to "Alder" still reads "Brand: Alder".
  */
 Ren.FilterSummary = (() => {
 

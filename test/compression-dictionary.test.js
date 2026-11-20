@@ -19,7 +19,7 @@ describe("CompressionDictionary", () => {
 
     test("compressValue_AStringNotInTheDictionary_ReturnsTheString", () => {
 
-        expect(createDictionary().compressValue("Staples", 1)).toBe("Staples");
+        expect(createDictionary().compressValue("Sundries", 1)).toBe("Sundries");
     });
 
     test("compressValue_TheNullSentinel_ReturnsIndexZero", () => {
@@ -97,10 +97,10 @@ describe("CompressionDictionary", () => {
         const dictionary = createDictionary();
         const appendedColumns = [];
 
-        const index = dictionary.internDerivedValue("Staples", 1, appendedColumns);
+        const index = dictionary.internDerivedValue("Sundries", 1, appendedColumns);
 
         expect(index).toBe(5);
-        expect(dictionary.decompressValue(index, 1)).toBe("Staples");
+        expect(dictionary.decompressValue(index, 1)).toBe("Sundries");
         expect(appendedColumns[1]).toBe(true);
     });
 
@@ -149,10 +149,10 @@ describe("CompressionDictionary", () => {
 
         const dictionary = createDictionary();
 
-        dictionary.internDerivedValue("Staples", 1, []);
+        dictionary.internDerivedValue("Sundries", 1, []);
 
         expect(dictionary.valueIsInDictionary("Ink", 1)).toBe(true);
-        expect(dictionary.valueIsInDictionary("Staples", 1)).toBe(false);
+        expect(dictionary.valueIsInDictionary("Sundries", 1)).toBe(false);
     });
 
     test("compressedValuesThatAreNullOrWhitespace_ADictionaryColumn_ReturnsTheBlankIndexes", () => {

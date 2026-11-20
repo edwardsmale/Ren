@@ -106,11 +106,11 @@ describe("Ren.DateValueChart_Title", () => {
         test("getSubtitle_Filtered_TokenNamesFilters", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"], ["Bic", "Bic"]]), isNegated: false }
+                Brand: { valueMap: new Map([["Alder", "Alder"], ["Birch", "Birch"]]), isNegated: false }
             });
 
             expect(Title.getSubtitle({ chartSubtitle: "Filtered: {filters}", visualisation }))
-                .toBe("Filtered: Brand: Acco; Bic");
+                .toBe("Filtered: Brand: Alder; Birch");
         });
 
         test("getSubtitle_ManyValues_ShownCappedAndTooltipFull", () => {
@@ -184,7 +184,7 @@ describe("Ren.DateValueChart_Title", () => {
         test("getSubtitleParts_Filtered_OnlyValuesFlagged", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"], ["Bic", "Bic"]]), isNegated: true }
+                Brand: { valueMap: new Map([["Alder", "Alder"], ["Birch", "Birch"]]), isNegated: true }
             });
 
             expect(Title.getSubtitleParts({ chartSubtitle: "In {filters}.", visualisation }))
@@ -192,9 +192,9 @@ describe("Ren.DateValueChart_Title", () => {
                     { text: "In ", isValue: false },
                     { text: "", isValue: false, isFilterSymbol: true },
                     { text: "Brand: not ", isValue: false },
-                    { text: "Acco", isValue: true },
+                    { text: "Alder", isValue: true },
                     { text: "; ", isValue: false },
-                    { text: "Bic", isValue: true },
+                    { text: "Birch", isValue: true },
                     { text: ".", isValue: false }
                 ]);
         });
@@ -202,7 +202,7 @@ describe("Ren.DateValueChart_Title", () => {
         test("render_Filtered_ValuesInBold", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"], ["Bic", "Bic"]]), isNegated: false }
+                Brand: { valueMap: new Map([["Alder", "Alder"], ["Birch", "Birch"]]), isNegated: false }
             });
 
             const { container, svg } = createChart();
@@ -212,16 +212,16 @@ describe("Ren.DateValueChart_Title", () => {
             const subtitle = container.querySelector(".ren-chart-subtitle");
             const values = subtitle.querySelectorAll("strong");
 
-            expect(subtitle.textContent).toBe("Brand: Acco; Bic");
+            expect(subtitle.textContent).toBe("Brand: Alder; Birch");
             expect(values.length).toBe(2);
-            expect(values[0].textContent).toBe("Acco");
-            expect(values[1].textContent).toBe("Bic");
+            expect(values[0].textContent).toBe("Alder");
+            expect(values[1].textContent).toBe("Birch");
         });
 
         test("render_CrossFiltered_CrossFilterFirstInChip", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Brand: { valueMap: new Map([["Alder", "Alder"]]), isNegated: false },
                 Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
             });
 
@@ -242,7 +242,7 @@ describe("Ren.DateValueChart_Title", () => {
             const chip = subtitle.querySelector(".ren-cross-filter-chip--inline");
 
             expect(Title.getSubtitle({ chartSubtitle: "{filters}", visualisation }))
-                .toBe("Region: South  |  Brand: Acco");
+                .toBe("Region: South  |  Brand: Alder");
             expect(chip.querySelector(".ren-cross-filter-chip__text").textContent)
                 .toBe("Region: South");
             expect(chip.querySelector("strong").textContent).toBe("South");
@@ -253,7 +253,7 @@ describe("Ren.DateValueChart_Title", () => {
         test("render_FilteredByTwoColumns_FilterSymbolBetweenThem", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Brand: { valueMap: new Map([["Alder", "Alder"]]), isNegated: false },
                 Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
             });
 
@@ -271,7 +271,7 @@ describe("Ren.DateValueChart_Title", () => {
 
         test("render_FilteredWithoutChips_FilterSymbolFirst", () => {
 
-            spyOnFilters({ Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false } });
+            spyOnFilters({ Brand: { valueMap: new Map([["Alder", "Alder"]]), isNegated: false } });
 
             const { container, svg } = createChart();
 
@@ -280,7 +280,7 @@ describe("Ren.DateValueChart_Title", () => {
             const text = container.querySelector(".ren-chart-subtitle__text");
 
             expect(text.firstChild.getAttribute("class")).toBe("ren-chart-subtitle__filter-icon");
-            expect(text.textContent).toBe("Brand: Acco");
+            expect(text.textContent).toBe("Brand: Alder");
         });
 
         test("render_CrossFiltered_NoFilterSymbolBeforeChip", () => {
@@ -304,13 +304,13 @@ describe("Ren.DateValueChart_Title", () => {
         test("render_TwoCrossFilters_NoFilterSymbolBeforeSecondChip", () => {
 
             spyOnFilters({
-                Brand: { valueMap: new Map([["Acco", "Acco"]]), isNegated: false },
+                Brand: { valueMap: new Map([["Alder", "Alder"]]), isNegated: false },
                 Region: { valueMap: new Map([["South", "South"]]), isNegated: false }
             });
 
             jest.spyOn(Ren.VisualisationCrossFilterIndicators, "getCrossFilters").mockReturnValue([
                 { filter: { column: "Region", group: "Mix" }, text: "Region: South", title: "" },
-                { filter: { column: "Brand", group: "Mix" }, text: "Brand: Acco", title: "" }
+                { filter: { column: "Brand", group: "Mix" }, text: "Brand: Alder", title: "" }
             ]);
 
             const { container, svg } = createChart();

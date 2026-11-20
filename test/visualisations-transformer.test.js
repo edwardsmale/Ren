@@ -30,7 +30,7 @@ describe("Ren.VisualisationsTransformer", () => {
         const chartDataGroupingSettings = {
             groupings: {
                 entries: [
-                    { groupByColumnIndexes: [3], groupByColumns: ["Amazon / Non-Amazon"] },
+                    { groupByColumnIndexes: [3], groupByColumns: ["Gift / Non-Gift"] },
                     { groupByColumnIndexes: [] }
                 ]
             }
@@ -42,7 +42,7 @@ describe("Ren.VisualisationsTransformer", () => {
         });
 
         expect(transformed.chartDataGroupingSettings.groupings.entries).toEqual([
-            { groupByColumns: ["Amazon / Non-Amazon"] },
+            { groupByColumns: ["Gift / Non-Gift"] },
             { groupByColumns: [] }
         ]);
 
