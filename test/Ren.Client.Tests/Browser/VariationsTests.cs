@@ -43,9 +43,13 @@ public class VariationsTests : BrowserTest
         await Ren.WaitUntilLoadedAsync();
     }
 
+    private Microsoft.Playwright.ILocator VariationButton(string action, string variationLabel) =>
+        Ren.Root.Locator("[data-qa-" + action + "-variation-name=\""
+            + variationLabel.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"]");
+
     private async Task ClickVariationButtonAsync(string action, string variationLabel)
     {
-        await Ren.Root.ClickAsync("[data-qa-" + action + "-variation-name=\"" + variationLabel + "\"]");
+        await VariationButton(action, variationLabel).ClickAsync();
         await Ren.WaitUntilLoadedAsync();
     }
 
@@ -158,6 +162,38 @@ public class VariationsTests : BrowserTest
 
         await ClickVariationButtonAsync("remove", "My Variation");
         await ExpectVariationLinksAsync("Another");
+    }
+
+    // A name's quotes once ended the buttons' onclick early, breaking them or running what followed.
+    [TestMethod("variations named with quotes are applied, updated and removed")]
+    public async Task VariationsNamedWithQuotesAreAppliedUpdatedAndRemoved()
+    {
+        const string apostrophe = "Bob's view";
+        const string quotes = "x\" onmouseover=\"window.renInjected = true";
+
+        await Ren.OpenAsync("ported/VariationsTest02.html");
+
+        await SetColumnWidthAsync("Id", 100);
+        await OpenVariationsWindowAsync();
+        await CreateVariationAsync(apostrophe);
+
+        await SetColumnWidthAsync("Id", 400);
+        await CreateVariationAsync(quotes);
+
+        await ClickVariationButtonAsync("apply", apostrophe);
+        await ExpectColumnWidthAsync("Id", 100);
+
+        await SetColumnWidthAsync("Id", 600);
+        await ClickVariationButtonAsync("update", quotes);
+        await ClickVariationButtonAsync("apply", apostrophe);
+        await ClickVariationButtonAsync("apply", quotes);
+        await ExpectColumnWidthAsync("Id", 600);
+
+        await VariationButton("remove", quotes).HoverAsync();
+        Expect(await Page.EvaluateAsync<bool>("() => window.renInjected === true")).ToBe(false);
+
+        await ClickVariationButtonAsync("remove", apostrophe);
+        await ExpectVariationLinksAsync(quotes);
     }
 
     [TestMethod("cells selected after a variation is applied are its cells")]

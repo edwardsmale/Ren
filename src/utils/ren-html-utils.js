@@ -677,6 +677,14 @@ Ren.HtmlUtils = (() => {
     };
 
     /**
+     * Escapes a value for a quoted attribute, whichever quote it's in.  Unlike escapeHtml, line
+     * breaks are kept, as an attribute's value is text.
+     */
+    const escapeAttribute = (value) =>
+        (value === null || value === undefined ? "" : String(value))
+            .replace(/[&<>"']/g, match => "&#" + match.charCodeAt(0) + ";");
+
+    /**
      * Defuses any closing-script-tag sequence in text for a <script> element's content by inserting
      * a backslash after the "<".  A <script>'s content is serialized verbatim, so "</script" would
      * otherwise end the element early when the HTML is parsed again.  The backslash is harmless in
@@ -695,6 +703,7 @@ Ren.HtmlUtils = (() => {
         create,
         createRootElement,
         enrich,
+        escapeAttribute,
         escapeHtml,
         escapeScriptClosingTag,
         get,
