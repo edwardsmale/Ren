@@ -67,3 +67,20 @@ jobs:
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" `
             --source https://api.nuget.org/v3/index.json `
             --skip-duplicate
+                    # Copies the release's built files into release-files/, from a checked build of the tag.
+        - name: Collect the client files
+          run: |
+            $version = $env:GITHUB_REF_NAME.Substring(1)
+            dotnet run --project build/Ren.Build -- export $version release-files
+
+      # Creates the GitHub release for the tag, with the client files and the package as downloads.
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.Substring(1)
+          gh release create $env:GITHUB_REF_NAME `
+            (Get-ChildItem release-files).FullName `
+            "packages/Ren.$version.nupkg" `
+            --title "Ren $version" `
+            --generate-notes
