@@ -27,8 +27,8 @@ endpoint.
 (write-excel-file is only used by the Excel downloads, so strictly you only need it if you're
 using them.  Ren draws its charts itself, so they need nothing else.)
 
-In production, use `ren.min.js` and `ren.min.css`, which are the same, minified (about 1.5 MB
-rather than 5 MB of script).  Each has a source map, so errors still point at Ren's own source.
+In production, use `ren.min.js` and `ren.min.css`, which are the same, minified (about 1.8 MB
+rather than 6 MB of script).  Each has a source map, so errors still point at Ren's own source.
 
 To import Ren as an ES module, use `ren.esm.js` (or `ren.esm.min.js`).  write-excel-file still
 goes on the page as a script, as Ren uses it as a global:
@@ -121,12 +121,12 @@ open a popup report, from a URL template filled in from the row:
 
 ```html
 <ren-change-chart data-source-name="SearchTerms"
-    label-heading="SearchTerm" before-heading="RateBefore" after-heading="RateAfter"
-    before-label="Before" after-label="After"
-    value-format-function="percentage-no-dp"
-    label-popup-report="/SearchLog?SearchTerm={value}"
-    label-popup-report-title="Searches for {value}"
-    change-popup-report="/SearchTermDetail?SearchTerm={row.SearchTerm}" />
+                  label-heading="SearchTerm" before-heading="RateBefore" after-heading="RateAfter"
+                  before-label="Before" after-label="After"
+                  value-format-function="percentage-no-dp"
+                  label-popup-report="/SearchLog?SearchTerm={value}"
+                  label-popup-report-title="Searches for {value}"
+                  change-popup-report="/SearchTermDetail?SearchTerm={row.SearchTerm}" />
 ```
 
 `{value}` is the label and `{row.Heading}` any of the row's values, with `{row.Heading:date}`
@@ -382,7 +382,7 @@ A task board looks like this (with a tile's text cut short):
 Ren works out a data source's format by checking, in order:
 1. The element's `data-format` attribute
 2. The response's content type
-3. The content itself (sniffing)
+3. The structure of the content itself
 
 Whatever the format, the data is converted into a tabular data set collection (described below),
 which is what the rest of Ren works with.
@@ -433,9 +433,9 @@ __Tabular data set collection__
             "Title": "Sales",
             "IsColumnCompressed": [false, true, false],
             "ColumnModels": [
-                { "Heading": "__Count", "ColumnId": "__Count", "Visible": false, "AggregationType": 1, "ColumnFormat": 1 },
-                { "Heading": "Product", "ColumnId": "Product", "Visible": true, "AggregationType": 0, "ColumnFormat": 0 },
-                { "Heading": "Revenue", "ColumnId": "Revenue", "Visible": true, "AggregationType": 1, "ColumnFormat": 3 }
+                { "Heading": "__Count", "ColumnId": "__Count", "Visible": false, "AggregationType": 0, "ColumnFormat": 1 },
+                { "Heading": "Product", "ColumnId": "Product", "Visible": true, "AggregationType": 10, "ColumnFormat": 0 },
+                { "Heading": "Revenue", "ColumnId": "Revenue", "Visible": true, "AggregationType": 0, "ColumnFormat": 3 }
             ],
             "RowModels": [{ "CV": [1, 0, 12.5] }, { "CV": [1, 1, 7] }]
         }]
@@ -452,6 +452,10 @@ when they're grouped.
 A compressed column's values are indexes into the `CompressionDictionary`, rather than the values
 themselves.  (`RowModels` can use `RowValues` instead of `CV`.)
 
+`AggregationType` and `ColumnFormat` are numbers from `Ren.AggregationTypeEnum` and
+`Ren.SpreadsheetColumnFormatEnum`: here 0 is Sum and 10 no total, and 0 is General, 1 Number and 3
+Currency.
+
 There's a full example in `examples/data/sales.collection.json`.
 
 __Embedded data__
@@ -459,7 +463,8 @@ __Embedded data__
 Data can be written into the page, rather than fetched:
 
 ```html
-<script type="application/json" class="ren-tabular-data-set-collection-json"
+<script type="application/json"
+        class="ren-tabular-data-set-collection-json"
         data-source-uri="/data/sales.json">
     { "DataSourceUri": "/data/sales.json", "TabularDataSets": [...] }
 </script>

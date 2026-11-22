@@ -1,0 +1,12 @@
+{
+    "columns": ["Category","Jan-Sep 2025","Jan-Sep 2026"],
+    "rows": [
+        ["Road bikes",1235829.75,1314443.84],
+        ["Mountain bikes",975816.47,1075320.4],
+        ["E-bikes",736950.87,1168058.16],
+        ["Tents",449818.62,520295.86],
+        ["Sleeping bags",183327.04,212426.99],
+        ["Waterproof jackets",402824.46,432364.44],
+        ["Walking boots",378440.31,415672.39]
+    ]
+}

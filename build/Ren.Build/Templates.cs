@@ -4,14 +4,15 @@ using Jint.Native;
 namespace Ren.Build;
 
 /// <summary>
-/// Compiles the library's HTML templates and format functions into a script that registers them
-/// through Ren.Extensions, so that the library works without the page's template and format
-/// function elements.  The page's own templates and functions override these.
+/// Writes a script that registers the library's HTML templates, compiled, and its format functions,
+/// as source, through Ren.Extensions, so that the library works without the page's template and
+/// format function elements.  The page's own templates and functions override these.
 ///
 /// Each HTML template is compiled here, with Ren's own resolver, into the function Ren would
 /// otherwise compile from it with an eval when it's first used.  So the library's templates work
 /// on a page whose content security policy doesn't allow eval.  (A page's own templates, and any
-/// registered as source, are still compiled when they're used.)
+/// registered as source, are still compiled when they're used, as are all format functions, the
+/// library's included, since their parameters are only filled in then.)
 ///
 /// The resolver runs in Jint, a JavaScript engine written in .NET, and so does the script's
 /// assembly, so that names and sources are quoted exactly as JavaScript quotes them.
@@ -136,7 +137,7 @@ internal static class Templates
 
         Repo.WriteText(OutputFile, result.Get("script").AsString());
 
-        Log.Info($"Compiled {result.Get("templateCount")} templates and {result.Get("functionCount")} format functions");
+        Log.Info($"Compiled {result.Get("templateCount")} templates and bundled {result.Get("functionCount")} format functions");
     }
 
     /// <summary>

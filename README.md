@@ -1,4 +1,7 @@
-<img src="docs/images/ren-logo.png" alt="Ren" width="231" height="72">
+<img src="docs/images/ren-logo.png" alt="Ren" width="231" height="72"><br>
+
+[![Latest release](https://img.shields.io/github/v/release/edwardsmale/Ren?label=release)](https://github.com/edwardsmale/Ren/releases/latest)
+[![NuGet](https://img.shields.io/nuget/v/Ren)](https://www.nuget.org/packages/Ren)
 
 **A client-side reporting library: data grids, charts, filters and saved report settings, all in
 the browser.**
@@ -29,7 +32,9 @@ has to serve the data.
 - **Select cells** like a spreadsheet, with a stat bar totalling the selection, copy straight into
   Excel, or find text in the grid.
 - **Resize and reorder columns**, page through rows, and save grid variations.
-- **Download to Excel**, keeping number and date formats.
+- **Download to Excel**, with correct number and date formatting.
+
+<img src="docs/images/grid.png" alt="A grid of sales grouped by department and category, with totals, data bars and a heat map" width="760">
 
 ### Charts
 
@@ -42,10 +47,23 @@ has to serve the data.
 
 Ren draws its charts itself, so there's no charting library to add.
 
+<img src="docs/images/date-value-chart-bars.png" alt="A bar chart of monthly revenue by department, with labelled date markers" width="880">
+<br />
+<img src="docs/images/date-value-chart-bars-and-lines.png" alt="A chart with orders as bars and profit as a line on a second axis, showing hover values" width="880">
+<br />
+<img src="docs/images/date-value-chart-pies.png" alt="Quarterly pie charts of revenue by department" width="880">
+<br />
+<img src="docs/images/change-chart.png" alt="A change chart of revenue by category, comparing two periods" width="720">
+<br />
+<img src="docs/images/word-cloud.png" alt="A word cloud of search terms" width="600">
+
 ### Whole reports
 
 - **Filter modules**, **filters bars** and **date selectors** that filter every visualisation
   sharing the data, and **settings groups** so a grid and a chart share one grouping and sort.
+
+  <img src="docs/images/filter-module.png" alt="A filter module with year, region and department filters, each value showing its total" width="500">
+
 - **Report parameters** passed through to your data endpoints.
 - **Saved settings**: named presets, per-user settings and a default for everyone, stored on your
   server or in the browser.
@@ -62,7 +80,7 @@ Endpoints can return an array of objects, columns and rows, TSV, Ren's own tabul
 collection (JSON with column formats and several tabs), or renpack, a compact binary format read
 on a worker so big data sets don't hold up the page.  Ren tells them apart by itself.
 
-## Getting it
+## Installation
 
 Ren ships as the `Ren` NuGet package.  Add it to a web project and, before each build, it copies
 Ren's files into `wwwroot/ren/` (ASP.NET Core) or `Statics/ren/` (ASP.NET), so they're published
@@ -71,11 +89,21 @@ with the site.  Add that folder to `.gitignore`; to update Ren, update the packa
 The package also has an optional .NET library that turns an `IDataReader`, `DataTable` or list of
 objects into Ren's data formats (see [dotnet/README.md](dotnet/README.md)).
 
-Not using .NET?  Build Ren (see [Developing Ren](docs/development.md)) and serve the files in
-`dist/`: `ren.js` or `ren.esm.js`, `ren.css`, and minified versions of each.
-
 To try the examples, build Ren, run `dotnet run --project build/Ren.Build -- serve`, and open
 http://localhost:8080/examples/.
+
+### Download
+
+Not using .NET?  Download the built files from the
+[latest release](https://github.com/edwardsmale/Ren/releases/latest) and serve them yourself:
+
+- [`ren.min.js`](https://github.com/edwardsmale/Ren/releases/latest/download/ren.min.js) or
+  [`ren.esm.min.js`](https://github.com/edwardsmale/Ren/releases/latest/download/ren.esm.min.js)
+  (an ES module)
+- [`ren.min.css`](https://github.com/edwardsmale/Ren/releases/latest/download/ren.min.css)
+
+The release also has unminified versions, source maps and the config schema.  Or build Ren
+yourself (see [Developing Ren](docs/development.md)) and serve the files in `dist/`.
 
 ## Licence
 

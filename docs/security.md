@@ -27,7 +27,7 @@ These are what a policy has to allow, beyond the scripts and styles themselves:
 |---|---|---|
 | `script-src 'unsafe-eval'` | Format, calculation and binning functions (the library's own included), and the page's own HTML templates, which are compiled when they're used | They don't run, and show `#VALUE!` |
 | `worker-src blob:` | The parse worker, which parses large data sources off the main thread | Parsing falls back to the main thread, with a warning in the console |
-| `style-src 'unsafe-inline'` | The `<style>` elements Ren adds to the page, for each visualisation's styles and the drag cursor | Those styles aren't applied |
+| `style-src 'unsafe-inline'` | The `<style>` elements Ren adds to the page (each visualisation's styles, the drag cursor, and the one hiding `<ren-*>` elements until they're set up), and `style` attributes in its markup | Those styles aren't applied |
 | `connect-src` | Each of the page's `endpoints`, and the data sources' URLs | Those requests fail |
 
 The library's own HTML templates are compiled by the build, so a report that uses no functions,
@@ -73,7 +73,7 @@ Then Ren won't run:
   turned off rather than opening)
 - Functions that a report's settings add
 - Parameter values from report settings that could run as code once they're written into a
-  function: anything that isn't a string, number or boolean, and any string with
+  function: anything that isn't a string, number, boolean or empty, and any string with
   ``= ( ) [ ] { } ; ' " ` \`` or a line break
 
 Each of those shows `#VALUE!`.  The library's own functions and templates, and those the page

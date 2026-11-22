@@ -1,0 +1,775 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "Sales": {
+            "queryColumns": [
+                "__Count",
+                "OrderDate",
+                "Department",
+                "Category",
+                "Region",
+                "Orders",
+                "Revenue",
+                "Profit",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "OrderDate": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Region": {
+                                "aggregationType": "ExpandIcon"
+                            },
+                            "Orders": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "number-abbreviated-1-dp"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Revenue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "cellStyleFunction": [
+                                    {
+                                        "name": "style-data-bar"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Profit": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "cellStyleFunction": [
+                                    {
+                                        "name": "style-heat-map",
+                                        "parameters": {
+                                            "padding": 15
+                                        }
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "sortOrder": {
+                            "isDescending": true,
+                            "column": "Revenue"
+                        },
+                        "groupByColumns": [
+                            "Category"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "OrderDate": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Category": {
+                                "aggregationType": "ExpandIconAlways"
+                            },
+                            "Region": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Orders": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "number-abbreviated-1-dp"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Revenue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "cellStyleFunction": [
+                                    {
+                                        "name": "style-data-bar"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Profit": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "cellStyleFunction": [
+                                    {
+                                        "name": "style-heat-map",
+                                        "parameters": {
+                                            "padding": 15
+                                        }
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "sortOrder": {
+                            "isDescending": true,
+                            "column": "Revenue"
+                        },
+                        "groupByColumns": [
+                            "Department"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "OrderDate": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Region": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Orders": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "number-abbreviated-1-dp"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Revenue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            },
+                            "Profit": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency-abbreviated-1-dp"
+                                    }
+                                ],
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "isDescending": true,
+                    "thenBy": [
+                        {
+                            "isDescending": true,
+                            "column": "Revenue"
+                        }
+                    ],
+                    "column": "OrderDate"
+                }
+            }
+        }
+    },
+    "gridState": {
+        "Sales": {
+            "showRowAndColumnHeadings": false,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false
+                },
+                {
+                    "column": "Department",
+                    "width": 212
+                },
+                {
+                    "column": "Category"
+                },
+                {
+                    "column": "Region"
+                },
+                {
+                    "column": "OrderDate"
+                },
+                {
+                    "column": "Orders"
+                },
+                {
+                    "column": "Revenue"
+                },
+                {
+                    "column": "Profit"
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    },
+    "raiseReport": true,
+    "visualisations": [
+        {
+            "visualisationTypeName": "FilterModule",
+            "dataSourceUri": "/test/browser/fixtures/readme/sales.json",
+            "reportContext": {
+                "reportContextGuid": "report-context-Readme",
+                "reportName": "Readme"
+            },
+            "dataGroupingSettingsGroup": "report-context-Readme Sales 1",
+            "gridStateGroup": "report-context-Readme Sales 1",
+            "visualisationSettingsGroup": "FilterModule-Readme",
+            "clientSide": true,
+            "columnOrder": [
+                "OrderDate",
+                "Region",
+                "Category"
+            ],
+            "columnOverrides": {
+                "OrderDate": {
+                    "included": true,
+                    "binningFunction": {
+                        "name": "bin-date-year"
+                    },
+                    "showBinningFunctionLink": true,
+                    "HeadingOverride": "Year",
+                    "valueColumn": "Revenue",
+                    "valueAggregationType": "Sum",
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                },
+                "Region": {
+                    "included": true,
+                    "sortByValue": true,
+                    "valueColumn": "Revenue",
+                    "valueAggregationType": "Sum",
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                },
+                "Category": {
+                    "included": true,
+                    "parentGroupings": [
+                        "Department"
+                    ],
+                    "valueColumn": "Revenue",
+                    "valueAggregationType": "Sum",
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                },
+                "Department": {
+                    "valueColumn": "Revenue",
+                    "valueAggregationType": "Sum",
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                }
+            },
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "fillAvailableSpace": true,
+            "filterGroup": "report-context-Readme Sales 1",
+            "fitPopupToContentExactly": true,
+            "resizeToFitContentOnLoad": false,
+            "showRightClickHint": false,
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": false,
+            "sourceDataGroupingSettingsGroup": "Sales",
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "targetSelector": ".js-filter-module",
+            "verticalScrollbar": true,
+            "visualisationHeight": "22rem",
+            "visualisationWidth": "60rem"
+        },
+        {
+            "visualisationTypeName": "DateValueChart",
+            "dataSourceUri": "/test/browser/fixtures/readme/sales.json",
+            "reportContext": {
+                "reportContextGuid": "report-context-Readme",
+                "reportName": "Readme"
+            },
+            "dataGroupingSettingsGroup": "Sales -|- GridSet -|- DateValueChart",
+            "gridStateGroup": "report-context-Readme Sales 1[1]",
+            "visualisationSettingsGroup": "DateValueChart-Readme-Revenue",
+            "axisLabelFontSize": 11,
+            "barLayout": "SideBySide",
+            "barNarrowingRatio": 0.9275,
+            "calendarMarkers": [
+                "years",
+                "quarters"
+            ],
+            "chartDataGroupingSettings": {
+                "groupings": {
+                    "entries": [
+                        {
+                            "groupByColumnIndexes": [
+                                1
+                            ],
+                            "groupByCalcFunctions": [
+                                {
+                                    "name": "date-month-start"
+                                }
+                            ],
+                            "dateRange": {
+                                "from": "2026-01-01",
+                                "to": "2026-09-01"
+                            },
+                            "columns": {
+                                "Revenue": {
+                                    "aggregationType": 0,
+                                    "valueFormatFunction": [
+                                        {
+                                            "name": "currency-abbreviated-no-dp"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "groupByColumnIndexes": [
+                                2
+                            ],
+                            "groupByColumns": [
+                                "Department"
+                            ]
+                        },
+                        {
+                            "groupByColumnIndexes": []
+                        }
+                    ]
+                }
+            },
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "dateMarkers": {
+                "dataSourceUri": "/test/browser/fixtures/readme/markers.json",
+                "hidden": false
+            },
+            "dateMarkersDataSourceUri": "/test/browser/fixtures/readme/markers.json",
+            "datePeriod": "Auto",
+            "dateRangeGroup": "Readme dates",
+            "defaultDateRange": {
+                "from": "2026-01-01",
+                "to": "2026-09-01"
+            },
+            "fillAvailableSpace": true,
+            "filterGroup": "Sales",
+            "hoverDateLineFullHeight": false,
+            "ignoreSqlGroupByDirectives": true,
+            "initialChartGroupCalcFunction": "date-month-start",
+            "initialChartGroupColumnAggregations": {
+                "Revenue": {
+                    "aggregationType": 0,
+                    "aggregateWithRespectToColumn": null,
+                    "calcFunction": null,
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                }
+            },
+            "leftAxis": {
+                "fromSettings": true,
+                "updateYScaleBehaviour": "AlwaysUpdate",
+                "label": "Revenue"
+            },
+            "legendSize": "small",
+            "markerLabelLayout": "staggered",
+            "resizeToFitContentOnLoad": false,
+            "selectedColumns": [
+                "OrderDate",
+                "Department",
+                "Revenue"
+            ],
+            "series": [
+                {
+                    "column": "Bikes",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046b8",
+                    "chartType": "Bar",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                },
+                {
+                    "column": "Camping",
+                    "valueAxis": "leftAxis",
+                    "colour": "#ED7014",
+                    "chartType": "Bar",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                },
+                {
+                    "column": "Clothing",
+                    "valueAxis": "leftAxis",
+                    "colour": "#4CAF50",
+                    "chartType": "Bar",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                }
+            ],
+            "showHoverDateLine": true,
+            "showHoverValues": true,
+            "showLeftAxis": true,
+            "showLeftAxisHeading": true,
+            "showRightAxis": false,
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": false,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "targetSelector": ".js-revenue-chart",
+            "valueLabelFontSize": 12,
+            "visualisationHeight": "32.4rem",
+            "visualisationWidth": "81rem"
+        },
+        {
+            "visualisationTypeName": "DateValueChart",
+            "dataSourceUri": "/test/browser/fixtures/readme/sales.json",
+            "reportContext": {
+                "reportContextGuid": "report-context-Readme",
+                "reportName": "Readme"
+            },
+            "dataGroupingSettingsGroup": "Sales -|- GridSet -|- DateValueChart -|- Orders",
+            "gridStateGroup": "report-context-Readme Sales 1[2]",
+            "visualisationSettingsGroup": "DateValueChart-Readme-Orders",
+            "axisLabelFontSize": 11,
+            "barLayout": "Overlayed",
+            "barNarrowingRatio": 0.6887,
+            "chartDataGroupingSettings": {
+                "groupings": {
+                    "entries": [
+                        {
+                            "groupByColumnIndexes": [
+                                1
+                            ],
+                            "groupByCalcFunctions": [
+                                {
+                                    "name": "date-month-start"
+                                }
+                            ],
+                            "columns": {
+                                "Orders": {
+                                    "aggregationType": 0,
+                                    "valueFormatFunction": [
+                                        {
+                                            "name": "number-abbreviated-1-dp"
+                                        }
+                                    ]
+                                },
+                                "Profit": {
+                                    "aggregationType": 0,
+                                    "valueFormatFunction": [
+                                        {
+                                            "name": "currency-abbreviated-no-dp"
+                                        }
+                                    ]
+                                }
+                            },
+                            "dateRange": {
+                                "from": "2026-01-01",
+                                "to": "2026-09-01"
+                            }
+                        },
+                        {
+                            "groupByColumnIndexes": []
+                        }
+                    ]
+                }
+            },
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "datePeriod": "Auto",
+            "dateRangeGroup": "Readme dates",
+            "defaultDateRange": {
+                "from": "2026-01-01",
+                "to": "2026-09-01"
+            },
+            "fillAvailableSpace": true,
+            "filterGroup": "Sales",
+            "hoverDateLineFullHeight": true,
+            "ignoreSqlGroupByDirectives": true,
+            "initialChartGroupCalcFunction": "date-month-start",
+            "initialChartGroupColumnAggregations": {
+                "Orders": {
+                    "aggregationType": 0,
+                    "aggregateWithRespectToColumn": null,
+                    "calcFunction": null,
+                    "valueFormatFunction": [
+                        {
+                            "name": "number-abbreviated-1-dp"
+                        }
+                    ]
+                },
+                "Profit": {
+                    "aggregationType": 0,
+                    "aggregateWithRespectToColumn": null,
+                    "calcFunction": null,
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                }
+            },
+            "leftAxis": {
+                "fromSettings": true,
+                "updateYScaleBehaviour": "AlwaysUpdateHalfway",
+                "label": "Orders"
+            },
+            "legendSize": "small",
+            "resizeToFitContentOnLoad": false,
+            "rightAxis": {
+                "fromSettings": true,
+                "updateYScaleBehaviour": "AlwaysUpdate",
+                "label": "Profit"
+            },
+            "selectedColumns": [
+                "OrderDate",
+                "Orders",
+                "Profit"
+            ],
+            "series": [
+                {
+                    "column": "Orders",
+                    "label": "Orders",
+                    "valueAxis": "leftAxis",
+                    "colour": "#9ec5ea",
+                    "chartType": "Bar",
+                    "showValueLabels": true,
+                    "isEnabled": true,
+                    "estimateLastPeriod": "Overlayed"
+                },
+                {
+                    "column": "Profit",
+                    "label": "Profit",
+                    "valueAxis": "rightAxis",
+                    "colour": "#b20000",
+                    "chartType": "Line",
+                    "showValueLabels": true,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "thick",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "Overlayed"
+                }
+            ],
+            "showHoverDateLine": true,
+            "showHoverValues": true,
+            "showLeftAxis": true,
+            "showLeftAxisHeading": true,
+            "showRightAxis": true,
+            "showRightAxisHeading": true,
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": false,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "targetSelector": ".js-orders-chart",
+            "valueLabelFontSize": 13,
+            "visualisationHeight": "21.6rem",
+            "visualisationWidth": "81rem"
+        },
+        {
+            "visualisationTypeName": "DateValueChart",
+            "dataSourceUri": "/test/browser/fixtures/readme/sales.json",
+            "reportContext": {
+                "reportContextGuid": "report-context-Readme",
+                "reportName": "Readme"
+            },
+            "dataGroupingSettingsGroup": "Sales -|- GridSet -|- DateValueChart -|- Pies",
+            "gridStateGroup": "report-context-Readme Sales 1[3]",
+            "visualisationSettingsGroup": "DateValueChart-Readme-Pies",
+            "axisLabelFontSize": 11,
+            "barLayout": "SideBySide",
+            "barNarrowingRatio": 0.9275,
+            "chartDataGroupingSettings": {
+                "groupings": {
+                    "entries": [
+                        {
+                            "groupByColumnIndexes": [
+                                1
+                            ],
+                            "groupByCalcFunctions": [
+                                {
+                                    "name": "date-quarter-start"
+                                }
+                            ],
+                            "dateRange": {
+                                "from": "2025-07-01",
+                                "to": "2026-07-01"
+                            },
+                            "columns": {
+                                "Revenue": {
+                                    "aggregationType": 0,
+                                    "valueFormatFunction": [
+                                        {
+                                            "name": "currency-abbreviated-no-dp"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "groupByColumnIndexes": [
+                                2
+                            ],
+                            "groupByColumns": [
+                                "Department"
+                            ]
+                        },
+                        {
+                            "groupByColumnIndexes": []
+                        }
+                    ]
+                }
+            },
+            "clientSide": true,
+            "dataTabGroup": "",
+            "dataTabIndex": 1,
+            "datePeriod": "Quarter",
+            "defaultDateRange": {
+                "from": "2025-07-01",
+                "to": "2026-07-01"
+            },
+            "fillAvailableSpace": true,
+            "filterGroup": "Sales",
+            "hoverDateLineFullHeight": false,
+            "ignoreSqlGroupByDirectives": true,
+            "initialChartGroupCalcFunction": "date-quarter-start",
+            "initialChartGroupColumnAggregations": {
+                "Revenue": {
+                    "aggregationType": 0,
+                    "aggregateWithRespectToColumn": null,
+                    "calcFunction": null,
+                    "valueFormatFunction": [
+                        {
+                            "name": "currency-abbreviated-1-dp"
+                        }
+                    ]
+                }
+            },
+            "leftAxis": {
+                "fromSettings": true,
+                "updateYScaleBehaviour": "AlwaysUpdate",
+                "label": "Revenue"
+            },
+            "legendSize": "small",
+            "resizeToFitContentOnLoad": false,
+            "selectedColumns": [
+                "OrderDate",
+                "Department",
+                "Revenue"
+            ],
+            "series": [
+                {
+                    "column": "Bikes",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046b8",
+                    "chartType": "Pie",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                },
+                {
+                    "column": "Camping",
+                    "valueAxis": "leftAxis",
+                    "colour": "#ED7014",
+                    "chartType": "Pie",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                },
+                {
+                    "column": "Clothing",
+                    "valueAxis": "leftAxis",
+                    "colour": "#4CAF50",
+                    "chartType": "Pie",
+                    "showValueLabels": true,
+                    "colourFilter": null,
+                    "curved": false,
+                    "lineStyle": "solid",
+                    "lineWidth": "normal",
+                    "dotSize": "medium",
+                    "isEnabled": true,
+                    "estimateLastPeriod": "None"
+                }
+            ],
+            "showHoverDateLine": false,
+            "showHoverValues": false,
+            "showLeftAxis": true,
+            "showLeftAxisHeading": true,
+            "showRightAxis": false,
+            "showRowAndColumnHeadings": true,
+            "showTabTitles": false,
+            "tabbedModuleTabId": null,
+            "tabularDataTransformers": [],
+            "targetSelector": ".js-pie-chart",
+            "valueLabelFontSize": 12,
+            "visualisationHeight": "24rem",
+            "visualisationWidth": "81rem",
+            "pieHoleRadius": 0.45,
+            "pieLabels": "auto",
+            "showLegend": true,
+            "pieTotalFormatFunction": [
+                {
+                    "name": "currency-abbreviated-1-dp"
+                }
+            ]
+        }
+    ],
+    "visualisationProperties": {
+        "GridSet Sales": {
+            "statBar": true,
+            "variations": false,
+            "quickLinks": false,
+            "showColumnHeaderDownArrows": true
+        }
+    }
+}

@@ -65,8 +65,8 @@ The first build downloads Dart Sass, Lightning CSS and esbuild into `.tools/`, a
 checked against hashes in `build/Ren.Build/Tools.cs`.  Set `REN_TOOLS` to keep them elsewhere.
 
 `dist/` gets:
-- `ren.js`: `vendor/`, `src/` and the compiled templates, wrapped in a function so their top-level
-  names aren't globals.  `Ren` is `window.Ren`, and a CommonJS export.
+- `ren.js`: `vendor/`, `src/`, the compiled templates and the format functions' source, wrapped in
+  a function so their top-level names aren't globals.  `Ren` is `window.Ren`, and a CommonJS export.
 - `ren.esm.js`: `ren.js` as an ES module, exporting `Ren`.
 - `ren.css`: `styles/`, compiled with Dart Sass and prefixed with Lightning CSS.
 - Minified versions of each (`ren.min.js`, `ren.esm.min.js`, `ren.min.css`), from esbuild.
@@ -75,9 +75,11 @@ checked against hashes in `build/Ren.Build/Tools.cs`.  Set `REN_TOOLS` to keep t
   SHA-256 hashes of the files (with line endings normalised to LF).  A development build's branch
   is the one checked out.  A release's is null, so published packages don't carry branch names.
 
-Each file starts with a licence comment naming the version.  The templates register themselves
-through `Ren.Extensions`, so a page doesn't need template elements of its own (but its own still
-override them).
+Each file starts with a licence comment naming the version.  The templates and format functions
+register themselves through `Ren.Extensions`, so a page doesn't need template or function elements
+of its own (but its own still override them).  The templates are compiled by the build, so they
+run where a page's content security policy doesn't allow eval.  The format functions are included
+as source and compiled when they're used, as their parameters are only filled in then.
 
 ### Versions of a build
 
@@ -182,6 +184,10 @@ Add `?layout=embedded` to the URL for an embedded report layout.  To look at a f
 `test/browser/fixtures/ported/` has reports generated from an existing reporting app, with their
 data in `ported/data/`.  Don't edit them: regenerate them.
 
+`test/browser/fixtures/readme/readme.html` is the page the README's images in `docs/images/` are
+taken from: one element screenshot per `.js-exhibit-*` figure, at 1.5 times scale.  Its data is
+made up by `generate-data.js` in the same folder.
+
 Each test class derives from `BrowserTest`, which gives each test its own page, and fails it if
 the page has an uncaught error (unless the test calls `AllowPageErrors()`).  It has:
 - `Ren`, a `RenContext` for the page:
@@ -258,7 +264,7 @@ gets a Ren that's missing something an earlier release had.
 
 ## Releasing
 
-1. Add each change under "Unreleased" in `CHANGELOG.md`.
+1. Add each change under "Unreleased" in `CHANGELOG.md`, as a one-line `- ` list item.
 2. Release, on main with nothing uncommitted:
 
    ```
@@ -276,8 +282,9 @@ gets a Ren that's missing something an earlier release had.
    ```
 
    The tag starts `.github/workflows/publish.yml`, which runs CI again, packs the release, and
-   pushes it to nuget.org (signing in with Trusted Publishing, so there's no stored API key).  A
-   version can't be replaced once published, so only push tags for releases.
+   pushes it to nuget.org (signing in with Trusted Publishing, so there's no stored API key).  It
+   then creates a GitHub release for the tag, with the built client files and the package as
+   downloads.  A version can't be replaced once published, so only push tags for releases.
 
 To pack a release yourself, without publishing it:
 
@@ -292,7 +299,8 @@ Releases before 1.1.1 can't be packed, as they don't have the build targets.  To
 development build locally, `dotnet pack dotnet/src/Ren -p:RenPackDevBuild=true` packs `dist/` as
 a prerelease, such as `1.1.0-dev.4f2a9c1`.
 
-For a site that doesn't use the package, copy a release's files into its folders:
+For a site that doesn't use the package, download a release's files from its GitHub release, or
+copy them into the site's folders:
 
 ```
 dotnet run --project build/Ren.Build -- export 1.1.1 <dir>[;<dir>...]

@@ -1,0 +1,82 @@
+<style>
+    /* The page around Ren sets its font; without one, Ren's HTML text is the browser's serif. */
+    .readme
+    {
+        padding: 1rem;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.9rem;
+    }
+
+    .readme .exhibit
+    {
+        margin: 0 0 1.25rem 0;
+        padding: 0.5rem;
+        width: fit-content;
+    }
+
+    /* The stat bar is positioned absolutely beneath the grid, so takes no space of its own. */
+    .readme .grid-exhibit
+    {
+        padding-bottom: 2.5rem;
+    }
+
+    .readme .host
+    {
+        position: relative;
+        width: 60rem;
+        max-width: 100%;
+    }
+
+    .readme .host > *
+    {
+        height: 100%;
+    }
+</style>
+
+<div class="readme">
+
+    <!-- The date markers' source, declared so that Ren fetches it. -->
+    <ren-data-source src="/test/browser/fixtures/readme/markers.json" />
+
+    <figure class="exhibit js-exhibit-revenue-chart">
+        <div class="host js-revenue-chart" style="width: 81rem; height: 32.4rem"></div>
+    </figure>
+
+    <figure class="exhibit js-exhibit-orders-chart">
+        <div class="host js-orders-chart" style="width: 81rem; height: 21.6rem"></div>
+    </figure>
+
+    <figure class="exhibit js-exhibit-pie-chart">
+        <div class="host js-pie-chart" style="width: 81rem; height: 24rem"></div>
+    </figure>
+
+    <figure class="exhibit js-exhibit-filter-module">
+        <div class="host js-filter-module" style="width: 33rem"></div>
+    </figure>
+
+    <figure class="exhibit grid-exhibit js-exhibit-grid">
+        <ren-grid src="/test/browser/fixtures/readme/sales.json"
+                  data-format="columns-and-rows"
+                  settings-group="Sales"
+                  max-height="30rem" />
+    </figure>
+
+    <figure class="exhibit js-exhibit-change-chart">
+        <ren-change-chart src="/test/browser/fixtures/readme/category-change.json"
+                          data-format="columns-and-rows"
+                          label-heading="Category"
+                          before-heading="Jan-Sep 2025"
+                          after-heading="Jan-Sep 2026"
+                          value-format-function="currency-abbreviated-auto-dp" />
+    </figure>
+
+    <figure class="exhibit js-exhibit-word-cloud">
+        <div class="host" style="width: 50rem; height: 30rem">
+            <ren-word-cloud src="/test/browser/fixtures/readme/search-terms.json"
+                            data-format="columns-and-rows"
+                            word-heading="Search term"
+                            count-heading="Searches" />
+        </div>
+    </figure>
+
+</div>
