@@ -65,7 +65,7 @@ The first build downloads Dart Sass, Lightning CSS and esbuild into `.tools/`, a
 checked against hashes in `build/Ren.Build/Tools.cs`.  Set `REN_TOOLS` to keep them elsewhere.
 
 `dist/` gets:
-- `ren.js`: `vendor/`, `src/`, the compiled templates and the format functions' source, wrapped in
+- `ren.js`: `vendor/`, `src/`, the compiled templates and format functions, wrapped in
   a function so their top-level names aren't globals.  `Ren` is `window.Ren`, and a CommonJS export.
 - `ren.esm.js`: `ren.js` as an ES module, exporting `Ren`.
 - `ren.css`: `styles/`, compiled with Dart Sass and prefixed with Lightning CSS.
@@ -77,9 +77,11 @@ checked against hashes in `build/Ren.Build/Tools.cs`.  Set `REN_TOOLS` to keep t
 
 Each file starts with a licence comment naming the version.  The templates and format functions
 register themselves through `Ren.Extensions`, so a page doesn't need template or function elements
-of its own (but its own still override them).  The templates are compiled by the build, so they
-run where a page's content security policy doesn't allow eval.  The format functions are included
-as source and compiled when they're used, as their parameters are only filled in then.
+of its own (but its own still override them).  Both are compiled by the build, so they run where
+a page's content security policy doesn't allow eval.  A format function's `$name` parameters are
+compiled to reads of a `parameters` argument (see `Ren.FunctionCompiler`), so one written straight
+into code, rather than into a string, can't be compiled ahead; the build leaves such a function
+(only `custom-format`, whose parameter is `{code}`) as source, compiled when it's used.
 
 ### Versions of a build
 

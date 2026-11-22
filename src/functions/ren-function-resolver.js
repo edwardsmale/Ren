@@ -228,6 +228,7 @@ Ren.FunctionResolver = (() => {
     };
 
     return {
+        stripComments,
         resolveAtExpressions,
         highlightExpressions,
         parseJSDocDefaults,

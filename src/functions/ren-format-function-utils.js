@@ -191,10 +191,39 @@ Ren.FormatFunctionUtils = (() => {
         return firstSpec?.name ?? "default";
     };
 
+    // The objects parseObjectParameter has read, by their text, as a function reads its parameter
+    // for every value it's given.
+    const objectParametersByText = new Map();
+    const MAX_CACHED_OBJECT_PARAMETERS = 100;
+
+    /**
+     * Reads a function's parameter holding an object, such as {"Low": 0, "High": 1}, as JSON or
+     * the looser JavaScript-like form Ren.JsonUtils_Lenient reads.  Gives an empty object for text
+     * that isn't one.  Read as data rather than written into the function's code, so it can't
+     * run.
+     */
+    const parseObjectParameter = (text) => {
+
+        let parsed = objectParametersByText.get(text);
+
+        if (parsed !== undefined) return parsed;
+
+        parsed = Ren.JsonUtils_Lenient.parse(String(text ?? ""));
+
+        if (!Ren.ObjectUtils.isObject(parsed)) parsed = {};
+
+        if (objectParametersByText.size >= MAX_CACHED_OBJECT_PARAMETERS) objectParametersByText.clear();
+
+        objectParametersByText.set(text, parsed);
+
+        return parsed;
+    };
+
     return {
         DEFAULT_BINNING_ORDER,
         reduceIndentation,
         parseFunctionHeader,
+        parseObjectParameter,
         getCustomCode,
         getFunctionName
     };

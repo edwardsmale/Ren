@@ -3,7 +3,7 @@
  *
  * TAGS: format, calculation
  *
- * @param {string} code - The JS code to generate the value.
+ * @param {code} code - The JS code to generate the value.
  * @returns {string} The result of the custom code.
  */
 return $code;

@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- A page whose content security policy allows no eval, but allows its own scripts by nonce,
+     through which Ren compiles functions written into a report. -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'nonce-ren-test-nonce'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+    <title>Nonce CSP - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/dist/ren.js" nonce="ren-test-nonce"></script>
+</head>
+<body>
+</body>
+</html>

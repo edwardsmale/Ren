@@ -13,7 +13,7 @@ Ren.HtmlTemplateFunctions = (() => {
 
         try {
 
-            return eval(outputFunctionString);
+            return Ren.FunctionCompiler.compile(outputFunctionString);
         }
         catch (e) {
 
@@ -26,7 +26,7 @@ Ren.HtmlTemplateFunctions = (() => {
 
     // Added by Ren.Extensions.registerHtmlTemplate, and used where the page has no template of the
     // same name.  Each is the template's source, or a function already compiled from it (as the
-    // library's own are, by the build), which is used as it is, with no eval.
+    // library's own are, by the build), which is used as it is, with nothing compiled on the page.
     const registeredHtmlTemplateFunctions = {};
     let initialised = false;
 

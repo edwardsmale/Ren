@@ -1,44 +1,5 @@
 Ren.FormatFunctions = (() => {
 
-    // The fixed argument list every format and calc function is compiled with.
-    const FUNCTION_ARGUMENTS =
-        "(value, rowVals, groupSummaryStats, overallSummaryStats, compressedRowVals)";
-
-    // The arguments carrying a function's context, as opposed to the value it transforms.
-    const CONTEXT_ARGUMENT_NAMES = [
-        "rowVals", "groupSummaryStats", "overallSummaryStats", "compressedRowVals"
-    ];
-
-    // Returned when the context a function needs was not supplied.  Blank rather than the
-    // unformatted value, which would read as though it had been transformed.
-    const NO_CONTEXT_RESULT = "";
-
-    /**
-     * Builds the guard statements prefixed to a function's body so that it returns
-     * NO_CONTEXT_RESULT where a context argument it reads wasn't supplied, as not every host can
-     * supply them all. Returns "" for a function reading none of them. Prefixed rather than wrapped
-     * around the compiled function so that it still stringifies to its own source, which
-     * Ren.SummaryStats.populateStatsUsedByFunctions reads the stats it needs off.
-     */
-    const buildContextGuardPrefix = (functionBody) => {
-
-        let prefix = "";
-
-        for (let i = 0; i < CONTEXT_ARGUMENT_NAMES.length; i++) {
-
-            const argumentName = CONTEXT_ARGUMENT_NAMES[i];
-
-            // resolveAtExpressions has already stripped comments, so an argument named only in a
-            // function's documentation doesn't count as a use of it.
-            if (!new RegExp("\\b" + argumentName + "\\b").test(functionBody)) continue;
-
-            prefix += "if (" + argumentName + " == null) return " +
-                JSON.stringify(NO_CONTEXT_RESULT) + "; ";
-        }
-
-        return prefix;
-    };
-
     /**
      * Gets a value indicating whether a compiled function's body reads the named argument, so that
      * a host can skip building an argument that no function it calls reads.
@@ -50,7 +11,7 @@ Ren.FormatFunctions = (() => {
         // The argument list names every argument, so only what follows the arrow counts.
         const body = source.slice(source.indexOf("=>") + 2);
 
-        return new RegExp("\\b" + argumentName + "\\b").test(body);
+        return new RegExp("\b" + argumentName + "\b").test(body);
     };
 
     /**
@@ -58,42 +19,83 @@ Ren.FormatFunctions = (() => {
      * is compiled with, which names every argument whether the function reads it or not.
      */
     const getSourceWithoutArguments = (compiledFunctions) =>
-        String(compiledFunctions).split(FUNCTION_ARGUMENTS).join("");
+        Ren.FunctionCompiler.getSourceWithoutArguments(compiledFunctions);
 
-    // paras is the report parameters of the report the function belongs to.  It isn't one of
-    // FUNCTION_ARGUMENTS: the compiled function closes over it, so every host calls it alike.
-    const createFunctionFromTemplate = (functionString, parameters, paras) => {
+    /**
+     * Gets the values of a function's parameters as the function reads them: each a string, with
+     * a value naming another parameter ("≥ $compareTo") given that parameter's value.  Where
+     * escapeValues is true, as for a function giving HTML, each is HTML-escaped, so that it's
+     * shown as text wherever the function writes it into its HTML.
+     */
+    const getParameterValues = (parameters, escapeValues) => {
 
-        // eslint-disable-next-line no-unused-vars -- read by the evaluated bodies.
-        paras = paras || {};
+        const resolved = {};
+        const values = {};
 
-        functionString = Ren.FunctionTemplateParameters.substitute(functionString, parameters);
+        for (const name in parameters) {
 
-        // A leading "=" is dropped, so that a body can be written like an Excel formula.  Stripped
-        // after resolving, which removes comments, so that it may follow a header comment.
-        const resolvedFunctionString = Ren.FunctionResolver.resolveAtExpressions(functionString)
-            .replace(/^\s*=/, "");
-        const guardPrefix = buildContextGuardPrefix(resolvedFunctionString);
-
-        // The evals stay in this scope: a resolved body can name what is in scope here, e.g. an
-        // @parameters["x"] expression resolving to the parameters argument above.
-        if (resolvedFunctionString.includes("return ")) {
-
-            return eval(FUNCTION_ARGUMENTS + " => { " + guardPrefix + resolvedFunctionString + "}");
+            resolved[name] = parameters[name] == null ? "" : String(parameters[name]);
         }
 
-        try {
+        for (const name in resolved) {
 
-            // Guards are statements, so a guarded expression body has to become the argument of a
-            // return rather than staying an expression-bodied arrow.
-            return eval(guardPrefix
-                ? FUNCTION_ARGUMENTS + " => { " + guardPrefix + "return (" + resolvedFunctionString + "); }"
-                : FUNCTION_ARGUMENTS + " => " + resolvedFunctionString);
-        }
-        catch (e) {
+            const value = Ren.FunctionTemplateParameters.substitute(resolved[name], resolved);
 
-            return eval(FUNCTION_ARGUMENTS + " => { " + guardPrefix + resolvedFunctionString + "}");
+            values[name] = escapeValues ? Ren.HtmlUtils.escapeAttribute(value) : value;
         }
+
+        return { resolved, values };
+    };
+
+    /**
+     * Makes the function a host calls, with the five arguments hosts pass, from a compiled one,
+     * which is also given the parameters and the report parameters.  It stringifies to source,
+     * which Ren.SummaryStats.populateStatsUsedByFunctions and functionReadsArgument read what it
+     * uses off.
+     */
+    const bindFunction = (compiledFunction, values, paras, source) => {
+
+        const boundFunction = (value, rowVals, groupSummaryStats, overallSummaryStats,
+            compressedRowVals) => compiledFunction(value, rowVals, groupSummaryStats,
+            overallSummaryStats, compressedRowVals, values, paras);
+
+        Object.defineProperty(boundFunction, "toString", { value: () => source });
+
+        return boundFunction;
+    };
+
+    // paras is the report parameters of the report the function belongs to.
+    const createFunctionFromTemplate = (functionString, parameters, paras, escapeValues) => {
+
+        const { resolved, values } = getParameterValues(parameters, escapeValues);
+
+        // A bare parameter is written in as code, unescaped, as it is code.
+        const { sources } = Ren.FunctionCompiler.buildSources(
+            functionString,
+            Object.keys(resolved),
+            resolved
+        );
+
+        const compiledFunction = Ren.FunctionCompiler.compileFirst(sources);
+
+        return bindFunction(compiledFunction, values, paras || {}, String(compiledFunction));
+    };
+
+    /**
+     * Gets the source a function the build compiled reads as: its code as it was compiled, which
+     * the compiled function itself may not read as, as the minified build renames its arguments.
+     */
+    const getPrecompiledSource = (func) => {
+
+        if (func.precompiledSource === undefined) {
+
+            const parameterNames = Object.keys(func.parameters || {});
+
+            func.precompiledSource =
+                Ren.FunctionCompiler.buildSources(func.code, parameterNames).sources[0];
+        }
+
+        return func.precompiledSource;
     };
 
     const functionCache = {};
@@ -101,14 +103,20 @@ Ren.FormatFunctions = (() => {
     let initialised = false;
 
     // fromReportSettings marks a function that a report's settings added, which runs only where
-    // the page allows user functions.
-    const initialiseFunction = (functionName, body, fromReportSettings) => {
+    // the page allows user functions.  compiled is the function the build compiled from the body,
+    // where it did, which is run in place of compiling the body on the page.
+    const initialiseFunction = (functionName, body, fromReportSettings, compiled) => {
 
         const parsed = Ren.FormatFunctionUtils.parseFunctionHeader(body);
         parsed.originalSource = body; // Store the full file content for JSDoc parsing.
         parsed.fromReportSettings = !!fromReportSettings;
+        parsed.compiled = typeof compiled === "function" ? compiled : null;
         formatFunctions[functionName] = parsed;
     };
+
+    // Gets a value indicating whether a function gives HTML, so that its parameters' values are
+    // escaped for it.
+    const givesHtml = (func) => !!func?.tags?.includes("html");
 
     /**
      * Gets a value indicating whether the page runs functions that come from report settings or
@@ -119,9 +127,29 @@ Ren.FormatFunctions = (() => {
     const areUserFunctionsAllowed = () => !Ren.Config.isFeatureDisabled("userFunctions");
 
     // Characters a parameter value from report settings can't have where user functions aren't
-    // allowed, as the value is written into the function's code.  Without them it can't call or
-    // assign anything, or leave a string or a comment it's written into.
-    const UNSAFE_PARAMETER_CHARACTERS = /[=()[\]{};'"`\\\r\n\u2028\u2029]/;
+    // allowed, if the value is code: one written straight into a function's code, or one declared
+    // as {code}.  Without them it can't call or assign anything, or leave a string or a comment
+    // it's written into.
+    const UNSAFE_CODE_CHARACTERS = /[=()[\]{};'"`\\\r\n\u2028\u2029]/;
+
+    /**
+     * Gets the names of the parameters a named function takes as code: those its header declares
+     * as {code}, and, for one compiled on the page, those written straight into its code.
+     */
+    const getCodeParameterNames = (func, parameterNames) => {
+
+        const declared = func.parameters || {};
+        const names = Object.keys(declared).filter(name => declared[name].type === "code");
+
+        if (func.compiled) return names;
+
+        const bareNames = Ren.FunctionCompiler.referenceParameters(
+            Ren.FunctionResolver.stripComments(func.code),
+            Object.keys(declared).concat(parameterNames)
+        ).bareNames;
+
+        return names.concat(bareNames);
+    };
 
     // Escapes text for a double-quoted attribute, as a function's name or parameter may be
     // anything.
@@ -144,9 +172,22 @@ Ren.FormatFunctions = (() => {
             return `Function '${spec.name}' is from the report's settings, which are turned off.`;
         }
 
-        for (const name in spec.parameters || {}) {
+        const parameters = spec.parameters || {};
+        const func = spec.name === undefined ? null : formatFunctions[spec.name];
 
-            const value = spec.parameters[name];
+        // A function that isn't found shows that instead.
+        if (!func) return null;
+
+        const codeParameterNames = getCodeParameterNames(func, Object.keys(parameters));
+
+        // What a function that doesn't give HTML gives is still shown as HTML where it has a "<"
+        // in it, so a value that could add markup isn't let into it.  A style function's values
+        // are written into CSS, which Ren.DataGridCellStyles guards.
+        const couldAddMarkup = !givesHtml(func) && !func.tags.includes("style");
+
+        for (const name in parameters) {
+
+            const value = parameters[name];
 
             if (typeof value !== "string" && typeof value !== "number" &&
                 typeof value !== "boolean" && value != null) {
@@ -154,9 +195,14 @@ Ren.FormatFunctions = (() => {
                 return `Parameter '${name}' isn't a plain value.`;
             }
 
-            if (UNSAFE_PARAMETER_CHARACTERS.test(String(value))) {
+            if (codeParameterNames.includes(name) && UNSAFE_CODE_CHARACTERS.test(String(value))) {
 
                 return `Parameter '${name}' has characters that could run as code.`;
+            }
+
+            if (couldAddMarkup && String(value).includes("<")) {
+
+                return `Parameter '${name}' has a "<", which could add HTML.`;
             }
         }
 
@@ -198,7 +244,12 @@ Ren.FormatFunctions = (() => {
 
         if (formatFunctions[registration.name]) return;
 
-        initialiseFunction(registration.name, registration.source.trim());
+        initialiseFunction(
+            registration.name,
+            registration.source.trim(),
+            false,
+            registration.compiled
+        );
 
         // The cache may hold the not-found stand-in for the name, under any of its specs.
         for (const key in functionCache) delete functionCache[key];
@@ -271,6 +322,7 @@ Ren.FormatFunctions = (() => {
         }
         let template;
         let parameters = {};
+        let escapeValues = false;
 
         if (Ren.ObjectUtils.isObject(spec) && spec.html) {
 
@@ -295,14 +347,30 @@ Ren.FormatFunctions = (() => {
                     return functionCache[serializedSpec];
                 }
             }
-            let code = func.code;
-
             const jsdocDefaults = Ren.FunctionResolver.parseJSDocDefaults(
-                func.originalSource || code
+                func.originalSource || func.code
             );
 
             parameters = Ren.FunctionResolver.applyJSDocDefaults(spec.parameters || {}, jsdocDefaults);
-            template = Ren.FunctionTemplateParameters.substitute(code, parameters);
+            escapeValues = givesHtml(func);
+
+            if (func.compiled) {
+
+                // Compiled by the build, so nothing is compiled here, and the page's policy needn't
+                // allow eval.
+                const { values } = getParameterValues(parameters, escapeValues);
+
+                functionCache[serializedSpec] = bindFunction(
+                    func.compiled,
+                    values,
+                    paras || {},
+                    getPrecompiledSource(func)
+                );
+
+                return functionCache[serializedSpec];
+            }
+
+            template = func.code;
         }
         else {
 
@@ -312,11 +380,13 @@ Ren.FormatFunctions = (() => {
                 {},
                 Ren.FunctionResolver.parseJSDocDefaults(spec)
             );
+            escapeValues = givesHtml(Ren.FormatFunctionUtils.parseFunctionHeader(spec));
         }
 
         try {
 
-            functionCache[serializedSpec] = createFunctionFromTemplate(template, parameters, paras);
+            functionCache[serializedSpec] =
+                createFunctionFromTemplate(template, parameters, paras, escapeValues);
         }
         catch (e) {
 
@@ -325,8 +395,10 @@ Ren.FormatFunctions = (() => {
             // A warning, not an error: a mistake in the user's code is shown by the #VALUE! below,
             // and is not a fault for the global error banner to report.
             console.warn("[FormatFunctions] Error creating format function:", e);
-            functionCache[serializedSpec] = () =>
-                `<span title="Error in format function definition: ${e}">#VALUE!</span>`;
+
+            const title = escapeAttribute("Error in format function definition: " + e);
+
+            functionCache[serializedSpec] = () => `<span title="${title}">#VALUE!</span>`;
         }
 
         return functionCache[serializedSpec];

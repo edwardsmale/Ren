@@ -25,15 +25,25 @@ These are what a policy has to allow, beyond the scripts and styles themselves:
 
 | Directive | Needed for | Without it |
 |---|---|---|
-| `script-src 'unsafe-eval'` | Format, calculation and binning functions (the library's own included), and the page's own HTML templates, which are compiled when they're used | They don't run, and show `#VALUE!` |
+| `script-src 'unsafe-eval'`, or a nonce | Functions written into a report ("Custom..." functions, and those a report's settings add), the page's own format functions and HTML templates, and the library's `custom-format`, which are compiled when they're used | They don't run, and show `#VALUE!` |
 | `worker-src blob:` | The parse worker, which parses large data sources off the main thread | Parsing falls back to the main thread, with a warning in the console |
 | `style-src 'unsafe-inline'` | The `<style>` elements Ren adds to the page (each visualisation's styles, the drag cursor, and the one hiding `<ren-*>` elements until they're set up), and `style` attributes in its markup | Those styles aren't applied |
 | `connect-src` | Each of the page's `endpoints`, and the data sources' URLs | Those requests fail |
 
-The library's own HTML templates are compiled by the build, so a report that uses no functions,
-and none of the page's own templates, renders without `unsafe-eval`.  Turning rows into objects
-uses a generated function too, but falls back to building them by assignment where the policy
-blocks it.
+The library's own HTML templates and format, calculation and binning functions are compiled by
+the build, so a report that uses only those renders without `unsafe-eval`.  Their parameters'
+values are passed to them as data, rather than written into their code, and are HTML-escaped for
+a function that gives HTML.
+
+Where the policy blocks eval, Ren compiles the rest in a `<script>` element carrying the page's
+nonce, so a policy such as `script-src 'self' 'nonce-…'` runs them without `unsafe-eval`.  Ren
+reads the nonce from the script it was loaded by, or failing that from any script on the page with
+one, so load `ren.js` with the nonce.  Without a nonce it doesn't try.  (Each function Ren compiles
+this way is allowed by the nonce, so treat it as allowing a report's code as much as
+`unsafe-eval` does.)
+
+Turning rows into objects uses a generated function too, but falls back to building them by
+assignment where the policy blocks it.
 
 #### What Ren does to the page
 
@@ -56,7 +66,7 @@ whole page, and each has a feature flag in `ren.config` to turn it off:
 #### Reports run code
 
 A report's settings can hold code: format, calculation and binning functions, HTML templates, and
-parameter values that are written into functions.  Ren runs them in the page, with the page's
+parameter values that are code (such as `custom-format`'s).  Ren runs them in the page, with the page's
 cookies and access to everything on it.  So where one user can save a report and another can open
 it, a saved report is a stored cross-site scripting risk, as the person who saved it can run code
 in the browser of anyone who opens it.
@@ -72,9 +82,11 @@ Then Ren won't run:
 - Functions or HTML written into report settings, or into the function editor (which says it's
   turned off rather than opening)
 - Functions that a report's settings add
-- Parameter values from report settings that could run as code once they're written into a
-  function: anything that isn't a string, number, boolean or empty, and any string with
-  ``= ( ) [ ] { } ; ' " ` \`` or a line break
+- Parameter values from report settings that aren't a string, number, boolean or empty
+- Parameter values from report settings that are code (declared `{code}`, or written straight
+  into a function compiled on the page) with any of ``= ( ) [ ] { } ; ' " ` \`` or a line break
+- Parameter values from report settings with a `<`, for a function that doesn't give HTML, as Ren
+  shows what a function gives as HTML where it has one
 
 Each of those shows `#VALUE!`.  The library's own functions and templates, and those the page
 provides itself (its template and function elements, and `Ren.Extensions` registrations), still
@@ -83,9 +95,10 @@ run, as they come with the page rather than with the report.
 `userFunctions: false` limits what a report can run; it isn't a sandbox.  In particular:
 - It trusts the page's own functions and templates.  One that writes a parameter or a data value
   into the page as HTML can still be used to inject it.
-- The parameter check is a deny-list of characters, which stops a value calling, assigning or
-  leaving the string it's written into.  A function that passes a parameter on to something that
-  runs it (`eval`, a `Function`, `innerHTML`) can still be made to run it.
+- Other parameter values are passed to a function as data, so they can't leave a string, but
+  the check on those that are code is a deny-list of characters.  A function that passes a
+  parameter on to something that runs it (`eval`, a `Function`, `innerHTML`) can still be made to
+  run it.
 - It doesn't cover data.  Ren escapes data values it shows as text, but a template or function
   that shows them as HTML trusts the data source.
 

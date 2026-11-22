@@ -5,7 +5,7 @@
  *
  * @param {string} buttonText - The button text.
  * @param {string} buttonCssClass - The CSS class for the button.
- * @param {string} onClick - Code to execute when the button is clicked.
+ * @param {code} onClick - Code to execute when the button is clicked.
  * @returns {string} The HTML for the button.
  */
 const filePath = "@value";

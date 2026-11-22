@@ -8,4 +8,4 @@
  * @param {string} [falseValue="< $compareTo"] - The string to return if the value is less than compareTo.
  */
 
-return @value >= $compareTo ? "$trueValue" : "$falseValue";
+return @value >= Ren.TextUtils.parseFloat("$compareTo") ? "$trueValue" : "$falseValue";

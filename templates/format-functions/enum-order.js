@@ -7,5 +7,5 @@
  * @param {object} enumOrder - Each value's place in the order, as a JSON object keyed by value,
  *     e.g. {"Low": 0, "Medium": 1, "High": 2}.
  */
-const enumOrder = $enumOrder;
+const enumOrder = Ren.FormatFunctionUtils.parseObjectParameter("$enumOrder");
 return enumOrder[value] ?? 999999;

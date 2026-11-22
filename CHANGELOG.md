@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 - Stop a redrawn word cloud drawing a second copy of itself under the first.
+- Run the built-in functions without `unsafe-eval`, and custom ones with a nonce instead.
 
 ## 1.2.0 (2026-11-21)
 

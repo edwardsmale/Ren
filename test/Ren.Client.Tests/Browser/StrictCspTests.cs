@@ -1,7 +1,9 @@
 namespace Ren.Client.Tests.Browser;
 
-// A page whose content security policy doesn't allow eval: the library's own templates are compiled
-// by the build, so a report needing none of the page's own code still renders.
+// Pages whose content security policy doesn't allow eval: the library's own templates and format
+// functions are compiled by the build, so a report needing none of the page's own code still
+// renders, and where the page allows its scripts by nonce, a report's own functions are compiled
+// through it.
 [TestClass]
 public class StrictCspTests : BrowserTest
 {
@@ -37,6 +39,10 @@ public class StrictCspTests : BrowserTest
             }))
             """)).Not.ToBe("<b>Hi</b>");
 
+        // The library's own format functions are compiled by the build, so they run, while one written
+        // into a report can't be compiled.
+        Expect(await Page.EvaluateAsync<string[]>(RunFormatFunctions)).ToEqual(new[] { "Pens!", "refused" });
+
         var headings = Page.Locator(".ren-data-grid__column-heading");
 
         await Expect(headings.First).ToBeAttachedAsync();
@@ -46,4 +52,38 @@ public class StrictCspTests : BrowserTest
         await Expect(Page.Locator(".ren-data-grid__cell.ren-c-1").First).ToBeAttachedAsync();
         Expect(violations).ToEqual(Array.Empty<string>());
     }
+
+    [TestMethod("a function written into a report runs where the page allows its scripts by nonce")]
+    public async Task CustomFunctionRunsWherePolicyAllowsNonce()
+    {
+        var violations = new List<string>();
+
+        Page.Console += (_, message) =>
+        {
+            if (message.Text.Contains("Content Security Policy")) lock (violations) violations.Add(message.Text);
+        };
+
+        await Page.GotoAsync("/test/browser/fixtures/nonce-csp.html");
+
+        Expect(await Page.EvaluateAsync<string[]>(RunFormatFunctions)).ToEqual(new[] { "Pens!", "Pens?" });
+
+        // Only the eval Ren tries first, once, before using the nonce.
+        Expect(violations.Count(violation => !violation.Contains("unsafe-eval"))).ToBe(0);
+    }
+
+    // Runs a library format function and one written into a report, from a timer, as the page's own
+    // code would (Playwright's evaluate isn't held to the policy).
+    private const string RunFormatFunctions = """
+        () => new Promise((resolve) => setTimeout(() => {
+
+            const library = Ren.FormatFunctions.createFunction({
+                name: "append-string-if",
+                parameters: { sourceColumn: "Flag", stringToAppend: "!" }
+            })("Pens", { Flag: true });
+
+            const custom = Ren.FormatFunctions.createFunction("return value + '?';")("Pens", {});
+
+            resolve([library, /#VALUE!/.test(custom) ? "refused" : custom]);
+        }))
+        """;
 }

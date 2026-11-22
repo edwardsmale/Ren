@@ -5,9 +5,10 @@ namespace Ren.Build;
 /// files, with esbuild.  esbuild follows each file's own source map, so the minified files map back
 /// to src/ and styles/ rather than to the concatenated files.
 ///
-/// Nothing is lowered to older syntax, as ren.js isn't, and names aren't changed in a scope
-/// holding a direct eval (esbuild leaves those alone), so format functions can still name what's in
-/// scope where they're compiled.  The licence banner is a "/*!" comment, which esbuild keeps.
+/// Nothing is lowered to older syntax, as ren.js isn't.  Functions compiled on the page are
+/// compiled in the global scope (see Ren.FunctionCompiler), so they name nothing esbuild renames,
+/// and the precompiled format functions keep their unminified source for Ren to read (see
+/// Ren.FormatFunctions).  The licence banner is a "/*!" comment, which esbuild keeps.
 /// </summary>
 internal static class Minifier
 {

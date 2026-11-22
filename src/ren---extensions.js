@@ -84,9 +84,17 @@ Ren.Extensions = (() => {
 
     /**
      * Registers a format function, which one of the same name on the page overrides.
+     *
+     * @param {string} source - The function's source, with its header comment.
+     * @param {function} [compiled] - The function compiled from the source, as the build compiles
+     *   the library's own, which is run in place of compiling the source on the page, so that it
+     *   runs where the page's content security policy doesn't allow eval.  It's given the value,
+     *   rowVals, groupSummaryStats, overallSummaryStats and compressedRowVals, and then the
+     *   parameters' values (as strings, HTML-escaped for a function tagged html) and the report
+     *   parameters.  Ren.FunctionCompiler.buildSources gives the source it compiles from.
      */
-    const registerFormatFunction = (name, source) =>
-        register("formatFunction", { name, source });
+    const registerFormatFunction = (name, source, compiled) =>
+        register("formatFunction", { name, source, compiled });
 
     /**
      * Registers an HTML template, which one of the same name on the page overrides.

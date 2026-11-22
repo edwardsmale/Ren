@@ -4,15 +4,17 @@ using Jint.Native;
 namespace Ren.Build;
 
 /// <summary>
-/// Writes a script that registers the library's HTML templates, compiled, and its format functions,
-/// as source, through Ren.Extensions, so that the library works without the page's template and
-/// format function elements.  The page's own templates and functions override these.
+/// Writes a script that registers the library's HTML templates and format functions, compiled,
+/// through Ren.Extensions, so that the library works without the page's template and format
+/// function elements.  The page's own templates and functions override these.
 ///
-/// Each HTML template is compiled here, with Ren's own resolver, into the function Ren would
-/// otherwise compile from it with an eval when it's first used.  So the library's templates work
-/// on a page whose content security policy doesn't allow eval.  (A page's own templates, and any
-/// registered as source, are still compiled when they're used, as are all format functions, the
-/// library's included, since their parameters are only filled in then.)
+/// Each is compiled here, with Ren's own resolver and Ren.FunctionCompiler, into the function Ren
+/// would otherwise compile from it on the page when it's first used.  So the library's own work on
+/// a page whose content security policy doesn't allow eval.  A format function's parameters are
+/// read from an argument, rather than written into its code, so it compiles the same whatever their
+/// values.  The one exception is a function taking a parameter as code (custom-format), which is
+/// registered as source alone, and compiled on the page.  (A page's own templates and functions,
+/// and any registered as source, are compiled when they're used.)
 ///
 /// The resolver runs in Jint, a JavaScript engine written in .NET, and so does the script's
 /// assembly, so that names and sources are quoted exactly as JavaScript quotes them.
@@ -21,13 +23,15 @@ internal static class Templates
 {
     public static string OutputFile => Path.Combine(Repo.Generated, "ren-templates.js");
 
-    // The scripts Ren.FunctionResolver needs, in the order ren.js has them.
+    // The scripts Ren.FunctionResolver and Ren.FunctionCompiler need, in the order ren.js has them.
     private static readonly string[] ResolverFiles =
     [
         "src/utils/ren-text-utils.js",
         "src/utils/ren-text-quote-counter.js",
-        "src/functions/ren-function-template-parameters.js",
-        "src/functions/ren-function-resolver.js"
+        "src/functions/ren-format-function-utils.js",
+        "src/functions/ren-function-compiler.js",
+        "src/functions/ren-function-resolver.js",
+        "src/functions/ren-function-template-parameters.js"
     ];
 
     // The text utilities make an element when they load, but the resolver doesn't use it.
@@ -42,6 +46,21 @@ internal static class Templates
         (function (templateNames, templateSources, functionNames, functionSources) {
 
             const resolveAtExpressions = Ren.FunctionResolver.resolveAtExpressions;
+
+            // Ren's own compile, which tries new Function first, so the check isn't on the page's
+            // terms.
+            const compiles = (source) => {
+
+                try {
+
+                    new Function("return (" + source + "\n);");
+                    return null;
+                }
+                catch (e) {
+
+                    return e;
+                }
+            };
 
             const readSource = (text) => text.replace(/^﻿/, "").trim();
 
@@ -61,16 +80,35 @@ internal static class Templates
                 const source =
                     "(parameters) => { return " + resolveAtExpressions("`" + template + "`") + "; }";
 
-                try {
+                const error = compiles(source);
 
-                    new Function("return " + source);
-                }
-                catch (e) {
-
-                    throw new Error(`HTML template "${name}" doesn't compile: ${e.message}`);
-                }
+                if (error) throw new Error(`HTML template "${name}" doesn't compile: ${error.message}`);
 
                 return source;
+            };
+
+            // Gets the source a format function compiles to, or null for one taking a parameter
+            // as code, which can only be compiled once its value is known.
+            const compileFormatFunction = (name, body) => {
+
+                const parsed = Ren.FormatFunctionUtils.parseFunctionHeader(body);
+                const { sources, bareNames } = Ren.FunctionCompiler.buildSources(
+                    parsed.code,
+                    Object.keys(parsed.parameters || {})
+                );
+
+                if (bareNames.length > 0) return null;
+
+                let lastError = null;
+
+                for (let i = 0; i < sources.length; i++) {
+
+                    lastError = compiles(sources[i]);
+
+                    if (!lastError) return sources[i];
+                }
+
+                throw new Error(`Format function "${name}" doesn't compile: ${lastError.message}`);
             };
 
             const compiledTemplates = [];
@@ -81,20 +119,40 @@ internal static class Templates
                     compileTemplate(name, templates[name]));
             }
 
+            const compiledFunctions = [];
+            let sourceOnlyCount = 0;
+
+            for (const name in formatFunctions) {
+
+                const source = compileFormatFunction(name, formatFunctions[name]);
+
+                if (source === null) {
+
+                    sourceOnlyCount++;
+                    continue;
+                }
+
+                compiledFunctions.push("        " + JSON.stringify(name) + ": " + source);
+            }
+
             return {
                 templateCount: Object.keys(templates).length,
                 functionCount: Object.keys(formatFunctions).length,
+                sourceOnlyCount,
                 script:
                     "// Generated by the build from the templates folder.\n" +
                     "// Don't edit.\n" +
                     "(() => {\n\n" +
                     "    const templates = {\n" + compiledTemplates.join(",\n") + "\n    };\n\n" +
                     "    const formatFunctions = " + JSON.stringify(formatFunctions) + ";\n\n" +
+                    "    const compiledFormatFunctions = {\n" + compiledFunctions.join(",\n") +
+                    "\n    };\n\n" +
                     "    for (const name in templates) {\n" +
                     "        Ren.Extensions.registerHtmlTemplate(name, templates[name]);\n" +
                     "    }\n\n" +
                     "    for (const name in formatFunctions) {\n" +
-                    "        Ren.Extensions.registerFormatFunction(name, formatFunctions[name]);\n" +
+                    "        Ren.Extensions.registerFormatFunction(\n" +
+                    "            name, formatFunctions[name], compiledFormatFunctions[name]);\n" +
                     "    }\n" +
                     "})();\n"
             };
@@ -137,7 +195,8 @@ internal static class Templates
 
         Repo.WriteText(OutputFile, result.Get("script").AsString());
 
-        Log.Info($"Compiled {result.Get("templateCount")} templates and bundled {result.Get("functionCount")} format functions");
+        Log.Info($"Compiled {result.Get("templateCount")} templates and {result.Get("functionCount")} format functions" +
+            $" ({result.Get("sourceOnlyCount")} left to compile on the page)");
     }
 
     /// <summary>

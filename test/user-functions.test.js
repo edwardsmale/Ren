@@ -75,10 +75,33 @@ describe("with user functions turned off", () => {
         expect(window.injected).toBe(false);
     });
 
-    test("a parameter value that would leave its string is refused", () => {
+    test("a parameter value that would leave its string is only text", () => {
 
-        expect(isRefused(run(appendStringIf("\" + (window.injected = true) + \"")))).toBe(true);
+        const value = "\" + (window.injected = true) + \"";
+
+        expect(run(appendStringIf(value))).toBe("Pens" + value);
         expect(window.injected).toBe(false);
+    });
+
+    test("a parameter value that could add HTML is refused", () => {
+
+        expect(isRefused(run(appendStringIf("<img src=x>")))).toBe(true);
+    });
+
+    test("a parameter value given as code is refused where it could run", () => {
+
+        expect(isRefused(run({
+            name: "cell-button",
+            parameters: { buttonText: "Open", buttonCssClass: "b", onClick: "window.injected = true" }
+        }))).toBe(true);
+    });
+
+    test("a parameter value given as code is let through where it couldn't run", () => {
+
+        expect(isRefused(run({
+            name: "cell-button",
+            parameters: { buttonText: "Open", buttonCssClass: "b", onClick: "Ren.version" }
+        }))).toBe(false);
     });
 
     test("a parameter value that isn't a plain value is refused", () => {
