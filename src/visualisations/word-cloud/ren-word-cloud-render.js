@@ -32,6 +32,9 @@ Ren.WordCloud_Render = (() => {
             throw new Error(`Container with class '${props.guid}' not found`);
         }
 
+        // A redraw renders into the same container, so the previous drawing is removed first.
+        container.querySelectorAll(":scope > svg").forEach(svg => svg.remove());
+
         props.svg = Ren.Svg.append(container, "svg", { "width": "100%", "height": "100%" });
 
         // Create an internal style element within the SVG for color palette rules
