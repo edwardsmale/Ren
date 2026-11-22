@@ -144,7 +144,7 @@ Some things to know:
   older than its sources.
 - `REN_TEST_MINIFIED=1` (which `--minified` sets) serves the minified files in place of
   `ren.js`, `ren.esm.js` and `ren.css`.
-- The tests serve the repo themselves, as http://localhost:8124, without opening a port.
+- The tests serve the repo themselves, over HTTP on a free localhost port, and run 16 at a time.
 
 ### Unit tests
 

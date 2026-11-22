@@ -1,6 +1,7 @@
 using Microsoft.Playwright;
 
-[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
+// 16 workers rather than one per core: with 32, the machine is busy enough that some tests time out.
+[assembly: Parallelize(Workers = 16, Scope = ExecutionScope.MethodLevel)]
 
 namespace Ren.Client.Tests;
 
@@ -18,7 +19,7 @@ public static class TestBrowser
     /// <summary>
     /// The origin the repo is served at.
     /// </summary>
-    public const string Origin = "http://localhost:8124";
+    public static string Origin { get; private set; } = "";
 
     private static IPlaywright? playwright;
     private static IBrowser? browser;
@@ -26,6 +27,8 @@ public static class TestBrowser
     [AssemblyInitialize]
     public static async Task StartAsync(TestContext context)
     {
+        Origin = RepoServer.Start();
+
         playwright = await Microsoft.Playwright.Playwright.CreateAsync();
 
         var executablePath = Environment.GetEnvironmentVariable("REN_CHROME_PATH");
@@ -42,6 +45,8 @@ public static class TestBrowser
         if (browser != null) await browser.CloseAsync();
 
         playwright?.Dispose();
+
+        RepoServer.Stop();
     }
 
     /// <summary>
@@ -58,11 +63,7 @@ public static class TestBrowser
 
         options.BaseURL ??= Origin;
 
-        var context = await browser.NewContextAsync(options);
-
-        await RepoServer.ServeAsync(context, Origin);
-
-        return context;
+        return await browser.NewContextAsync(options);
     }
 
     /// <summary>
