@@ -1,0 +1,15 @@
+<div class="ren-filter-module__node-row qa-ren-filter-module-node-row">
+    @(parameters.isLeaf
+        ? '<span class="ren-filter-module__expand-spacer"></span>'
+        : '<span class="ren-filter-module__expand-icon qa-ren-filter-module-expand-icon js-ren-expand-icon">' +
+          (parameters.expanded ? '&#8722;' : '+') + '</span>')
+    <label class="ren-filter-module__option qa-ren-filter-module-option js-ren-option-label">
+        <input type="@parameters.inputType" class="ren-filter-module__checkbox js-ren-option-input" />
+        <span class="ren-filter-module__option-text qa-ren-filter-module-option-text js-ren-option-text"></span>
+        @(parameters.totalsShown ? '<span class="ren-filter-module__option-count js-ren-option-count"></span>' : '')
+    </label>
+</div>
+@(parameters.isLeaf
+    ? ''
+    : '<div class="ren-filter-module__children qa-ren-filter-module-children js-ren-children-container" style="max-height: ' +
+      (parameters.expanded ? 'none' : '0px') + '"></div>')

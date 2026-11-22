@@ -1,0 +1,25 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "RowMouseEventsTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "RowMouseEventsTest 1": {
+            "queryEmbedding": "AP//AAAAAAAAAAD+AAAA/wAAAAAA/gAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAABAAEB/wD/AAEAAP8AAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAEBAP8AAAAAAAAAAAD/AAAAAAAAAAAAAP4AAgAAAAAAAAAAAAAAAAAAAAAA/wAAAP4AAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA/wAAAAAAAP//AAAAAAABAAAAAAD/AAAAAP4AAAD/AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "CreatedOn",
+                "Days Active"
+            ]
+        }
+    }
+}

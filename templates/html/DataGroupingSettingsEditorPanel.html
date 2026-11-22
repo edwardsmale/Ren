@@ -1,0 +1,25 @@
+<div class="ren-data-grouping-settings-editor-grouping">
+    <div class="ren-data-grouping-settings-editor-grouping__top-section">
+        <div class="ren-data-grouping-settings-editor-grouping__header-left">
+            <span class="ren-data-grouping-settings-editor-grouping__drag-grip"
+                  title="Drag to reorder groupings">@parameters.gripSymbol</span>
+            <div class="ren-data-grouping-settings-editor-grouping__group-by-columns ren-data-grouping-settings-editor-grouping__tile-title-clickable">@(parameters.columns
+                    ? Ren.HtmlUtils.escapeHtml(parameters.columns) +
+                      ' <span class="ren-data-grouping-settings-editor-grouping__tile-title-lead">' +
+                      Ren.HtmlUtils.escapeHtml(parameters.lead) + '</span>'
+                    : Ren.HtmlUtils.escapeHtml(parameters.lead)
+                )</div>
+        </div>
+        <div class="ren-data-grouping-settings-editor-grouping__header-right">
+            <label class="ren-data-grouping-settings-editor-grouping__prevent-expansion js-ren-data-grouping-settings-editor-grouping-prevent-expansion"
+                   title="Stop this grouping's groups from being expanded">
+                <input type="checkbox" class="ren-data-grouping-settings-editor-grouping__prevent-expansion-checkbox" />
+                prevent expansion
+            </label>
+            <a class="ren-data-grouping-settings-editor-grouping__remove-grouping js-ren-data-grouping-settings-editor-grouping-disable-grouping"
+               href="javascript:void(0)">disable</a>
+            <span class="ren-data-grouping-settings-editor-grouping__collapse-toggle"
+                  title="Expand or collapse this grouping">@parameters.toggleSymbol</span>
+        </div>
+    </div>
+</div>

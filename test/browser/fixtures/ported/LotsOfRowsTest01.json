@@ -1,0 +1,33 @@
+{
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "LotsOfRowsTest 1": {
+            "dataRows": {
+                "columns": {
+                    "Category": {
+                        "valueFormatFunction": {
+                            "name": "cell-link"
+                        }
+                    }
+                }
+            },
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "LotsOfRowsTest 1": {
+            "visibleColumns": [
+                "Top-Level Category",
+                "Category",
+                "ProductCode",
+                "Product Name"
+            ]
+        }
+    }
+}

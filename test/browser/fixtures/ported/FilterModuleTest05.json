@@ -1,0 +1,19 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "filter-module-tests-05": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            }
+        }
+    }
+}

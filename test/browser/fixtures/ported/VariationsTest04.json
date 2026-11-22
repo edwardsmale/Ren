@@ -1,0 +1,92 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "EnumValues_Data 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "column": "Enum Name"
+                        },
+                        "groupByColumns": [
+                            "Enum Name"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "EnumValues_Data 1__!!!!All": {
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "column": "Enum Name"
+                        },
+                        "groupByColumns": [
+                            "Enum Name"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        },
+        "EnumValues_Data 1__!Account": {
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "column": "Enum Name"
+                        },
+                        "groupByColumns": [
+                            "Enum Name"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "EnumValues_Data 1": {
+            "queryEmbedding": "AQD/AAAAAAAAAAAAAf8A/v8AAAAA/gAAAQAAAAAAAAD/AAAAAAAC/wAA/wAAAAAAAAAAAAD//wAAAAABAAAA/gAAAAAAAAABAAAAAAEAAAD//gAAAAAAAAAC/wAAAAAAAP8AAAD/AAAAAAABAAEBAAAAAAAAAAAAAAAAAAAAAAEA/wAAAP8AAAAAAAAAAAAAAAEAAAAAAAAAAAAA/wAAAAAAAQAAAAD/AAEBAQAA/wEAAgAA/wABAAABAAAAAAAA/wAAAAD+AAAAAf8AAAAAAAEAAAAA/wD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAA/wAAAQAAAA==",
+            "columnWidths": {
+                "Enum Name": 221
+            },
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Enum Name",
+                "Value",
+                "Key"
+            ]
+        },
+        "EnumValues_Data 1__!!!!All": {
+            "columnWidths": {
+                "Enum Name": 221
+            },
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Enum Name",
+                "Value",
+                "Key"
+            ]
+        },
+        "EnumValues_Data 1__!Account": {
+            "columnWidths": {
+                "Enum Name": 221
+            },
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Enum Name",
+                "Value",
+                "Key"
+            ]
+        }
+    }
+}

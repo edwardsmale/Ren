@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ren-build",
+            "detail": "Builds into dist/, and copies the build into each folder in REN_STATICS (one in a git repo only while its branch has the same name as Ren's).",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "build/Ren.Build", "--", "build", "--statics", "${env:REN_STATICS}"],
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": []
+        },
+        {
+            "label": "ren-watch",
+            "detail": "As ren-build, then again whenever a source file changes.",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "build/Ren.Build", "-c", "Background", "--", "watch", "--statics", "${env:REN_STATICS}"],
+            "isBackground": true,
+            "problemMatcher": [],
+            "runOptions": { "runOn": "folderOpen" }
+        },
+        {
+            "label": "ren-test",
+            "detail": "Runs every client test against the ren.js already built (by ren-watch, say).",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["test", "test/Ren.Client.Tests"],
+            "group": { "kind": "test", "isDefault": true },
+            "problemMatcher": []
+        },
+        {
+            "label": "ren-serve",
+            "detail": "Serves the repo at http://localhost:8080/, for the examples and test fixtures.",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "build/Ren.Build", "-c", "Background", "--", "serve"],
+            "isBackground": true,
+            "problemMatcher": []
+        }
+    ]
+}

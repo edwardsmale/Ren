@@ -1,0 +1,45 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "ExternalCode": {
+                                "aggregationType": "DistinctValuesIncludingEmpty"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "SingleValuesOnly"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "ExternalCode": {
+                                "aggregationType": "DistinctValuesIncludingEmptyWithCounts"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "SingleValueOrPlaceholder"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "ParentCategoryName",
+                "CategoryName",
+                "ExternalCode"
+            ]
+        }
+    }
+}

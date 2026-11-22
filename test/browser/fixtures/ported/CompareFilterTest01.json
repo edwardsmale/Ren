@@ -1,0 +1,19 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "compare-filter-tests-01": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            }
+        }
+    }
+}

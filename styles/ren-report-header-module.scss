@@ -1,0 +1,125 @@
+@use "ren-variables" as *;
+@use "ren-images" as *;
+
+.ren-report-header-module
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-left: auto;
+    width: 288px;
+    height: 2.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+
+    &__info
+    {
+        height: -webkit-fill-available;
+    }
+
+    &__button
+    {
+        display: flex;
+        box-shadow: 2px 2px 3px 1px #00000022;
+        cursor: pointer;
+        transition: filter 0.05s, box-shadow 0.05s;
+
+        &--disabled
+        {
+            opacity: 0.5;
+
+            a
+            {
+                cursor: default;
+            }
+        }
+
+        &:hover
+        {
+            box-shadow: 2px 2px 3px 1px #00000033;
+            filter: brightness(0.9) contrast(1.4);
+        }
+    }
+
+    &__item
+    {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.ren-settings-based-report
+{
+    .ren-web-report-reset-report-settings-module
+    {
+        &__reset-report-settings
+        {        
+            filter: hue-rotate(180deg);
+
+            &:hover
+            {
+                box-shadow: 2px 2px 3px 1px #00000033;
+                filter: brightness(0.9) contrast(1.4) hue-rotate(180deg);
+            }
+        }
+    }
+}
+
+.ren-web-report-download-module
+{
+    &__download-report
+    {
+        width: 36px;
+        height: 31px;
+        background-image: $download-button-image;
+    }    
+}
+
+.ren-web-report-save-report-settings-module
+{
+    &__save-report-settings
+    {
+        width: 36px;
+        height: 31px;
+        background-image: $save-report-settings-image;
+    }
+}
+
+.ren-web-report-save-default-report-settings-module
+{
+    &__save-default-report-settings
+    {
+        width: 36px;
+        height: 31px;
+        background-image: $save-default-report-settings-image;
+    }
+}
+
+.ren-web-report-reset-report-settings-module
+{
+    &__reset-report-settings
+    {
+        width: 36px;
+        height: 31px;
+        background-image: $reset-report-settings-image;
+    }
+}
+
+.ren-report-edit-mode-module
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+
+    &__label-text
+    {
+        font-size: 0.75rem;
+        font-family: Calibri, Arial, sans-serif;
+        user-select: none;
+    }
+}

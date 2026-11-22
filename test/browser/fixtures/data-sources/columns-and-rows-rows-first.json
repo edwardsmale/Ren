@@ -1,0 +1,7 @@
+{
+    "rows": [
+        ["Stapler", 3],
+        ["Pens", 12]
+    ],
+    "columns": ["Product", "Quantity"]
+}

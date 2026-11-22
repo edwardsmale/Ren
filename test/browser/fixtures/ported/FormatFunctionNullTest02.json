@@ -1,0 +1,41 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "FormatFunctionNullTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "DecimalValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "percentage-no-dp"
+                                    }
+                                ]
+                            },
+                            "PercentageRatio": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "percentage-div-100-2-dp"
+                                    }
+                                ]
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "FormatFunctionNullTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Label",
+                "DecimalValue",
+                "PercentageRatio"
+            ]
+        }
+    }
+}

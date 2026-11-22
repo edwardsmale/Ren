@@ -1,0 +1,65 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "SortCalcFunctionTests 1": {
+            "queryEmbedding": "AAD/AAAAAAAAAAAAAAAAAAAAAAAA/v8AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAD/AQEAAAAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAAAD/AAEAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAA/wAA/gAAAP//AAD/AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAD//QAAAAAAAAAAAQAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "queryColumns": [
+                "__Count",
+                "Id",
+                "Name",
+                "__Zero"
+            ],
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "sortCalcFunction": {
+                                "name": "string-length"
+                            },
+                            "column": "Name"
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "sortCalcFunction": {
+                        "name": "string-length"
+                    },
+                    "column": "Name"
+                }
+            }
+        }
+    },
+    "gridState": {
+        "SortCalcFunctionTests 1": {
+            "queryEmbedding": "AAD/AAAAAAAAAAAAAAAAAAAAAAAA/v8AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAD/AQEAAAAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAAAD/AAEAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAA/wAA/gAAAP//AAD/AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAD//QAAAAAAAAAAAQAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "visible": false
+                },
+                {
+                    "column": "Id"
+                },
+                {
+                    "column": "Name"
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    },
+    "visualisationProperties": {
+        "GridSet SortCalcFunctionTests": {
+            "statBar": true,
+            "variations": true,
+            "quickLinks": true,
+            "showColumnHeaderDownArrows": true
+        }
+    }
+}

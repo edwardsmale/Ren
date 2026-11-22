@@ -1,0 +1,133 @@
+@use "ren-variables" as *;
+
+.ren-embedded-report
+{
+    &__response-wrapper
+    {
+        padding: 0.25rem 0.25rem 0;
+        height: calc(100% - 0.4375rem);
+    }
+
+    &__error-panel
+    {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 80%;
+        gap: 1rem;
+        text-align: center;
+        overflow-y: auto;
+
+        &--details-open
+        {
+            height: auto;
+            justify-content: flex-start;
+
+            .ren-embedded-report__error-panel-message
+            {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                overflow: hidden;
+                width: 100%;
+            }
+        }
+    }
+
+    &__error-panel-icon
+    {
+        font-size: 3rem;
+        opacity: 0.7;
+    }
+
+    &__error-panel-message
+    {
+        font-size: 1.1rem;
+        color: #666666;
+
+        strong
+        {
+            color: #333;
+            font-weight: 600;
+        }
+    }
+
+    &__error-details-link
+    {
+        color: #cc0000;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    &__error-details-popup
+    {
+        display: none;
+        margin-top: 0.5rem;
+        background: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        white-space: pre-wrap;
+        font-size: 0.75rem;
+        font-family: monospace;
+        color: #333333;
+        max-width: 80rem;
+        overflow-y: auto;
+        text-align: left;
+
+        &--visible
+        {
+            display: block;
+            flex: 1;
+            min-height: 10rem;
+        }
+    }
+
+    &__error-panel-close-button
+    {
+        padding: 0.125rem 1rem;
+        margin-top: 0.5rem;
+        background-color: #EEEEEE;
+        border: 1px solid #B1B1B1;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover
+        {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+
+        &:active
+        {
+            background-color: #d0d0d0;
+        }
+    }
+}
+
+.ren-visualisation--embedded-report
+{
+    /*
+        This is to ensure that the scrollbar behaviour of visualisations inside the embedded report
+        is as intended.
+    */
+    display: contents;
+}
+
+// Fills its popup, so that the response wrapper's percentage height resolves against the window.
+// Without a doctype the page was in quirks mode, where a percentage skips the auto heights between,
+// and a grid's stat bar beneath the wrapper's in-flow content would otherwise scroll the popup.
+.ren-report-popup-window__content-container:has(> .ren-visualisation > .ren-embedded-report)
+{
+    height: 100%;
+
+    > .ren-visualisation > .ren-embedded-report
+    {
+        height: 100%;
+    }
+}

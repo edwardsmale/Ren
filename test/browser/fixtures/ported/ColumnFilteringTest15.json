@@ -1,0 +1,33 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests_Nulls 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Days Active": {
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests_Nulls 1": {
+            "queryEmbedding": "AQD/AP8BAAEA/wL8AAL//wD/AwAA/gH/AAABAAAA/wAAAAAA/gABAP8AAAEAAQAAAAMAAAAAAAIA/gAAAQAAAAAAAAD/AAAAAQD/AAEA/gAA/wAAAP8AAf8AAAAAAP7+AAEBAP4AAAEA/gEA/wEAAAEBAAH/AQAAAQAAAQD/AAAAAPsAAAT///7/AwAAAAIAAAEAAQAAAwAAAAEA/wAAAP4AAP8AAAIAAAAAAP8BAAAAAAABAP8BAAIAAf//AAEAAv8AAAD//gAAAP0CAAAA/gD/AAEBAAAAAAD/AAD/AAAEAAAAAQD/AAAAAAAAAP8A/wEBAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn With Null",
+                "Null Column",
+                "Days Active",
+                "Search Terms"
+            ]
+        }
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "CreatedOn With Null": {
+                                "aggregationType": "ExpandIcon"
+                            }
+                        },
+                        "groupByColumns": [
+                            "CreatedOn With Null"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn With Null",
+                "Product Name With Null",
+                "DaysActive"
+            ]
+        }
+    }
+}

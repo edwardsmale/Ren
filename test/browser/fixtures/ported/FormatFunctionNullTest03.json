@@ -1,0 +1,41 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "FormatFunctionNullTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "DateValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "date"
+                                    }
+                                ]
+                            },
+                            "IntegerValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "nulls-as-zero"
+                                    }
+                                ]
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "FormatFunctionNullTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Label",
+                "DateValue",
+                "IntegerValue"
+            ]
+        }
+    }
+}

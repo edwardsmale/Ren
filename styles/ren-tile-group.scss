@@ -1,0 +1,65 @@
+@use "ren-variables" as *;
+
+// A group of tiles under a heading (see Ren.CreateTileGroup).
+.ren-tile-group
+{
+    margin-bottom: 2rem;
+
+    &__heading
+    {
+        margin: 0 0 1rem;
+    }
+
+    &__title
+    {
+        width: fit-content;
+        padding: 0.25rem 0.5rem;
+        font-variant: all-small-caps;
+        background-color: white;
+        border-radius: 5px;
+    }
+
+    &__subheading
+    {
+        font-weight: normal;
+        color: gray;
+    }
+
+    // An empty subheading, shown as a placeholder while the heading is hovered so that it can be
+    // right-clicked to fill it in.
+    &__part--empty
+    {
+        visibility: hidden;
+        opacity: 0.45;
+    }
+
+    &__heading:hover &__part--empty
+    {
+        visibility: visible;
+    }
+
+    &__subheading.ren-tile-group__part--empty::before
+    {
+        content: "subheading";
+    }
+
+    &--read-only &__part--empty
+    {
+        display: none;
+    }
+
+    // A tile's height, so a group with no tiles still has somewhere to right-click.
+    &__tiles
+    {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--ren-tile-group-tile-gap, $standard-horizontal-spacing);
+        min-height: 6rem;
+
+        // Visualisations are full width by default, which would put each tile on its own row.
+        > .ren-visualisation
+        {
+            width: auto;
+        }
+    }
+}

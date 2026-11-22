@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Builds Ren's client library into dist/.  See Program.cs for its commands. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Ren.Build</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Runs Ren's own template resolver at build time, to precompile the templates. -->
+    <PackageReference Include="Jint" Version="4.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The serve command answers requests just as the browser tests' pages are answered. -->
+    <Compile Include="../../test/Ren.Client.Tests/RepoFiles.cs" Link="Shared/RepoFiles.cs" />
+    <Compile Include="../../test/Ren.Client.Tests/RepoServer.cs" Link="Shared/RepoServer.cs" />
+    <Compile Include="../../test/Ren.Client.Tests/FixtureLayout.cs" Link="Shared/FixtureLayout.cs" />
+  </ItemGroup>
+
+</Project>

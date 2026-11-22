@@ -1,0 +1,30 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "CalcFunctionTests 1": {
+            "totalsRow": {
+                "position": "None"
+            },
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "Amount": {
+                        "calcFunction": ["return value ?? 0", "return value * 2"]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "CalcFunctionTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": ["Id", "Amount"]
+        }
+    }
+}

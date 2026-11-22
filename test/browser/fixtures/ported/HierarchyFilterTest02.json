@@ -1,0 +1,32 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "hierarchy-filter-test-02": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                },
+                "filterSet": {
+                    "FilterModuleTests": {
+                        "rowFilter": {
+                            "predicates": [
+                                {
+                                    "type": "includeCombinations",
+                                    "columns": [ "Category", "Active" ],
+                                    "tuples": [ [ "Structures" ] ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

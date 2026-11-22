@@ -1,0 +1,1 @@
+@(parameters.summary ? "<strong>" + Ren.HtmlUtils.escapeHtml(parameters.summary) + "</strong>" : "<strong>" + parameters.startDate + "</strong> to <strong>" + parameters.endDate + "</strong> (exclusive)") (@parameters.dayCountText, <strong>@parameters.workingDayCountText</strong>)&nbsp;&nbsp;@Ren.HtmlUtils.escapeHtml(parameters.suffix)

@@ -1,0 +1,825 @@
+@use "ren-variables" as *;
+
+// The grid set's contents rather than the grid set, so its loading animation (see
+// ren-visualisation-loading-animation.scss) shows in their place.
+grid-set:not(.ren-grid-set--shown) > *
+{
+    opacity: 0;
+}
+
+/* For a parameter which isn't set. */
+.ren-not-set
+{
+    color: #999999;
+}
+
+/* Styles that apply only on the Home page. */
+.ren-report-generator-home
+{
+    .ren-grid-set__viewport
+    {
+        max-width: fit-content; /* Make vertical scrollbar flush with right-hand side of datagrid. */
+        max-height: 76vh; /* Set max height so that the datagrid can be scrolled. */
+    }
+}
+
+.ren-report-generator-editor
+{
+    overflow: hidden; /* Prevent scrollbars in the editor when popups are dragged. */
+
+    .ren-report-header-module
+    {
+        position: absolute;
+        right: 7rem;
+        top: 0.25rem;
+    }
+}
+
+.ren-report-generator
+{
+    display: flex;
+    flex-direction: column;
+    font-family: $reportGeneratorFont;
+    height: calc(100vh - 0.5rem); /* Down to the body's bottom margin. */
+
+    &__top-section
+    {
+        flex-shrink: 0;
+    }
+
+    &__renlogo
+    {
+        position: absolute;
+        right: 12px;
+        top: 19px;
+        width: 90px;
+        height: 28px;
+    }
+
+    &__switch-mode-link,
+    &__transpose-layout-link
+    {
+        font-size: $reportGeneratorFontSize;
+    }
+
+    &__transpose-layout-link
+    {
+        position: absolute;
+        top: 2rem;
+        right: 8rem;
+        width: 4rem;
+        height: 4rem;
+
+        a
+        {
+            display: block;
+        }
+
+        rect
+        {
+            opacity: 0.6;
+        }
+
+        .ren-vertical
+        {
+            fill: red;
+        }
+
+        .ren-horizontal
+        {
+            fill: transparent;
+        }
+    }
+
+    &__switch-mode-link
+    {
+        position: absolute;
+        top: 3.8125rem;
+        right: 1rem;
+    }
+
+    &__link
+    {
+        text-decoration: none;
+        white-space: nowrap;
+        color: #4D85FF;
+        margin-left: 0.5rem;
+
+        &:first-of-type
+        {
+            margin-left: 0;
+        }
+    }
+
+    &__link--dark
+    {
+        color: royalblue !important;
+    }
+
+    &__link--bold
+    {
+        font-weight: bold;
+        color: #17213A;
+    }
+
+    &__link--directive
+    {
+        color: darkgreen;
+        background-color: #EFEFEF;
+        font-family: Consolas;
+        font-size: 0.75rem;
+    }
+
+    &__link--directive:hover
+    {
+        text-decoration: none !important;
+    }
+
+    &__link:hover
+    {
+        text-decoration: underline;
+    }
+
+    &__header
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        height: 3rem;
+
+        svg
+        {
+            margin: 0.3125rem 0 0.3125rem -0.25rem;
+            flex-grow: 1;
+        }
+    }
+
+    &__report-specific-options
+    {
+        display: flex;
+        align-items: center;
+        min-height: 2.75rem;
+    }
+}
+
+.ren-report-generator-form
+{
+    margin: 0;
+}
+
+.ren-report-generator-options
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin: 0.375rem 4rem 0.375rem 0.625rem;
+    min-height: 24px;
+    user-select: none;
+
+    &--no-left-margin
+    {
+        margin-left: 0;
+    }
+}
+
+.ren-report-generator-option
+{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: $reportGeneratorFontSize;
+
+    &__label
+    {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    &__input
+    {
+        margin: 0 4px;
+    }
+
+    &__report-name-dropdown
+    {
+        width: 16rem;
+    }
+
+    &__checkbox
+    {
+        margin-left: 0;
+        margin-right: 0.625rem;
+    }
+
+    &__date-range
+    {
+        display: flex;
+        align-items: center;
+    }
+
+    &__button
+    {
+        margin-right: 10px;
+    }
+
+    &__filter
+    {
+        display: flex;
+        align-items: center;
+    }
+
+    &__insert-text-link
+    {
+        opacity: 0.75;
+    }
+}
+
+.ren-report-generator-option-date-helpers
+{
+    margin-left: 10px;
+    height: 24px;
+}
+
+.ren-report-generator-upload-files__input
+{
+    display: none;
+}
+
+.ren-report-generator-upload-files__form
+{
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.ren-report-generator-uploaded-files
+{
+    margin-left: 1rem;
+
+    &__hint
+    {
+        margin-left: 0.25rem;
+        margin-bottom: -0.125rem;
+    }
+
+    &__uploaded-files-have-header-rows,
+    &__uploaded-files-delimiter
+    {
+        display: flex;
+        align-items: center;
+        margin-left: 1rem;
+        white-space: nowrap;
+        border-color: gray;
+        color: #333333;
+    }
+
+    &__uploaded-files-have-header-rows-checkbox,
+    &__uploaded-files-delimiter-dropdown
+    {
+        height: 19px;
+    }
+
+    &__uploaded-files-delimiter-dropdown
+    {
+        margin-left: 0.5rem;
+    }
+
+    &__clear
+    {
+        margin-left: 1rem;
+    }
+
+    &__clear-link
+    {
+        color: #4D85FF;
+    }
+
+    &__iis-log-section
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-left: 1rem;
+    }
+
+    &__iis-log-label
+    {
+        background: #EEEEEE;
+        padding: 0.125rem 0.5rem;
+    }
+}
+
+.ren-report-editor__panes
+{
+    display: flex;
+    align-items: stretch;
+    height: calc(100vh - 9rem);
+    box-sizing: border-box;
+}
+
+.ren-report-editor__sql
+{
+    position: relative;
+    width: 40%;
+    height: 96.75%;
+    border: solid 1px darkgray;
+    overflow: hidden; /* Prevents 100-char guideline appearing outside editor box. */
+}
+
+.ren-report-editor__auto-complete-container
+{
+    display: none;
+    flex-direction: row;
+    align-items: start;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+    font-size: $reportGeneratorFontSize;
+}
+
+.ren-report-editor__auto-complete
+{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 20rem;
+    box-shadow: 2px 2px 4px 4px rgba(0,0,0, 0.2);
+}
+
+.ren-report-generator-options__load-report
+{
+    position: absolute;
+    right: 1.25rem;
+    top: 0;
+    width: 100%;
+    font-size: $reportGeneratorFontSize;
+
+    select
+    {
+        border-color: lightgray;
+    }
+}
+
+.ren-report-generator-options-load-report
+{
+    user-select: none;
+
+    &__dropdown,
+    &__dropdown-arrow
+    {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 10000;
+    }
+
+    &__dropdown-placeholder,
+    &__option,
+    &__dropdown-search-box
+    {
+        padding: 0.125rem 0.25rem;
+    }
+
+    &__dropdown-placeholder
+    {
+        background-color: white;
+        color: black;
+    }
+
+    &__dropdown
+    {
+        position: relative;
+        display: none;
+        flex-direction: column;
+        max-width: 85%;
+        width: 22rem;
+        position: absolute;
+        right: 0rem;
+        max-height: 78vh;
+        overflow: auto;
+        background: white;
+        border: solid 1px gray;
+        padding: 0.0625rem;
+        box-sizing: border-box;
+        font-size: 0.75rem;
+    }
+
+    &__dropdown-search-box
+    {
+        display: none;
+        background-color: white;
+        color: black;
+        width: 20.5rem;
+        box-sizing: border-box;
+        outline: none;
+        border: solid 1px darkgray;
+        border-radius: 4px;
+    }
+
+    &__option
+    {
+        display: none;
+        color: black;
+        white-space: nowrap;
+        cursor: default;
+        min-height: 0.75rem;
+
+        &:hover:not([data-is-divider="true"]),
+        &--selected
+        {
+            background-color: #4D85FF !important;
+            color: white;
+        }
+    }
+
+    &__description
+    {
+        position: absolute;
+        background: #eeeeee;
+        border: 1px solid #aaaaaa;
+        padding: 0.25rem 0.5rem;
+        font-family: system-ui, sans-serif;
+        font-size: 0.75rem;
+        color: navy;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+        pointer-events: none;
+    }
+    &__description.ren-show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    &__description.ren-hide {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+.ren-report-generator--transposed-layout
+{
+    .ren-report-editor__panes
+    {
+        flex-direction: column;
+    }
+
+    .ren-report-editor__sql,
+    .ren-report-editor__preview
+    {
+        width: 100%;
+    }
+
+    .ren-report-editor__sash
+    {
+        width: 100%;
+        height: 6px;
+        cursor: ns-resize;
+    }
+
+    .ren-report-generator__transpose-layout-link
+    {
+        .ren-vertical
+        {
+            fill: transparent;
+        }
+
+        .ren-horizontal
+        {
+            fill: red;
+        }
+    }
+
+    .ren-grid-set__viewport
+    {
+        max-height: calc(100% - 45px);
+    }
+}
+
+.ren-report-editor
+{
+
+    &__sql-box
+    {
+        position: relative;
+        border: solid 1px #A9A9A9;
+        outline: none;
+        width: 100%;
+        height: 800px;
+        cursor: text;
+        scrollbar-face-color: #ff8c00;
+        scrollbar-track-color: #fff8dc;
+        scrollbar-arrow-color: #ffffff;
+        scrollbar-highlight-color: #fff8dc;
+        scrollbar-shadow-color: #d2691e;
+        scrollbar-3dlight-color: #ffebcd;
+        scrollbar-darkshadow-color: #8b0000;
+    }
+
+    &__sql-box-code
+    {
+        cursor: text;
+    }
+
+    &__help
+    {
+        display: none;
+        margin-top: 3rem;
+        box-sizing: border-box;
+        line-height: 18px;
+        font-size: 0.875rem;
+        overflow: hidden;
+
+        > p:not(.ren-report-editor__help-heading)
+        {
+            margin-block: 0.75rem;
+            padding-left: 1rem;
+            filter: contrast(0.75);
+        }
+    }
+
+    &__help-header
+    {
+        display: flex;
+        justify-content: flex-start;
+        align-items: baseline;
+    }
+
+    &__help-title
+    {
+        width: 20rem;
+        border-bottom: solid 1px #DDDDDD;
+        border-top: solid 1px #DDDDDD;
+        padding: 0.5rem 0;
+        margin-bottom: 0;
+    }
+
+    &__help-heading
+    {
+        margin: 2rem 0 0.5rem;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    &__directive-heading
+    {
+        padding: 1.5rem 0 0 !important;
+    }
+
+    &__bottom-options
+    {
+        text-align: right;
+        width: 100%;
+        min-width: 28rem;
+        font-size: $reportGeneratorFontSize;
+    }
+
+    &__sash
+    {
+        width: 6px;
+        cursor: ew-resize;
+    }
+
+    &__preview
+    {
+        position: relative;
+        margin-left: auto;
+        border: solid 1px #A9A9A9;
+        width: 59.5%;
+        height: 100%;
+        overflow: hidden;
+
+        &--hidden
+        {
+            display: none;
+        }
+    }
+
+    &__modified-query-display
+    {
+        display: none;
+        z-index: 99999;
+    }
+
+    &__modified-query-display,
+    &__modified-query-display pre
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__modified-query-error
+    {
+        position: relative; /* In order to use z-index. */
+        z-index: 9999;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__auto-complete-debug
+    {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: white;
+        z-index: 100000;
+    }
+
+    &__close-button
+    {
+        position: absolute;
+        top: 0;
+        right: 1rem;
+        width: 1rem;
+        height: 1rem;
+        z-index: 10000;
+        cursor: pointer;
+
+        &::before
+        {
+            content: '\2716';
+        }
+    }
+
+    &__preview-content
+    {
+        height: 100%;
+    }
+
+    &__preview-content--error
+    {
+        overflow: auto; /* Provide scrollbars when showing an error message. */
+    }
+
+    &__preview-content_no_results,
+    &__preview-content_no_sql
+    {
+        margin: 0.25rem;
+    }
+
+    &__error-details-container
+    {
+        padding: 0.5rem;
+    }
+
+    &__preview-content_error-heading,
+    &__preview-content_error-details-heading,
+    &__preview-content_error-sql-heading
+    {
+        margin: $standard-vertical-spacing 0;
+        font-size: 0.875rem;
+        color: #5e70cd;
+    }
+
+    &__preview-content_error-heading
+    {
+        margin-top: 0;
+    }
+
+    &__preview-content_error-message
+    {
+        text-shadow: 0 0 1px #0000006b; // Thickens up the text for emphasis.
+        font-family: system-ui;
+
+        // A message written in paragraphs - an uploaded file's columns not matching what the
+        // report asks for, say - keeps its line breaks.
+        white-space: pre-wrap;
+    }
+
+    &__preview-content_error-details
+    {
+        font-family: system-ui;
+        font-size: 0.8125rem;
+    }
+}
+
+.ren-report-editor-bottom-options
+{
+    display: flex;
+    justify-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 0.5rem;
+
+    > *
+    {
+        margin-right: 0.5rem;
+    }
+
+    &__save-filename
+    {
+        width: 18rem;
+    }
+
+    &__rhs
+    {
+        display: flex;
+        gap: 0.8125rem;
+        margin-left: auto;
+    }
+}
+
+.ren-report-editor-git-branch-display
+{
+    &__text
+    {
+        color: #138100;
+
+        &--warning
+        {
+            color: red;
+            position: relative;
+
+            &::before
+            {
+                content: "\26A0"; /* Unicode warning triangle */
+                margin-right: 0.3em;
+                font-size: 1.2em;
+                line-height: 0.125rem;
+            }
+        }
+    }
+}
+
+.ren-report-editor-auto-complete-debug
+{
+    &__properties,
+    &__subqueries,
+    &__aliases
+    {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        overflow: scroll;
+        margin-top: 0;
+        font-family: monospace;
+        font-size: 0.75rem;
+        white-space: pre-wrap;
+    }
+
+    &__properties
+    {
+        top: 0;
+    }
+
+    &__subqueries
+    {
+        top: 15rem;
+    }
+
+    &__aliases
+    {
+        top: 0;
+        left: 40rem;
+    }
+}
+
+.ren-external-link
+{
+    // Image converted to Base64 using https://www.base64-image.de/
+    // Image embedded so that they work in downloaded reports.
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAALHRFWHRDcmVhdGlvbiBUaW1lAFNhdCAyMCBBcHIgMjAyNCAxNjoxOTozMiAtMDAwMNg4XRYAAAAHdElNRQfoBBoLKSn2RsoSAAAACXBIWXMAAArwAAAK8AFCrDSYAAAABGdBTUEAALGPC/xhBQAAAwBQTFRF////f39/4uLi+fn5enp61tbWubm55+fn0NDQs7OzoqKiysrKqKioY2Njv7+/7e3tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByo83wAAAAF0Uk5TAEDm2GYAAAA8SURBVHjaY2CAAD42NjZ+KJuBg5uHlxPGYWBm4QJxmIAAyGbnAHPA4kwMrGxQDiMTVDUTEomPAwEM+AAAYc0A236OprsAAAAASUVORK5CYII=");
+    background-position: right;
+    background-repeat: no-repeat;
+    padding-right: 0.875rem;
+}
+
+// A shopping basket, for anywhere a report marks something as having been added to a basket.
+// Give the element a display, a width and a height and the basket draws to fit it; padding
+// leaves room for a background colour to show around it.  Embedded as a data URI rather than an
+// icon font, so that nothing extra has to be included and it still draws in a downloaded report.
+//
+// Display is deliberately left to the caller: these files are compiled separately and then
+// concatenated in no guaranteed order, so a display here would be free to override a caller's
+// own - including the display: none of an icon that is only shown some of the time.
+.ren-icon-basket
+{
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23EB4297'%3E%3Cpath d='M5.93 1.19a.8.8 0 0 1 1.14 1.05L5.4 5h5.2L8.93 2.24a.8.8 0 1 1 1.14-1.05L12.6 5h2.2a.8.8 0 0 1 .78.99l-1.46 5.85A2 2 0 0 1 12.18 13.4H3.82a2 2 0 0 1-1.94-1.56L.42 5.99A.8.8 0 0 1 1.2 5h2.2zM5.2 7.4a.7.7 0 0 0-.7.7v2.4a.7.7 0 1 0 1.4 0V8.1a.7.7 0 0 0-.7-.7m2.8 0a.7.7 0 0 0-.7.7v2.4a.7.7 0 1 0 1.4 0V8.1a.7.7 0 0 0-.7-.7m2.8 0a.7.7 0 0 0-.7.7v2.4a.7.7 0 1 0 1.4 0V8.1a.7.7 0 0 0-.7-.7'/%3E%3C/svg%3E");
+    background-origin: content-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+// Only Ren's own buttons: those with a ren- class, or inside an element with one.  Not body's or
+// html's, which may get ren- classes too but hold the host's page as well.
+:where(:not(html, body):is([class^="ren-"], [class*=" ren-"]))
+    :is(input[type="submit"], input[type="button"], button),
+:is(input[type="submit"], input[type="button"], button):is([class^="ren-"], [class*=" ren-"])
+{
+    cursor: pointer;
+}
+
+.ren-hide-in-simple-mode,
+.ren-only-show-in-simple-mode
+{
+    display: contents;
+}

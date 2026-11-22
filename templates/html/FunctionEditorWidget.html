@@ -1,0 +1,136 @@
+<div class="@parameters.className ren-function-editor-widget">
+    <div class="ren-function-editor-widget__parameters">
+        <span class="ren-function-editor-widget__parameters-caption"
+              title="The code is the body of a function taking these parameters.
+
+A single expression is returned as it stands, e.g. value * 2.  Code made of
+statements needs its own return, e.g.
+if (value == null) return &quot;&quot;; return value * 2;
+
+Only the parameters supplied where this function runs are listed.
+
+Inside a string, @@value or @@rowVals.ColumnId inserts the value without the
+string having to be closed and reopened, e.g. &quot;/find?q=@@value&quot;.
+Write @@@@ for a literal @@.
+
+Click a parameter to insert it into the code at the cursor.
+
+Where the editor was opened from a grid cell, clicking another of that grid's
+cells while the code has the focus inserts what reads it: value or
+rowVals[&quot;...&quot;] for a cell in a row like the one the editor was opened from,
+groupSummaryStats for one in the group row above that level, and
+overallSummaryStats for one in the totals row.
+
+Typing the first two letters of a parameter lists the parameters that start
+with them.  Typing rowVals, compressedRowVals, groupSummaryStats,
+overallSummaryStats or paras (or a . or [ after one) lists the column IDs,
+aggregation types or report parameters it can be read by.  Ctrl+Space lists
+them again; Tab or Enter takes the one selected, and Escape closes the list."
+        >Parameters:</span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="The value the function works on: the cell value for a format or calc
+function, the value being grouped or sorted by for a binning or sort function,
+the column value for a custom filter (which keeps the rows the function
+returns something truthy for), or the marker label for a flag text function.
+
+It may be a number or a string, and may be blank.">
+            <span class="ren-function-editor-widget__parameter-name">value</span>
+        </span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="An object holding every value in the same row, keyed by column ID (and in
+most places by column heading too).
+
+Read one with rowVals.OrderCount, or with rowVals[&quot;Order Count&quot;]
+where the key has spaces or other characters a property name cannot.
+
+On a group row these are the aggregated values of the group.  They are the
+underlying values rather than their formatted text, and a column that does not
+exist reads as undefined.">
+             <span class="ren-function-editor-widget__parameter-name">rowVals</span>
+        </span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="Like rowVals, but holding the compressed values of the row (their indexes in
+the compression dictionary of the data) rather than the values themselves.
+
+Quick to compare for equality, but rarely needed otherwise.  Supplied when
+formatting values for display, to custom filters and to a grid's calc
+functions; elsewhere it is null.">
+            <span class="ren-function-editor-widget__parameter-name">compressedRowVals</span>
+        </span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="Statistics on this column across the group the row belongs to, in an object
+with a property per aggregation type, e.g.
+value / groupSummaryStats.sum
+for a share of the group total.  average, count, countDistinct, min and max
+are among the other types.
+
+Like rowVals, it is also keyed by column ID and heading, for the statistics
+on another column, e.g.
+groupSummaryStats.OrderCount.sum
+groupSummaryStats[&quot;Order Count&quot;].sum
+
+Always name the aggregation type, and any key, in one of the forms above, as
+that is how the statistics a function needs are found and calculated.
+
+Supplied only when formatting values for display; calc, sort, binning and
+filter functions are given null.">
+            <span class="ren-function-editor-widget__parameter-name">groupSummaryStats</span>
+        </span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="The same statistics as groupSummaryStats, but across the whole grid rather
+than the group, e.g.
+value / overallSummaryStats.sum
+for a share of the grand total.  Another column's statistics are keyed by its
+column ID or heading, e.g. overallSummaryStats.OrderCount.sum.
+
+Always name the aggregation type, and any key, in one of the forms
+groupSummaryStats describes, as that is how the statistics a function needs
+are found and calculated.
+
+Supplied only when formatting values for display; calc, sort, binning and
+filter functions are given null.">
+            <span class="ren-function-editor-widget__parameter-name">overallSummaryStats</span>
+        </span>
+        <span class="ren-function-editor-widget__parameter js-ren-function-editor-parameter"
+              title="The parameters of the report the function is in, as an object keyed by
+camel-cased name, e.g. paras.startDate or paras.regionId.  Empty where the report has none.">
+            <span class="ren-function-editor-widget__parameter-name">paras</span>
+        </span>
+    </div>
+    <div class="ren-function-editor-widget__description js-ren-function-editor-description" hidden></div>
+    <div class="ren-function-editor-widget__tags js-ren-function-editor-tags" hidden></div>
+    <div class="ren-function-editor-widget__template-parameters js-ren-function-editor-template-parameters"
+         hidden></div>
+    <div class="ren-function-editor-widget__edit-box">
+        <textarea class="ren-function-editor-widget__edit-textarea" spellcheck="false"></textarea>
+        <pre class="ren-function-editor-widget__highlight-pre" aria-hidden="true"></pre>
+        <pre class="ren-function-editor-widget__highlight-pre ren-function-editor-widget__caret-mirror js-ren-function-editor-caret-mirror"
+             aria-hidden="true"></pre>
+    </div>
+    <div class="ren-function-editor-widget__auto-preview js-ren-function-editor-auto-preview"
+         data-placeholder="Preview" hidden
+         title="Auto preview: what the code gives for the row of the cell the editor was opened
+from, updated a second after the code stops changing.
+
+Turned on and off by Layout > Auto preview on the grid's menu.  It turns itself off
+where it has never been turned on and a preview takes a second or more."></div>
+    <div class="ren-function-editor-widget__buttons">
+        <button class="ren-function-editor-widget__library-button js-ren-function-editor-library-button qa-ren-function-editor-library-button"
+                title="Loads code from a built-in, saved or recently used function, and saves this code for reuse.
+
+Loading replaces the code in the box; Ctrl+Z brings it back.">Functions &#9662;</button>
+        <div class="ren-function-editor-widget__history-buttons">
+            <button class="ren-function-editor-widget__undo-button js-ren-function-editor-undo-button"
+                    title="Go back to the code applied before the last Apply" disabled>Undo</button>
+            <button class="ren-function-editor-widget__redo-button js-ren-function-editor-redo-button"
+                    title="Apply again the code the last Undo went back from" disabled>Redo</button>
+        </div>
+        <div class="ren-function-editor-widget__close-buttons">
+            <button class="ren-function-editor-widget__ok-button"
+                    title="Apply the change and close the popup (Ctrl+Enter)">OK</button>
+            <button class="ren-function-editor-widget__cancel-button">Cancel</button>
+            <button class="ren-function-editor-widget__apply-button"
+                    title="Apply the change without closing the popup (Alt+Enter)">Apply</button>
+        </div>
+    </div>
+</div>

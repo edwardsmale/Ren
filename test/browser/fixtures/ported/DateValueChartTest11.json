@@ -1,0 +1,66 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "date-value-chart-test-11": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "filterSet": {
+                    "DateValueChartMarkerLineTests_Data": {
+                        "columnValueFilters": {
+                            "Event": [
+                                "Price rise",
+                                "Relisted"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DateValueChartMarkerLineTests_Data",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DateValueChartMarkerLineTests_Data",
+            "reportContext": {
+                "reportContextGuid": "report-context-DateValueChartTest11",
+                "reportName": "DateValueChartTest11"
+            },
+            "dataGroupingSettingsGroup": "date-value-chart-test-11 -|- Chart",
+            "gridStateGroup": "report-context-DateValueChartTest11 DateValueChartMarkerLineTests_Data Chart",
+            "visualisationSettingsGroup": "DateValueChart-Chart",
+            "filterGroup": "date-value-chart-test-11",
+            "clientSide": true,
+            "dataTabGroup": null,
+            "dataTabIndex": 1,
+            "initialChartGroupCalcFunction": "date-day-start",
+            "targetSelector": ".js-chart",
+            "resizeToFitContentOnLoad": false,
+            "fillAvailableSpace": true,
+            "showRowAndColumnHeadings": true,
+            "visualisationWidth": "38rem",
+            "visualisationHeight": "20rem",
+            "selectedColumns": [
+                "Date",
+                "Searches"
+            ],
+            "series": [
+                {
+                    "column": "Searches",
+                    "label": "Searches",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046B8",
+                    "chartType": "Bar",
+                    "showValueLabels": false
+                }
+            ],
+            "tabularDataTransformers": []
+        }
+    ]
+}

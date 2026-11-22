@@ -1,0 +1,36 @@
+{
+    "settingsVersion": "Dragonfly",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "CreatedOn With Null",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name With Null"
+            ],
+            "showRowAndColumnHeadings": true
+        }
+    }
+}

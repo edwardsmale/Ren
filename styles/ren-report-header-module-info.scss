@@ -1,0 +1,14 @@
+.ren-report-header-module-info
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding-left: 0.5rem;
+
+    &__text
+    {
+        padding-left: 0.5rem;
+        font-weight: 100;
+    }
+}

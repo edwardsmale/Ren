@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Inline data - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body>
+    <script type="application/json" class="ren-tabular-data-set-collection-json" data-source-uri="/inline/sales">
+    {"DataSourceUri":"/inline/sales","TabularDataSets":[{"TabularDatas":[{"IsColumnCompressed":[false,true,true,true,false,false],"ColumnModels":[{"Heading":"Count","ColumnId":"__Count","ColumnIdOrHeading":"__Count","Visible":false,"AggregationType":0,"ColumnFormat":1,"ColumnType":"Number"},{"Heading":"Date","ColumnId":"Date","ColumnIdOrHeading":"Date","Visible":true,"AggregationType":10,"ColumnType":"Date","ColumnFormat":5},{"Heading":"Product","ColumnId":"Product","ColumnIdOrHeading":"Product","Visible":true,"AggregationType":10,"ColumnFormat":0,"ColumnType":"String"},{"Heading":"Category","ColumnId":"Category","ColumnIdOrHeading":"Category","Visible":true,"AggregationType":10,"ColumnFormat":0,"ColumnType":"String"},{"Heading":"Quantity","ColumnId":"Quantity","ColumnIdOrHeading":"Quantity","Visible":true,"AggregationType":10,"ColumnType":"Number","ColumnFormat":2},{"Heading":"Revenue","ColumnId":"Revenue","ColumnIdOrHeading":"Revenue","Visible":true,"AggregationType":10,"ColumnType":"Number","ColumnFormat":3}],"RowModels":[{"CV":[1,0,23,17,4,14]},{"CV":[1,1,16,26,12,15]},{"CV":[1,2,15,22,40,162]}],"Title":"Sales"}],"Title":"Sales"}],"CompressionDictionary":["2026-07-01","2026-07-03","2026-07-08","2026-07-15","2026-07-22","2026-08-04","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30","A4 copier paper (ream)","Ballpoint pens (pack of 10)","Desk accessories","Desk tidy","Filing","Highlighters (pack of 4)","Lever arch file","Paper","Stapler","Sticky notes","Suspension files (box of 50)","Writing"]}
+    </script>
+    <ren-grid src="/inline/sales" data-format="tabular-data-set-collection" show-row-and-column-headings />
+</body>
+</html>

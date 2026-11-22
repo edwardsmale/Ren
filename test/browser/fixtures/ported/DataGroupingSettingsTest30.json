@@ -1,0 +1,36 @@
+{
+    "settingsVersion": "Emu",
+    "dataGroupingSettings": {
+        "NullNumericSortTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "Average"
+                            }
+                        },
+                        "sortOrder": {
+                            "column": "Val"
+                        },
+                        "groupByColumns": [
+                            "Num"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NullNumericSortTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Num",
+                "Val"
+            ]
+        }
+    }
+}

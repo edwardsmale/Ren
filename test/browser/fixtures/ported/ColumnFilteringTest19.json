@@ -1,0 +1,24 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "column-filtering-test-19": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Description": {
+                                "aggregationType": "ExpandIcon"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Description"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    }
+}

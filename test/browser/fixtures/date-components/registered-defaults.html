@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Date components with registered data sources - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+    <script type="application/json" class="js-ren-config">
+    { "endpoints": { "namedDataSources": "/test/browser/fixtures/date-components/" } }
+    </script>
+    <script>
+        Ren.Extensions.registerVisualisationDefaults("DateSelector", { dataSourceName: "date-selector-dates" });
+        Ren.Extensions.registerVisualisationDefaults("DateRangeSummary", { sqlFilename: "date-range-summary-dates" });
+    </script>
+</head>
+<body>
+    <ren-default-dates start-date="2025-04-01" end-date="2025-07-01" />
+    <ren-date-selector />
+    <ren-date-range-summary />
+    <ren-date-range-summary src="/test/browser/fixtures/date-components/own-dates.json" />
+</body>
+</html>

@@ -1,0 +1,8 @@
+@use "ren-variables" as *;
+
+/* Hide nested contents of <ren-content-module> tag (used to specify the content) to avoid seeing
+   a flash of this content prior to the visualisation being rendered. */
+ren-content-module *
+{
+    opacity: 0;
+}

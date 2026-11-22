@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quick start - Ren examples</title>
+    <link href="/examples/favicon.ico" rel="icon" sizes="any" />
+    <link href="/examples/favicon-32x32.png" rel="icon" type="image/png" sizes="32x32" />
+    <link href="/examples/favicon-16x16.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/examples/examples.css" rel="stylesheet" />
+    <script src="/examples/markdown.js"></script>
+</head>
+<body class="ren-example">
+    <img class="ren-example__logo" src="/docs/images/ren-logo.svg" alt="Ren">
+    <p class="ren-example__nav">⯇ <a class="ren-example__nav-link" href="/examples/">Ren examples</a></p>
+    <div class="js-quick-start">Loading...</div>
+    <script>
+        fetch("/docs/quick-start.md")
+            .then(response => response.text())
+            .then(markdown => {
+                // The page has the logo above its link already, so the doc's own is left out.
+                markdown = markdown.replace(/^!\[[^\]]*\]\([^)]+\)\s*/, "");
+                document.querySelector(".js-quick-start").innerHTML = Markdown.render(markdown);
+            });
+    </script>
+</body>
+</html>

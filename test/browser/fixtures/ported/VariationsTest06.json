@@ -1,0 +1,213 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "column": "Id"
+                        },
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        },
+        "DataGroupingSettingsTests 1__Combo": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Search Terms": {
+                                "aggregationType": "DistinctValues"
+                            }
+                        },
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "CreatedOn"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        },
+        "DataGroupingSettingsTests 1__Full": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Search Terms": {
+                                "aggregationType": "DistinctValues"
+                            }
+                        },
+                        "groupByColumns": [
+                            "CreatedOn"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "CreatedOn"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        },
+        "DataGroupingSettingsTests 1__Grouped": {
+            "groupings": {
+                "entries": [
+                    {
+                        "sortOrder": {
+                            "column": "Id"
+                        },
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        },
+        "DataGroupingSettingsTests 1__Simple": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        },
+        "DataGroupingSettingsTests 1__Ungrouped": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            },
+            "variationTooltip": "This variation affects both grid state and data grouping settings."
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests 1": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name"
+            ]
+        },
+        "DataGroupingSettingsTests 1__Combo": {
+            "columnWidths": {
+                "Search Terms": 400
+            },
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "CreatedOn",
+                "Search Terms"
+            ]
+        },
+        "DataGroupingSettingsTests 1__Full": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name"
+            ]
+        },
+        "DataGroupingSettingsTests 1__Grouped": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name"
+            ]
+        },
+        "DataGroupingSettingsTests 1__Simple": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code"
+            ]
+        },
+        "DataGroupingSettingsTests 1__Ungrouped": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code"
+            ]
+        }
+    }
+}

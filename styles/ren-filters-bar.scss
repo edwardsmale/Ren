@@ -1,0 +1,10 @@
+@use "ren-variables" as *;
+
+.ren-filters-bar
+{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    column-gap: $standard-horizontal-spacing;
+    width: fit-content;
+}

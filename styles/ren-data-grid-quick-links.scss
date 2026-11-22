@@ -1,0 +1,66 @@
+.ren-data-grid__quick-links 
+{
+    position: absolute;
+    user-select: none;
+    min-width: 142px; /* Prevent links disappearing off the side when the datagrid is narrow. */
+}
+
+.ren-data-grid__quick-links a
+{
+    position: absolute;
+    top: -1rem;
+    height: 1rem;
+    display: block;
+    padding: 0;
+    color: #225544!important;
+    text-decoration-color: #225544;
+    font-size: 0.75rem;
+    font-family: Arial;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover
+    {
+        text-decoration: underline;
+        text-decoration-color: #669988!important;
+    }
+}
+
+.ren-data-grid__export-link
+{
+    right: 0.6125rem;
+    opacity: 0.75;
+    white-space: nowrap;
+
+    &:hover
+    {
+        opacity: 1;
+    }
+}
+
+.ren-data-grid__show-hide-columns-link
+{
+    right: 5.5rem;
+    white-space: nowrap;
+}
+
+/* The link is only shown while a Find window 'Filter Rows' filter is in effect.  The selectors are
+   qualified with the container so that they outweigh a quick link's display and colour. */
+.ren-data-grid__quick-links a.ren-data-grid__remove-row-filter-link
+{
+    right: 9.1rem;
+    display: none;
+    white-space: nowrap;
+    color: #CC2277!important;
+    text-decoration-color: #CC2277;
+
+    &:hover
+    {
+        text-decoration-color: #EE66AA!important;
+    }
+}
+
+.ren-data-grid__quick-links a.ren-data-grid__remove-row-filter-link--visible
+{
+    display: block;
+}

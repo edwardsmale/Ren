@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Host globals - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <!-- The page's own script declares names of its own at the top level, as any page's might,
+         before ren.js is loaded.  A top-level let, const or class in one classic script can't be
+         declared again in another, so ren.js mustn't declare its own names at the top level. -->
+    <script>
+        const getColumnValueFormats = "the page's";
+        let isNumericCalcFunction = "the page's";
+        class Prism { }
+    </script>
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body>
+    <ren-grid src="/examples/data/sales.renpack"
+              data-format="renpack"
+              show-row-and-column-headings />
+</body>
+</html>

@@ -1,0 +1,34 @@
+@use "ren-variables" as *;
+
+.ren-expandable-module
+{
+    &__expand-icon
+    {
+        &::before
+        {
+            content: '+';
+            font-size: 11px;
+            border: solid 1px #ABABAB;
+            color: #6B6B6B;
+            text-align: center;
+            display: block;
+            background-color: white;
+            box-sizing: border-box;
+            width: 10px;
+            line-height: 9px;
+            cursor: pointer;
+        }
+    }
+
+    &__title-row
+    {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    &__content
+    {
+        overflow: hidden;
+    }
+}

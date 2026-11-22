@@ -1,0 +1,26 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "DateRangeSummariserTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "columns": {
+                    "DateRangeSummary": {
+                        "calcFunction": [
+                            "return Ren.DateRangeSummariser.getDateRangeSummary(rowVals.StartDate, rowVals.EndDate, '2026-06-11')"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

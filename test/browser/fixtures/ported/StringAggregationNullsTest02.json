@@ -1,0 +1,45 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "StringAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "ExternalCode": {
+                                "aggregationType": "DistinctValuesWithCounts"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "MostCommon"
+                            }
+                        },
+                        "groupByColumns": [
+                            "ParentCategoryName"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "ExternalCode": {
+                                "aggregationType": "CountDistinct"
+                            },
+                            "CategoryName": {
+                                "aggregationType": "MostCommon"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "StringAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "ParentCategoryName",
+                "CategoryName",
+                "ExternalCode"
+            ]
+        }
+    }
+}

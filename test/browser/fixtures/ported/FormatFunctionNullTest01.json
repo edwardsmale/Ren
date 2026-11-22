@@ -1,0 +1,49 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "FormatFunctionNullTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "CurrencyValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "currency"
+                                    }
+                                ]
+                            },
+                            "IntegerValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "number-no-dp"
+                                    }
+                                ]
+                            },
+                            "DecimalValue": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "number-2-dp"
+                                    }
+                                ]
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "FormatFunctionNullTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Label",
+                "CurrencyValue",
+                "IntegerValue",
+                "DecimalValue"
+            ]
+        }
+    }
+}

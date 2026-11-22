@@ -1,0 +1,6 @@
+{
+    "columns": ["StartDate", "EndDate", "CompareStartDate", "CompareEndDate"],
+    "rows": [
+        ["2025-07-01", "2025-10-01", null, null]
+    ]
+}

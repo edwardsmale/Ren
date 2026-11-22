@@ -1,0 +1,216 @@
+.ren-task-tile
+{
+    padding: 0.625rem 0.75rem;
+    border: 1px solid lightgray;
+    background-color: #F5F5F5;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+
+    &__header
+    {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.375rem;
+    }
+
+    &__id
+    {
+        flex: none;
+        min-width: 1.5rem;
+        padding: 0 0.25rem;
+        border-radius: 0.25rem;
+        background-color: #3046b8;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    &__title
+    {
+        font-weight: bold;
+    }
+
+    &__size
+    {
+        flex: none;
+        margin-left: auto;
+        padding: 0 0.375rem;
+        border-radius: 0.25rem;
+        font-weight: bold;
+    }
+
+    &__size--xs
+    {
+        background-color: #006d00;
+        color: white;
+    }
+
+    &__size--s
+    {
+        background-color: #3b6db5;
+        color: white;
+    }
+
+    &__size--m
+    {
+        background-color: #ffe364;
+        color: black;
+    }
+
+    &__size--l
+    {
+        background-color: #f0a030;
+        color: black;
+    }
+
+    &__size--xl
+    {
+        background-color: #c0392b;
+        color: white;
+    }
+
+    &__footer
+    {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    &__prerequisites
+    {
+        color: #666666;
+        font-size: 0.75rem;
+
+        b
+        {
+            color: #3046b8;
+        }
+    }
+
+    // Kept right-clickable when empty.
+    &__text
+    {
+        min-height: 1.35em;
+    }
+
+    // An empty ID, size or prerequisites list, shown as a placeholder while the tile is hovered so
+    // that it can be right-clicked to fill it in.
+    &__part--empty
+    {
+        visibility: hidden;
+        opacity: 0.45;
+    }
+
+    &:hover &__part--empty
+    {
+        visibility: visible;
+    }
+
+    &--read-only &__part--empty
+    {
+        display: none;
+    }
+
+    &__id.ren-task-tile__part--empty::before
+    {
+        content: "?";
+    }
+
+    &__size.ren-task-tile__part--empty
+    {
+        border: 1px dashed #666666;
+
+        &::before
+        {
+            content: "size";
+            font-weight: normal;
+        }
+    }
+
+    &__prerequisites.ren-task-tile__part--empty b::before
+    {
+        content: "\2026";
+    }
+
+    &__status
+    {
+        flex: none;
+        margin-left: auto;
+        padding: 0.0625rem 0.5rem;
+        border: none;
+        color: #444444;
+        font-family: inherit;
+        font-size: 0.75rem;
+        cursor: pointer;
+
+        &::after
+        {
+            content: " \25BE";
+        }
+
+        &:disabled
+        {
+            cursor: default;
+
+            &::after
+            {
+                content: none;
+            }
+        }
+    }
+
+    // A decision to make rather than code to write.
+    &--decision
+    {
+        border-style: dashed;
+        background-color: #fffbe6;
+    }
+
+    &--in-progress
+    {
+        border-color: #e0a800;
+        box-shadow: inset 0 3px 0 #e0a800;
+
+        .ren-task-tile__status
+        {
+            border-color: #e0a800;
+            background-color: #fff3c4;
+            color: #6b5000;
+        }
+    }
+
+    &--in-review
+    {
+        border-color: #7a4fc4;
+        box-shadow: inset 0 3px 0 #7a4fc4;
+
+        .ren-task-tile__status
+        {
+            border-color: #7a4fc4;
+            background-color: #ece3fa;
+            color: #4b2a85;
+        }
+    }
+
+    &--complete
+    {
+        border-color: #1e9e1e;
+        background-color: #eaf6ea;
+
+        .ren-task-tile__status
+        {
+            border-color: #1e9e1e;
+            background-color: #1e9e1e;
+            color: white;
+        }
+    }
+
+    // A task to do straight after the one above it.  Declared after the statuses so that their
+    // border colours leave it showing.
+    &--linked
+    {
+        border-left: 4px solid #3b6db5;
+    }
+}

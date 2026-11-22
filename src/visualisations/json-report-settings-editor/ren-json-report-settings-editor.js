@@ -1,0 +1,153 @@
+Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
+
+    // Prevent serialization of the visualisation when it is shown inside a popup, and keep it on
+    // the page when new report settings are loaded.
+    visualisation.doNotSerializeIfPopup = true;
+    visualisation.isTransitive = true;
+
+    const element = Ren.HtmlTemplateFunctions.reifyHtmlTemplate("JsonReportSettingsEditor", {});
+
+    const textarea = element.querySelector(".js-ren-json-report-settings-editor-textarea");
+    const filePathElement = element.querySelector(".js-ren-json-report-settings-editor-filepath");
+    const saveButton = element.querySelector(".js-ren-json-report-settings-editor-save");
+    const cancelButton = element.querySelector(".js-ren-json-report-settings-editor-cancel");
+
+    // The settings to edit are identified by the settings name and preset flag of the report
+    // context that the editor was opened from.  These are passed in as visualisation options.
+    const settingsName = visualisation.settingsName ?? null;
+    const isPreset = visualisation.isPreset ?? true;
+    const reportName = visualisation.settingsReportName ??
+        Ren.WebReports.getWebReportName();
+
+    const kind = isPreset ? "preset" : "user";
+
+    // Builds the URL of the endpoint that gives the settings' file path, which only the server has.
+    const buildFilePathUrl = () => {
+
+        const path = Ren.Endpoints.getUrl("getReportSettingsFilePath");
+
+        if (!path) return null;
+
+        let url = Ren.UrlUtils.upsertQueryParameter(path, "reportName", reportName);
+
+        if (settingsName) {
+            url = Ren.UrlUtils.upsertQueryParameter(url, "settingsName", settingsName);
+        }
+
+        return Ren.UrlUtils.upsertQueryParameter(url, "isPreset", isPreset);
+    };
+
+    const closePopup = () => {
+
+        if (visualisation.popup) {
+            visualisation.popup.closeWindow();
+        }
+    };
+
+    // Fetches the current settings JSON and its file path, and populates the editor.
+    const loadSettings = async () => {
+
+        const settingsJson = await Ren.SettingsStore.load(kind, reportName, settingsName)
+            .catch(() => null);
+
+        textarea.value = settingsJson || "";
+
+        const pathUrl = buildFilePathUrl();
+
+        const pathResponse = pathUrl ?
+            await Ren.FetchUtils.fetch(pathUrl, {
+                method: "GET",
+                headers: { "Accept": "text/plain" }
+            }) :
+            null;
+
+        const filePath = pathResponse && pathResponse.ok ? await pathResponse.text() : "";
+        filePathElement.textContent = filePath;
+        filePathElement.title = filePath;
+    };
+
+    // Saves the edited JSON to the settings store verbatim.
+    const saveSettings = async () => {
+
+        const result =
+            await Ren.SettingsStore.save(kind, reportName, settingsName, textarea.value);
+
+        if (result && result.ok) {
+
+            // Evict any cached embedded-report responses for this report so that the next popup
+            // open re-fetches from the server with the corrected settings JSON.
+            if (reportName) {
+                Ren.EmbeddedReportResponses.invalidateResponsesForReport(reportName);
+            }
+        }
+        else {
+
+            Ren.GlobalErrorHandler.logError(
+                "[JsonReportSettingsEditor] Failed to save report settings."
+            );
+        }
+    };
+
+    saveButton.addEventListener("click", () => {
+
+        // Close the popup regardless of whether the save succeeds, so the button always dismisses
+        // the window as expected.
+        saveSettings().finally(closePopup);
+    });
+
+    cancelButton.addEventListener("click", () => {
+
+        closePopup();
+    });
+
+    loadSettings();
+
+    return {
+        element
+    };
+};
+
+/**
+ * Opens the JSON report settings editor in a popup window for the given settings name and preset
+ * flag.
+ */
+Ren.ShowJsonReportSettingsEditor = (settingsName, isPreset, reportName) => {
+
+    Ren.VisualisationCreator.createVisualisation({
+        visualisationTypeName: "JsonReportSettingsEditor",
+        excludeFromSerialization: true,
+        sourceVisualisation: null,
+        settingsName: settingsName ?? null,
+        isPreset: isPreset ?? true,
+        settingsReportName: reportName ?? null,
+        popupTitle: "JSON settings",
+        isPopup: true,
+        popupWidth: "50rem",
+        popupHeight: "500px"
+    });
+};
+
+/**
+ * Opens the JSON report settings editor for the report context that contains the given element,
+ * reading the settings name and preset flag from that context.
+ */
+Ren.ShowJsonReportSettingsEditorForElement = (element) => {
+
+    // Resolve to the report context that contains the element, falling back to the on-page report
+    // (e.g. when triggered from the report-wide menu, whose menu element is outside any context).
+    const reportContext = (element && Ren.HtmlUtils.getContainingReportContext(element)) ||
+        document.querySelector(".js-ren-report-context--on-page");
+
+    let settingsName = null;
+    let isPreset = true;
+    let reportName = null;
+
+    if (reportContext) {
+
+        settingsName = reportContext.getAttribute("data-settings-name") || null;
+        isPreset = reportContext.getAttribute("data-is-preset") !== "false";
+        reportName = reportContext.getAttribute("data-report-name") || null;
+    }
+
+    Ren.ShowJsonReportSettingsEditor(settingsName, isPreset, reportName);
+};

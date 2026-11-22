@@ -1,0 +1,69 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "FormatFunctionTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "SearchTerm": {
+                                "aggregationType": "MostCommon"
+                            },
+                            "SearchLink": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "search-link",
+                                        "parameters": {
+                                            "searchTermColumn": "SearchTerm",
+                                            "categoryIdStringColumn": "CategoryKey",
+                                            "categoryNameColumn": "CategoryFilter"
+                                        }
+                                    }
+                                ]
+                            },
+                            "__Count": {
+                                "valueFormatFunction": [
+                                    {
+                                        "name": "percentage-of-group-max-2-dp"
+                                    }
+                                ]
+                            }
+                        },
+                        "sortOrder": {
+                            "isDescending": true,
+                            "column": "__Count"
+                        },
+                        "groupByColumns": [
+                            "UserGuid"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "__Count": {
+                        "valueFormatFunction": [
+                            {
+                                "name": "percentage-of-group-max-2-dp"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "FormatFunctionTests 1": {
+            "queryEmbedding": "AAD/AwAAAAD/AAAAAAAAAAACAAAA/gAAAAEA/QAAAAAAAAAAAAACAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAIAAAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAP8AAQAAAAAA/wAAAAAAAAAAAAAAAAAAAAEAAAACAAAA//4AAAEAAAAAAAABAAAAAAAAAAAA/wAAAAAAAAAAAAD/AAAAAAD/AP8AAAAAAAD/AAAA/wAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAAA/wAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAP8AAA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "__Count",
+                "UserGuid",
+                "SearchTerm"
+            ]
+        }
+    }
+}

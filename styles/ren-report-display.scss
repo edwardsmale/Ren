@@ -1,0 +1,71 @@
+@use "ren-variables" as *;
+
+report
+{
+    position: relative;
+    display: block;
+}
+
+.ren-home-editor-layout
+{
+    report, grid-set
+    {
+        width: unset;
+    }
+}
+
+report-tabs
+{
+    display: flex;
+    width: calc(100% - 11rem); /* Leave space on the right so we don't overlap the quick links. */
+    height: $reportTabsHeight;
+}
+
+/*
+    Ensure that the report tabs in the editor are clickable and not obscured due to the negative
+    margin on the visualisation element.
+*/
+.ren-preview-report-tabs
+{
+    position: relative;
+    z-index: 99999;
+}
+
+.ren-report-tabs--many-tabs
+{
+    max-width: 99vw;
+}
+
+.ren-report-tab
+{
+    padding: 0.25rem 0.5rem;
+    border-color: darkgreen;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom: solid 1px darkolivegreen;
+    border-width: 1px;
+    height: fit-content;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7rem;
+    color: #666666;
+    background-color: #AABB99;
+    cursor: pointer;
+
+    &:first-of-type
+    {
+        border-left-style: solid;
+    }
+
+    &--active
+    {
+        background-color: white;
+        border-bottom-color: white;
+        color: black;
+        cursor: default;        
+    }
+
+    &:hover
+    {
+        z-index: 99999;
+    }
+}

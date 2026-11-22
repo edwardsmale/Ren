@@ -1,0 +1,15 @@
+<div class="ren-number-editor-popup__content">
+    <label class="ren-number-editor-popup__label js-ren-number-editor-popup-label">@Ren.HtmlUtils.escapeHtml(parameters.label)</label>
+    <input type="number"
+           class="ren-number-editor-popup__input js-ren-number-editor-popup-input qa-ren-number-editor-input"
+           autocomplete="off"
+           min="@parameters.min"
+           max="@parameters.max"
+           step="@parameters.step" />
+    <input type="range"
+           class="ren-range-slider js-ren-number-editor-popup-slider qa-ren-number-editor-slider"
+           min="@parameters.min"
+           max="@parameters.max"
+           step="@parameters.step"
+           hidden />
+</div>

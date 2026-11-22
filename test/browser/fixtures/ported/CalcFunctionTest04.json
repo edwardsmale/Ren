@@ -1,0 +1,30 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "CalcFunctionTests 1": {
+            "totalsRow": {
+                "position": "None"
+            },
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "Name": {
+                        "calcFunction": ["return compressedRowVals.Id / groupSummaryStats.Id.sum"]
+                    }
+                }
+            }
+        }
+    },
+    "gridState": {
+        "CalcFunctionTests 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": ["Id", "Name"]
+        }
+    }
+}

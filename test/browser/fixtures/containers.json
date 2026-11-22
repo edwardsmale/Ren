@@ -1,0 +1,51 @@
+{
+    "settingsVersion": "Fox",
+    "visualisations": [
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "inner",
+            "containerOrder": 2,
+            "taskId": "I2",
+            "taskTitle": "Inner second"
+        },
+        {
+            "visualisationTypeName": "TestContainer",
+            "clientSide": true,
+            "visualisationId": "outer",
+            "heading": "Outer"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "outer",
+            "containerOrder": 3,
+            "taskId": "O3",
+            "taskTitle": "Outer third"
+        },
+        {
+            "visualisationTypeName": "TestContainer",
+            "clientSide": true,
+            "visualisationId": "inner",
+            "containerVisualisationId": "outer",
+            "containerOrder": 2,
+            "heading": "Inner"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "outer",
+            "containerOrder": 1,
+            "taskId": "O1",
+            "taskTitle": "Outer first"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "inner",
+            "containerOrder": 1,
+            "taskId": "I1",
+            "taskTitle": "Inner first"
+        }
+    ]
+}

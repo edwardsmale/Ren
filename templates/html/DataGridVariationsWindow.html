@@ -1,0 +1,37 @@
+<div class="ren-data-grid-variations-window__content">
+
+    @(!parameters.anyData &&
+
+    `<div style="text-align: center; padding: 1rem; color: gray; font-size: 0.875rem">
+        No data grid variations yet.
+    </div>`
+    ||
+    `<ren-grid data-source-uri="@parameters.dataSourceUri"
+               settings-group="DataGridVariationsWindow"
+               is-child-visualisation="true"
+               max-height="12.5rem"
+               show-column-header-down-arrows="false"
+               stat-bar="false"
+               totals-row="false"
+               quick-links="false"
+               variations="false" />
+
+        <script class="js-ren-report-settings" type="application/json">
+            @parameters.reportSettings
+        </scr` + `ipt>`
+    )
+
+    <div class="ren-data-grid-variations-window-create-form">
+        <label class="ren-data-grid-variations-window-create-form__label" 
+               for="data-grid-variations-window-create-form__input">
+            New:
+        </label>
+        <input type="text" 
+               class="ren-data-grid-variations-window-create-form__input js-ren-data-grid-variations-window-create-input qa-ren-data-grid-variations-window-create-input"
+               placeholder="Name"
+               autocomplete="off" />
+        <button class="ren-data-grid-variations-window-create-form__create-button js-ren-data-grid-variations-window-create-button qa-ren-data-grid-variations-window-create-button">
+            Create
+        </button>
+    </div>
+</div>

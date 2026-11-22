@@ -1,0 +1,98 @@
+<Project>
+
+  <!--
+    Puts Ren's client files (ren.js, ren.css, their minified versions and source maps, the config
+    schema and ren.manifest.json) where a web project serves them from, for the version of Ren the
+    project references.
+
+    They're copied into the folder before each build (only the files that have changed, so
+    switching to a branch that references another version of Ren updates them), and they're the
+    project's content, so they're published and deployed with the rest of the site.  The folder
+    should be ignored by source control.
+
+    These can be set in the project, or as environment variables:
+
+      RenStaticsEnabled     false to leave the files out.  It's true in a web project (ASP.NET or
+                            ASP.NET Core) and false otherwise.
+      RenStaticsDirectory   The folder, relative to the project, the files are served from.  It's
+                            wwwroot\ren\ in an ASP.NET Core project and Statics\ren\ otherwise.
+      RenRepo               A clone of Ren, for working on Ren itself.  When it has a branch checked
+                            out with the same name as the project's repo's branch, the files come
+                            from its dist folder instead of the package.  While they match, Ren's
+                            watch copies each build into the folder too, so a refresh gets it
+                            without building the project (see Ren's docs/development.md).
+      RenDist               A Ren repo's dist folder, to take the files from instead of the
+                            package whatever the branches are.
+  -->
+
+  <PropertyGroup>
+    <_RenIsAspNetCore Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true'">true</_RenIsAspNetCore>
+    <_RenIsAspNet Condition="$(ProjectTypeGuids.ToUpperInvariant().Contains('349C5851-65DF-11DA-9384-00065B846F21'))">true</_RenIsAspNet>
+
+    <RenStaticsEnabled Condition="'$(RenStaticsEnabled)' == '' and ('$(_RenIsAspNetCore)' == 'true' or '$(_RenIsAspNet)' == 'true')">true</RenStaticsEnabled>
+    <RenStaticsDirectory Condition="'$(RenStaticsDirectory)' == '' and '$(_RenIsAspNetCore)' == 'true'">wwwroot\ren\</RenStaticsDirectory>
+    <RenStaticsDirectory Condition="'$(RenStaticsDirectory)' == ''">Statics\ren\</RenStaticsDirectory>
+    <RenStaticsDirectory>$([MSBuild]::EnsureTrailingSlash('$(RenStaticsDirectory)'))</RenStaticsDirectory>
+  </PropertyGroup>
+
+  <!--
+    Works out where the files come from.  It's done when the project builds, rather than when it's
+    loaded, so that switching branches in either repo takes effect on the next build.  A repo's
+    branch comes from its HEAD file, which is in its .git folder, or, in a worktree, in the folder
+    its .git file names.  A detached HEAD, as on a build server, has no branch.
+  -->
+  <Target Name="RenResolveStatics" Condition="'$(RenStaticsEnabled)' == 'true'">
+    <PropertyGroup>
+      <_RenStaticsSource>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\statics\'))</_RenStaticsSource>
+      <_RenStaticsFrom>the Ren package</_RenStaticsFrom>
+
+      <_RenProjectRepo>$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', '.git\HEAD'))</_RenProjectRepo>
+      <_RenProjectRepo Condition="'$(_RenProjectRepo)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', '.git'))</_RenProjectRepo>
+      <_RenProjectGit Condition="'$(_RenProjectRepo)' != ''">$(_RenProjectRepo)\.git</_RenProjectGit>
+      <_RenProjectHead Condition="'$(_RenProjectGit)' != '' and Exists('$(_RenProjectGit)\HEAD')">$(_RenProjectGit)\HEAD</_RenProjectHead>
+      <_RenProjectHead Condition="'$(_RenProjectGit)' != '' and '$(_RenProjectHead)' == '' and Exists('$(_RenProjectGit)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_RenProjectGit)')), 'gitdir:\s*([^\r\n]+)').Groups[1].Value)\HEAD</_RenProjectHead>
+      <_RenProjectBranch Condition="'$(_RenProjectHead)' != '' and Exists('$(_RenProjectHead)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_RenProjectHead)')), 'ref:\s*refs/heads/(\S+)').Groups[1].Value)</_RenProjectBranch>
+
+      <_RenRepoGit Condition="'$(RenRepo)' != ''">$([System.IO.Path]::GetFullPath('$(RenRepo)'))\.git</_RenRepoGit>
+      <_RenRepoHead Condition="'$(_RenRepoGit)' != '' and Exists('$(_RenRepoGit)\HEAD')">$(_RenRepoGit)\HEAD</_RenRepoHead>
+      <_RenRepoHead Condition="'$(_RenRepoGit)' != '' and '$(_RenRepoHead)' == '' and Exists('$(_RenRepoGit)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_RenRepoGit)')), 'gitdir:\s*([^\r\n]+)').Groups[1].Value)\HEAD</_RenRepoHead>
+      <_RenRepoBranch Condition="'$(_RenRepoHead)' != '' and Exists('$(_RenRepoHead)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_RenRepoHead)')), 'ref:\s*refs/heads/(\S+)').Groups[1].Value)</_RenRepoBranch>
+
+      <_RenUseRepo Condition="'$(_RenRepoBranch)' != '' and '$(_RenRepoBranch)' == '$(_RenProjectBranch)'">true</_RenUseRepo>
+      <_RenStaticsSource Condition="'$(_RenUseRepo)' == 'true'">$([System.IO.Path]::GetFullPath('$(RenRepo)'))\dist\</_RenStaticsSource>
+      <_RenStaticsFrom Condition="'$(_RenUseRepo)' == 'true'">Ren's $(_RenRepoBranch) in $(RenRepo)</_RenStaticsFrom>
+
+      <_RenStaticsSource Condition="'$(RenDist)' != ''">$([MSBuild]::EnsureTrailingSlash('$([System.IO.Path]::GetFullPath('$(RenDist)'))'))</_RenStaticsSource>
+      <_RenStaticsFrom Condition="'$(RenDist)' != ''">RenDist ($(RenDist))</_RenStaticsFrom>
+    </PropertyGroup>
+
+    <Warning Condition="'$(RenRepo)' != '' and '$(_RenRepoHead)' == ''"
+             Text="RenRepo is &quot;$(RenRepo)&quot;, which isn't a git repo, so the Ren package's files are used." />
+    <Error Condition="!Exists('$(_RenStaticsSource)ren.manifest.json') and '$(_RenStaticsFrom)' != 'the Ren package'"
+           Text="The client files are to come from $(_RenStaticsFrom), but there's no Ren build in &quot;$(_RenStaticsSource)&quot;.  Build Ren." />
+    <Error Condition="!Exists('$(_RenStaticsSource)ren.manifest.json') and '$(_RenStaticsFrom)' == 'the Ren package'"
+           Text="The Ren package has no client files in &quot;$(_RenStaticsSource)&quot;." />
+    <Message Importance="high" Condition="'$(_RenStaticsFrom)' != 'the Ren package'"
+             Text="$(MSBuildProjectName): Ren's client files come from $(_RenStaticsFrom)." />
+
+    <ItemGroup>
+      <_RenStaticsFile Include="$(_RenStaticsSource)ren.*" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RenCopyStatics"
+          BeforeTargets="BeforeBuild"
+          DependsOnTargets="RenResolveStatics"
+          Condition="'$(RenStaticsEnabled)' == 'true'">
+    <Copy SourceFiles="@(_RenStaticsFile)"
+          DestinationFolder="$(MSBuildProjectDirectory)\$(RenStaticsDirectory)"
+          SkipUnchangedFiles="true"
+          Retries="3" />
+
+    <ItemGroup>
+      <Content Remove="@(_RenStaticsFile->'$(RenStaticsDirectory)%(Filename)%(Extension)')" />
+      <Content Include="@(_RenStaticsFile->'$(RenStaticsDirectory)%(Filename)%(Extension)')" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+</Project>

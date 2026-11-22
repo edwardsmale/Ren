@@ -1,0 +1,57 @@
+{
+    "settingsVersion": "Fox",
+    "visualisations": [
+        {
+            "visualisationTypeName": "TaskBoard",
+            "clientSide": true,
+            "visualisationId": "board",
+            "targetSelector": ".js-board",
+            "columns": [
+                { "id": "start", "heading": "Start", "subheading": "self-contained" },
+                { "id": "next", "heading": "Next" }
+            ]
+        },
+        {
+            "visualisationTypeName": "TaskLane",
+            "clientSide": true,
+            "visualisationId": "lane-1",
+            "containerVisualisationId": "board",
+            "containerOrder": 1,
+            "heading": "Containers"
+        },
+        {
+            "visualisationTypeName": "TaskLane",
+            "clientSide": true,
+            "visualisationId": "lane-2",
+            "containerVisualisationId": "board",
+            "containerOrder": 2,
+            "heading": "Tiles"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "lane-1",
+            "containerSlot": "next",
+            "containerOrder": 1,
+            "taskId": "B",
+            "taskTitle": "Editing"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "lane-1",
+            "containerSlot": "start",
+            "containerOrder": 1,
+            "taskId": "A",
+            "taskTitle": "Containers"
+        },
+        {
+            "visualisationTypeName": "TaskTile",
+            "clientSide": true,
+            "containerVisualisationId": "lane-2",
+            "containerOrder": 1,
+            "taskId": "C",
+            "taskTitle": "LinkTile"
+        }
+    ]
+}

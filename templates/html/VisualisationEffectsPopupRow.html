@@ -1,0 +1,15 @@
+<div class="ren-visualisation-effects-popup__row">
+    <label class="ren-visualisation-effects-popup__label">@Ren.HtmlUtils.escapeHtml(parameters.label)</label>
+    <input type="range"
+           class="ren-range-slider js-ren-visualisation-effects-popup-slider qa-ren-visualisation-effects-slider"
+           min="@parameters.min"
+           max="@parameters.max"
+           step="1" />
+    <input type="number"
+           class="ren-visualisation-effects-popup__input js-ren-visualisation-effects-popup-input qa-ren-visualisation-effects-input"
+           autocomplete="off"
+           min="@parameters.min"
+           max="@parameters.max"
+           step="1" />
+    <span class="ren-visualisation-effects-popup__unit">@Ren.HtmlUtils.escapeHtml(parameters.unitLabel)</span>
+</div>

@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.cmd text eol=crlf
+
+*.png binary
+*.gif binary
+*.ico binary
+*.jpg binary
+*.woff binary
+*.woff2 binary
+*.renpack binary
+
+# Written byte for byte by the .NET tests, which compare against them.
+test/golden/*.json -text

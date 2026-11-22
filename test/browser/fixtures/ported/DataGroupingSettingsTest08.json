@@ -1,0 +1,44 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Active": {
+                                "aggregationType": "Count"
+                            },
+                            "DaysActive": {
+                                "aggregationType": "Concatenate"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests 1": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name"
+            ]
+        }
+    }
+}

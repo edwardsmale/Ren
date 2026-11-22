@@ -1,0 +1,58 @@
+// A link as a tile (see Ren.CreateLinkTile).  A tile group sets its width with
+// --ren-tile-group-tile-width.
+.ren-link-tile
+{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    box-sizing: border-box;
+    width: var(--ren-tile-group-tile-width, 16rem);
+    padding: 1rem;
+    border: 1px solid lightgray;
+    border-radius: 0.5rem;
+    background-color: white;
+    box-shadow: 3px 3px 1px #45596B1A;
+    transition: border-color 0.05s;
+
+    &:hover
+    {
+        border-color: gray;
+        filter: contrast(1.2);
+    }
+
+    &--without-link:hover
+    {
+        border-color: lightgray;
+        filter: none;
+    }
+
+    // Covers the whole tile, so that all of it is the link.
+    &__link
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9;
+        user-select: none;
+    }
+
+    &__image
+    {
+        flex-shrink: 0;
+        width: 4rem;
+        height: 4rem;
+        mix-blend-mode: multiply;
+        user-select: none;
+    }
+
+    &__title
+    {
+        min-width: 0;
+        min-height: 1.2em;
+        overflow-wrap: break-word;
+    }
+}

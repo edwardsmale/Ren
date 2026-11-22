@@ -1,0 +1,31 @@
+{
+    "raiseReport": true,
+    "settingsVersion": "Badger",
+    "dataGroupingSettings": {
+        "GroupTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "GroupTests 1": {
+            "visibleColumns": [
+                "CustomerRef",
+                "ProductCodes",
+                "LastEditedBy",
+                "PricingMethod",
+                "MarginPercentage",
+                "DiscountPercentage",
+                "CreatedOn",
+                "UpdatedOn",
+                "FindCustomerLink",
+                "ViewCustomerReportLink"
+            ]
+        }
+    }
+}

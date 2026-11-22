@@ -1,0 +1,32 @@
+{
+    "settingsVersion": "Fox",
+    "visualisations": [
+        {
+            "visualisationTypeName": "TileGroup",
+            "clientSide": true,
+            "visualisationId": "merch",
+            "targetSelector": ".js-menu",
+            "heading": "Merchandising",
+            "subheading": "reports",
+            "tileWidth": "12rem"
+        },
+        {
+            "visualisationTypeName": "LinkTile",
+            "clientSide": true,
+            "containerVisualisationId": "merch",
+            "containerOrder": 2,
+            "title": "Brand Sales",
+            "url": "/BrandSales"
+        },
+        {
+            "visualisationTypeName": "LinkTile",
+            "clientSide": true,
+            "containerVisualisationId": "merch",
+            "containerOrder": 1,
+            "title": "Category Sales",
+            "url": "/CategorySales",
+            "imageUrl": "/category-sales.png",
+            "imageFilter": "hue-rotate(90deg)"
+        }
+    ]
+}

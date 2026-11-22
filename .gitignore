@@ -1,0 +1,10 @@
+dist/
+.generated/
+bin/
+obj/
+*.nupkg
+.vs/
+.release-builds/
+.tools/
+TestResults/
+packages/

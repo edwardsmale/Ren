@@ -1,0 +1,85 @@
+@use "ren-variables" as *;
+
+// A change chart: a row per label, with an arrow from its before value to its after value (see
+// Ren.CreateChangeChart).
+.ren-change-chart
+{
+    font-family: $reportGeneratorFont;
+    font-size: 12px;
+
+    &__svg
+    {
+        display: block;
+        overflow: visible;
+    }
+
+    &__label,
+    &__legend-text,
+    &__tick-label
+    {
+        fill: #333333;
+    }
+
+    &__label--link
+    {
+        cursor: pointer;
+
+        &:hover
+        {
+            text-decoration: underline;
+        }
+    }
+
+    &__tick-label
+    {
+        fill: #666666;
+        font-size: 11px;
+    }
+
+    &__gridline
+    {
+        stroke: #e4e4e4;
+        stroke-width: 1;
+
+        &--zero
+        {
+            stroke: #999999;
+        }
+    }
+
+    &__arrow
+    {
+        stroke: #999999;
+        stroke-width: 1.5;
+    }
+
+    &__arrowhead
+    {
+        fill: #999999;
+    }
+
+    &__before
+    {
+        fill: #1f4e8c;
+    }
+
+    &__after
+    {
+        fill: #b02a2a;
+    }
+
+    &__hit-area
+    {
+        fill: transparent;
+
+        &--link
+        {
+            cursor: pointer;
+        }
+    }
+
+    &__row:hover &__hit-area
+    {
+        fill: rgba(0, 0, 0, 0.04);
+    }
+}

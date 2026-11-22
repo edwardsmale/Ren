@@ -1,0 +1,32 @@
+{
+    "settingsVersion": "Emu",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsNullFilterTests 1": {
+            "queryEmbedding": "AAH/AP4BAAAAAQL8/wL//wAAAwAA/v//AAABAAD//wAAAAAA/v8CAAAAAAAAAAAAAgAAAQAAAQL//f8AAQAAAAAAAP//AAAAAQEAAAEA/gEAAAAA//8AAf8AAAAAAP//AAEBAP4AAAD//gEAAAIAAAEBAAH+AQAAAQEAAQD/AAAAAPwAAAT+//z/BP8AAAIAAQEAAQACAwAAAAAA/wAAAP4AAQD/AAEBAAAAAP8CAQAAAAAD//8BAAIAAQAAAAIBAgAAAAD//gEAAP8CAAAA/gD/AAEBAAAAAP//AAD/AAADAAABAAD//wAA/wEAAP8A/wABAP8BAAAAAP7+AAL+/w==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Id",
+                "Active",
+                "CreatedOn",
+                "CreatedOn With Null",
+                "DaysActive",
+                "Search Terms",
+                "Unique Searches Per Day",
+                "Product Code",
+                "Discontinued",
+                "Product Name With Null"
+            ]
+        }
+    }
+}

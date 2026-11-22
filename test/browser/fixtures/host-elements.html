@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Host elements - Ren test fixture</title>
+    <link href="/dist/ren.css" rel="stylesheet" />
+    <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
+    <script src="/dist/ren.js"></script>
+</head>
+<body>
+    <!-- The host's own elements, beside Ren's, which ren.css mustn't style. -->
+    <form class="host-form">
+        <button type="button" class="host-button">Host button</button>
+        <input type="submit" class="host-submit" value="Host submit">
+    </form>
+
+    <ren-grid src="/examples/data/sales.renpack"
+              data-format="renpack"
+              show-row-and-column-headings />
+</body>
+</html>

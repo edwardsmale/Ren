@@ -1,0 +1,25 @@
+{
+    "raiseReport": true,
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "GroupTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "GroupTests 1": {
+            "visibleColumns": [
+                "CustomerRef",
+                "ProductCodes",
+                "CreatedOn",
+                "UpdatedOn"
+            ]
+        }
+    }
+}

@@ -1,0 +1,26 @@
+@use "ren-images" as *;
+@use "ren-variables" as *;
+
+.ren-report-loading-animation
+{
+    pointer-events: none;
+    user-select: none;
+    height: 100%;
+}
+
+.ren-loading-animation-image
+{
+    background-image: $loading-image;
+    background-repeat: no-repeat;
+    background-position: calc(50% - 1.5rem) calc(50% - 9rem);
+    width: 100%;
+    height: 100%;
+}
+
+.ren-small-loading-animation
+{
+    background-image: $loading-image;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}

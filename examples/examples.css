@@ -1,0 +1,60 @@
+/* The example pages' own text, around the Ren elements they show. */
+.ren-example {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 16px 24px;
+    max-width: 960px;
+}
+
+/* The logo at 40% of its 231 x 72 size, on a line of its own above everything else. */
+.ren-example__logo {
+    display: block;
+    width: 92px;
+    height: auto;
+}
+
+.ren-example__title {
+    font-size: 1.5em;
+}
+
+.ren-example__paragraph,
+.ren-example__list,
+.ren-example__code-block {
+    margin-left: 2rem;
+}
+
+.ren-example__code-block {
+    background: #f4f4f4;
+    overflow-x: auto;
+    padding: 8px 12px;
+    tab-size: 16;
+}
+
+.ren-example__code {
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: darkgreen;
+}
+
+.ren-example__code--html {
+    color: #ab0000;
+}
+
+.ren-example__code--html-block {
+    color: #00034e;
+}
+
+/* The back link under the logo, styled as a quiet "back to dashboard" link. */
+.ren-example__nav {
+    font-size: 0.9em;
+    color: #6a7fd1;
+    white-space: nowrap;
+}
+
+.ren-example__nav-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ren-example__nav-link:hover {
+    text-decoration: underline;
+}

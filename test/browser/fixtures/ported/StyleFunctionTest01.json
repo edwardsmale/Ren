@@ -1,0 +1,50 @@
+{
+    "settingsVersion": "Fox",
+    "dataGroupingSettings": {
+        "style-function-test-01": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Product": {
+                                "aggregationType": "NoTotal"
+                            },
+                            "Sales": {
+                                "mergeDataRowBackgrounds": true,
+                                "cellStyleFunction": [
+                                    "return Ren.TextUtils.parseFloat(value) > 60 ? { \"background-color\": \"rgb(255, 255, 0)\" } : null;"
+                                ]
+                            }
+                        },
+                        "sortOrder": {
+                            "column": "Category"
+                        },
+                        "groupByColumns": [
+                            "Category"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "dataRows": {
+                "columns": {
+                    "Product": {
+                        "rowStyleFunction": [
+                            "return value === \"P4\" ? { \"color\": \"rgb(0, 128, 0)\" } : null;"
+                        ]
+                    },
+                    "Sales": {
+                        "cellStyleFunction": [
+                            "const sales = Ren.TextUtils.parseFloat(value); return sales > 20 ? { \"background-color\": \"rgb(255, 0, 0)\" } : sales >= 8 ? { \"background-color\": \"rgb(0, 0, 255)\" } : null;"
+                        ]
+                    }
+                },
+                "sortOrder": {
+                    "column": "Product"
+                }
+            }
+        }
+    }
+}

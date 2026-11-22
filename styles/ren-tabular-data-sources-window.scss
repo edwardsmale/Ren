@@ -1,0 +1,63 @@
+@use "ren-images" as *;
+
+.ren-data-sources-window
+{
+    &__content
+    {
+        height: calc(100% - 17px); /* $scrollbarHeight: 17px. SASS doesn't support $ vars in calc. */
+    }
+
+    &__data-source-list
+    {
+        margin: 0;
+        padding: 0 0.3125rem;
+        height: 100%;
+        scale: 0.9;
+        translate: -2rem 0;
+        list-style-type: none;
+    }
+
+    &__data-source
+    {
+        margin-bottom: 0.5rem;
+        padding: 0.75rem 1rem 0.25rem 3rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        background-image: $data-source-image;
+        background-size: 2.5rem;
+        background-position: 0.125rem 0.5rem;
+        background-repeat: no-repeat;
+        border-bottom: solid 1px #b1b1b1;
+    }
+
+    &__sql-filename
+    {
+        padding: 0.125rem 0.25rem;
+        background-color: #ffffff47;
+        color: #000000;
+        font-size: 0.75rem;
+        box-shadow: 2px 2px 3px 2px #82c5ff26;
+        font-weight: bold;
+    }
+
+    &__cloned-tabular-data-models
+    {
+        display: grid;
+        grid-template-columns: 40% 60%;
+        row-gap: .25rem;
+        column-gap: 1rem;
+        margin: 1rem 0 2rem 1rem;
+        max-width: 30rem;
+
+        paMenAKW4R span, small
+        {
+            white-space: nowrap;
+        }
+
+        small
+        {
+            font-size: small;
+            color: #666666;
+        }
+    }
+}

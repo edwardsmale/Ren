@@ -1,0 +1,38 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "NullAggregateValueTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "DistinctValuesIncludingEmptyWithCounts"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Num"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "Val": {
+                                "aggregationType": "MostCommon"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NullAggregateValueTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Num",
+                "Val"
+            ]
+        }
+    }
+}

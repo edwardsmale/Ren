@@ -1,0 +1,245 @@
+/* The Find window, opened over a report with Ctrl+F. */
+.ren-find-window
+{
+    box-sizing: border-box;
+    height: 100%;
+
+    /* The window is sized to this content when it opens, and the content is then given the whole
+       of the window it ends up in, so that dragging the window bigger does not leave the fields in
+       a box of their own, and a window dragged smaller scrolls rather than clipping them.  The
+       padding is on this element rather than a margin outside it, so that the height below takes
+       it in. */
+    &__content
+    {
+        box-sizing: border-box;
+        height: 100%;
+        /* The text box is as wide as the window, so the content has no natural width of its own to
+           be measured for; this is the width the window opens at.  It is wide enough for the
+           longest status message to stand on one line, which is the line the status is given. */
+        min-width: 16rem;
+        padding: 0.5rem;
+        overflow: auto;
+        font-size: 0.8125rem;
+    }
+
+    &__input
+    {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.1875rem 0.25rem;
+        border: solid 1px #B1B1B1;
+        font-size: 0.8125rem;
+    }
+    /* Names the columns the search will run in, whether that is a restricted set of them or all
+       of them.  It keeps its height either way, so that the Find Next button does not move as the
+       selection changes. */
+    &__columns
+    {
+        margin-top: 0.25rem;
+        min-height: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #666666;
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+
+    &__columns-text
+    {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    /* Takes the column restriction off again.  Only shown while there is one. */
+    &__columns-clear-button
+    {
+        display: none;
+        flex: none;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #666666;
+        font-size: 0.875rem;
+        line-height: 1rem;
+        cursor: pointer;
+
+        &:hover
+        {
+            color: #000000;
+        }
+
+        &:focus, &:active
+        {
+            outline: 0;
+            outline-style: none;
+            outline-width: 0;
+        }
+    }
+
+    &--restricted-to-columns
+    {
+        .ren-find-window__columns-clear-button
+        {
+            display: block;
+        }
+    }
+
+    &__option
+    {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        font-family: sans-serif;
+        line-height: 1rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    &__option-checkbox
+    {
+        margin: 0 0.25rem 0 0;
+        vertical-align: middle;
+    }
+
+    /* The letter of the Alt shortcut for the checkbox it appears in. */
+    &__access-key
+    {
+        text-decoration: underline;
+    }
+
+    &__buttons
+    {
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__button
+    {
+        padding: 0.1875rem 0.5rem;
+        border: solid 1px #B1B1B1;
+        border-radius: 0.25rem;
+        box-sizing: border-box;
+        font-size: 0.75rem;
+        line-height: 0.75rem;
+        background-color: #EEEEEE;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover
+        {
+            filter: contrast(1.1);
+        }
+        /* Prevent ugly border appearing when, after clicking the button, a key is pressed. */
+        &:focus, &:active
+        {
+            outline: 0;
+            outline-style: none;
+            outline-width: 0;
+        }
+    }
+
+    /* Arms the next search to start from the top of the grid rather than on from the cell the
+       last search found.  It is only shown while the search would otherwise resume. */
+    &__start-from-top-button
+    {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #666666;
+        font-size: 0.6rem;
+        line-height: 0.6rem;
+        cursor: pointer;
+
+        &:hover
+        {
+            text-decoration: underline;
+            color: #000000;
+        }
+
+        &:focus, &:active
+        {
+            outline: 0;
+            outline-style: none;
+            outline-width: 0;
+        }
+    }
+
+    /* The Find button says what the next search will do, so only one of its labels is shown. */
+    &__button-label--find-first
+    {
+        display: none;
+    }
+
+    &--find-from-top
+    {
+        .ren-find-window__button-label--find-next
+        {
+            display: none;
+        }
+
+        .ren-find-window__button-label--find-first
+        {
+            display: inline;
+        }
+
+        .ren-find-window__start-from-top-button
+        {
+            display: none;
+        }
+    }
+
+    /* Clears the Filter Rows filter.  Only shown while one is active. */
+    &__filter-rows-clear-button
+    {
+        display: none;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #666666;
+        font-size: 0.6rem;
+        line-height: 0.6rem;
+        cursor: pointer;
+
+        &:hover
+        {
+            text-decoration: underline;
+            color: #000000;
+        }
+
+        &:focus, &:active
+        {
+            outline: 0;
+            outline-style: none;
+            outline-width: 0;
+        }
+    }
+
+    &--filter-rows-active
+    {
+        .ren-find-window__filter-rows-clear-button
+        {
+            display: block;
+        }
+    }
+
+    /* Says how the search went.
+       count of the rows selected does not read as a problem.  It keeps its height while it has
+       nothing to say, so that a message appearing does not push the window's contents about - or,
+       the window being fitted to those contents, spill them out of it. */
+    &__status
+    {
+        margin-top: 0.25rem;
+        min-height: 1rem;
+        color: #666666;
+        font-size: 0.75rem;
+        line-height: 1rem;
+
+        &--failure
+        {
+            color: #AA0000;
+        }
+    }
+}

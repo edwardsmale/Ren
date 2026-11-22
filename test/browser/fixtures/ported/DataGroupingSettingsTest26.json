@@ -1,0 +1,118 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "DataGroupingSettingsTests 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "DaysActive": {
+                                "aggregationType": "Average"
+                            },
+                            "Unique Searches Per Day": {
+                                "aggregationType": "SingleValuesOnly"
+                            },
+                            "Product Code": {
+                                "aggregationType": "ExpandIcon"
+                            },
+                            "CreatedOn": {
+                                "aggregationType": "ExpandIcon"
+                            }
+                        },
+                        "groupByColumns": [
+                            "Id"
+                        ]
+                    },
+                    {
+                        "columns": {
+                            "Unique Searches Per Day": {
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": []
+                    }
+                ]
+            },
+            "totalsRow": {
+                "position": "None"
+            },
+            "dataRows": {
+                "sortOrder": {
+                    "column": "Id"
+                }
+            }
+        }
+    },
+    "gridState": {
+        "DataGroupingSettingsTests 1": {
+            "queryEmbedding": "Af//AP8BAAEAAAL8AAL//wAAAwAA/gD/AAABAAAA/wAAAAAA/v8BAAAAAAEAAgAAAAEAAAAAAAIA/QAAAQAAAAAAAAD/AAAB/wD/AAEA/gAAAAAAAP8AAQAAAAAAAP7+AAEBAP4AAAEA/gEAAAAAAAABAAH/AQAAAQAAAAD/AAD/APsAAAQAAP7/AwAAAAIAAAEAAAAAAwAAAAEA/wAAAP4AAP8AAAEAAAAAAP8BAQAAAAABAP8BAAIAAAD/AAEAAv8AAAD//gAAAAECAAAA/gAAAAEAAAAAAAD/AAD/AAAE/wABAAD/AAAAAAAAAAAA/wEAAAABAP8A//4AAAH+AA==",
+            "showRowAndColumnHeadings": true,
+            "columns": [
+                {
+                    "column": "__Count",
+                    "displayOrder": 0
+                },
+                {
+                    "column": "Id",
+                    "displayOrder": 1
+                },
+                {
+                    "column": "Active",
+                    "displayOrder": 2
+                },
+                {
+                    "column": "CreatedOn",
+                    "displayOrder": 4
+                },
+                {
+                    "column": "DaysActive",
+                    "displayOrder": 3
+                },
+                {
+                    "column": "Search Terms",
+                    "displayOrder": 5
+                },
+                {
+                    "column": "Search Terms__Length",
+                    "visible": false
+                },
+                {
+                    "column": "Total Searches",
+                    "displayOrder": 6
+                },
+                {
+                    "column": "Unique Searches Per Day",
+                    "displayOrder": 7
+                },
+                {
+                    "column": "Product Code",
+                    "displayOrder": 8
+                },
+                {
+                    "column": "Product Code__Length",
+                    "visible": false
+                },
+                {
+                    "column": "Discontinued",
+                    "displayOrder": 9
+                },
+                {
+                    "column": "Discontinued__Length",
+                    "visible": false
+                },
+                {
+                    "column": "Product Name",
+                    "displayOrder": 10
+                },
+                {
+                    "column": "Product Name__Length",
+                    "visible": false
+                },
+                {
+                    "column": "__Zero",
+                    "visible": false
+                }
+            ]
+        }
+    }
+}

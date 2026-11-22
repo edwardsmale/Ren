@@ -1,0 +1,43 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "NumberAggregationTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "columns": {
+                            "OrderCount": {
+                                "aggregationType": "Average"
+                            },
+                            "OrderLineCount": {
+                                "aggregationType": "Average"
+                            },
+                            "OrderRevenue": {
+                                "aggregationType": "Sum"
+                            },
+                            "DiscountAmount": {
+                                "aggregationType": "Sum"
+                            }
+                        },
+                        "groupByColumns": ["AccountId"]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NumberAggregationTest 1": {
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "AccountId",
+                "OrderCount",
+                "OrderLineCount",
+                "OrderRevenue",
+                "DiscountAmount"
+            ]
+        }
+    }
+}

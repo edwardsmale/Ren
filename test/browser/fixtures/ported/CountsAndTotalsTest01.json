@@ -1,0 +1,26 @@
+{
+    "settingsVersion": "Elk",
+    "dataGroupingSettings": {
+        "CountsAndTotalsTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "CountsAndTotalsTest 1": {
+            "queryEmbedding": "AAD/AAAAAP8AAAAAAAABAAAAAAAA/gAAAAAAAAABAgD/AAAAAAABAAAAAAAAAAAA/wEAAAAAAAAAAAAAAf8AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAABAAD/AAAAAAAAAAH//wAAAAAAAAAABAAAAP8AAAIAAAAAAf/+AP///wAAAAMAAAD//wD/AAD/AAAAAAAAAAAAAAIAAAABAAACAAAAAAAA//8AAQAAAAAAAAEAAAAAAAAAAAAAAAAA/QEBAAAAAAAAAAAAAAD/AAABAAEAAAEBAAD/AP8AAAAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "CustomerRef",
+                "Id",
+                "OrderTotal",
+                "NumLines"
+            ]
+        }
+    }
+}

@@ -1,0 +1,83 @@
+{
+    "settingsVersion": "Fox",
+    "visualisations": [
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DateValueChartMarkerLineTests_Data",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DateValueChartMarkerLineTests_Data",
+            "reportContext": {
+                "reportContextGuid": "report-context-DateValueChartTest09",
+                "reportName": "DateValueChartTest09"
+            },
+            "dataGroupingSettingsGroup": "DateValueChartMarkerLineTests_Data -|- FirstChart",
+            "gridStateGroup": "report-context-DateValueChartTest09 DateValueChartMarkerLineTests_Data FirstChart",
+            "visualisationSettingsGroup": "DateValueChart-FirstChart",
+            "filterGroup": "DateValueChartMarkerLineTests_Data",
+            "dateRangeGroup": "DateValueChartTest09 dates",
+            "clientSide": true,
+            "dataTabGroup": null,
+            "dataTabIndex": 1,
+            "initialChartGroupCalcFunction": "date-day-start",
+            "targetSelector": ".js-first-chart",
+            "resizeToFitContentOnLoad": false,
+            "fillAvailableSpace": true,
+            "showRowAndColumnHeadings": true,
+            "visualisationWidth": "38rem",
+            "visualisationHeight": "20rem",
+            "selectedColumns": [
+                "Date",
+                "Searches"
+            ],
+            "series": [
+                {
+                    "column": "Searches",
+                    "label": "Searches",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046B8",
+                    "chartType": "Bar",
+                    "showValueLabels": false
+                }
+            ],
+            "tabularDataTransformers": []
+        },
+        {
+            "visualisationTypeName": "DateValueChart",
+            "sqlFilename": "DateValueChartMarkerLineTests_Data",
+            "dataSourceUri": "/test/browser/fixtures/ported/data/DateValueChartMarkerLineTests_Data",
+            "reportContext": {
+                "reportContextGuid": "report-context-DateValueChartTest09",
+                "reportName": "DateValueChartTest09"
+            },
+            "dataGroupingSettingsGroup": "DateValueChartMarkerLineTests_Data -|- SecondChart",
+            "gridStateGroup": "report-context-DateValueChartTest09 DateValueChartMarkerLineTests_Data SecondChart",
+            "visualisationSettingsGroup": "DateValueChart-SecondChart",
+            "filterGroup": "DateValueChartMarkerLineTests_Data",
+            "dateRangeGroup": "DateValueChartTest09 dates",
+            "clientSide": true,
+            "dataTabGroup": null,
+            "dataTabIndex": 1,
+            "initialChartGroupCalcFunction": "date-day-start",
+            "targetSelector": ".js-second-chart",
+            "resizeToFitContentOnLoad": false,
+            "fillAvailableSpace": true,
+            "showRowAndColumnHeadings": true,
+            "visualisationWidth": "38rem",
+            "visualisationHeight": "20rem",
+            "selectedColumns": [
+                "Date",
+                "Searches"
+            ],
+            "series": [
+                {
+                    "column": "Searches",
+                    "label": "Searches",
+                    "valueAxis": "leftAxis",
+                    "colour": "#3046B8",
+                    "chartType": "Bar",
+                    "showValueLabels": false
+                }
+            ],
+            "tabularDataTransformers": []
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "columns": [
+        { "name": "Term", "type": "string" },
+        { "name": "SearchesBefore", "type": "number" },
+        { "name": "SearchesAfter", "type": "number" },
+        { "name": "RateBefore", "type": "number" },
+        { "name": "RateAfter", "type": "number" },
+        { "name": "StartDate", "type": "date" }
+    ],
+    "rows": [
+        ["envelopes", 40, 95, 0.25, 0.4, "2026-10-01"],
+        ["printer paper", 120, 60, 0.5, 0.3, "2026-10-01"],
+        ["stapler", 15, 15, 0.1, 0.12, "2026-10-01"],
+        ["toner", null, 30, 0.2, 0.2, "2026-10-01"]
+    ]
+}

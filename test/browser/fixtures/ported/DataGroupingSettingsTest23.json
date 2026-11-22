@@ -1,0 +1,29 @@
+{
+    "settingsVersion": "Emu",
+    "dataGroupingSettings": {
+        "NullAggregateValueTest 1": {
+            "groupings": {
+                "entries": [
+                    {
+                        "groupByColumns": [
+                            "Num"
+                        ]
+                    },
+                    {
+                        "groupByColumns": []
+                    }
+                ]
+            }
+        }
+    },
+    "gridState": {
+        "NullAggregateValueTest 1": {
+            "queryEmbedding": "AAD/AAABAAEAAAAAAAAAAAAAAP8A/gAAAAAAAAAAAAAAAAD/AAABAAABAAAA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAD/AAAAAAD/AAAAAAAAAAAAAAEAAAAAAAAAAAACAQAAAAAAAAAA/wAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA==",
+            "showRowAndColumnHeadings": true,
+            "visibleColumns": [
+                "Num",
+                "Val"
+            ]
+        }
+    }
+}
