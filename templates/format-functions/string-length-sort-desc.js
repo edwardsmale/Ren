@@ -3,4 +3,4 @@
  *
  * TAGS: calculation, sort
  */
-return (10000000000 - value?.length ?? 0).toString() + value;
+return (10000000000 - (value?.length ?? 0)).toString() + value;

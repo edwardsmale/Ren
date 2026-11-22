@@ -3,4 +3,4 @@
  *
  * TAGS: calculation, sort
  */
-return (value?.length ?? 0).toString().padLeft(10, "0") + value;
+return (value?.length ?? 0).toString().padStart(10, "0") + value;
