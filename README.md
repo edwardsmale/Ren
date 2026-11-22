@@ -76,15 +76,27 @@ Ren draws its charts itself, so there's no charting library to add.
 
 ### Data
 
-Endpoints can return an array of objects, columns and rows, TSV, Ren's own tabular data set
-collection (JSON with column formats and several tabs), or renpack, a compact binary format read
-on a worker so big data sets don't hold up the page.  Ren tells them apart by itself.
+Endpoints can return the data in any of these formats.  Ren tells them apart by itself.
+
+| Format | Looks like |
+| --- | --- |
+| Array of objects | `[{ "Product": "Widget", "Revenue": 12.5 }, ...]` |
+| Columns and rows | `{ "columns": [...], "rows": [[...], ...] }` |
+| TSV | Tab-separated, with headings on the first line. |
+| Tabular data set collection | Ren's own JSON, with column formats and several tabs. |
+| renpack | A compact binary format, read on a worker so big data sets don't hold up the page. |
+
+You can serve the first three from any server.  The package's .NET library can write the last two
+for you.
 
 ## Installation
 
 Ren ships as the `Ren` NuGet package.  Add it to a web project and, before each build, it copies
 Ren's files into `wwwroot/ren/` (ASP.NET Core) or `Statics/ren/` (ASP.NET), so they're published
 with the site.  Add that folder to `.gitignore`; to update Ren, update the package.
+
+To change where the files go, or to leave them out, set `RenStaticsDirectory` or
+`RenStaticsEnabled` in the project file.
 
 The package also has an optional .NET library that turns an `IDataReader`, `DataTable` or list of
 objects into Ren's data formats (see [dotnet/README.md](dotnet/README.md)).

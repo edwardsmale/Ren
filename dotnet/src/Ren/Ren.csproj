@@ -5,7 +5,7 @@
     <RootNamespace>Ren</RootNamespace>
     <PackageId>Ren</PackageId>
     <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../../VERSION').Trim())</Version>
-    <Description>A powerful client-side reporting library, providing data grids, charts, and data grouping, sorting and filtering.</Description>
+    <Description>A client-side reporting library: data grids, charts, filters and saved report settings, all in the browser.</Description>
     <Authors>Ed Smale</Authors>
     <Copyright>Copyright (c) 2026 Ed Smale</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
