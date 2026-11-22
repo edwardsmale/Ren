@@ -77,6 +77,7 @@ Ren.InViewFirstQueue = (() => {
             inView.push(work);
         }
         else {
+
             outOfView.push(work);
         }
 

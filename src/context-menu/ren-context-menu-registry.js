@@ -324,6 +324,7 @@ Ren.ContextMenuRegistry = (() => {
             return fn();
         }
         finally {
+
             rightClickAncestors = previousAncestors;
             Ren.LastRightClickPosition = previousPosition;
         }

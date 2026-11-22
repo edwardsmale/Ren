@@ -13,7 +13,12 @@
 Ren.CreateNumberEditorPopupWindow = (title, initialValue, onChange, options) => {
 
     // A settings window offers the number itself (see Ren.MenuItemProbe).
-    Ren.MenuItemProbe.intercept("number", { title, initialValue, onChange, options: options || {} });
+    Ren.MenuItemProbe.intercept("number", {
+        title,
+        initialValue,
+        onChange,
+        options: options || {}
+    });
 
     const width = (options && options.width) || 160;
     const height = (options && options.height) || 100;

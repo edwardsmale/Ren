@@ -116,7 +116,10 @@ Ren.FilterModule_SettingsWindow = (() => {
         if (item.id !== VIEW_SETTINGS_ITEM_ID || !Array.isArray(item.submenu)) return [item];
 
         return [{ section: item.section, text: "-" }].concat(item.submenu.map(subitem =>
-            isSeparator(subitem) ? { section: item.section, text: "-" } : inSection(subitem, item.section)
+            isSeparator(subitem) ? {
+                section: item.section,
+                text: "-"
+            } : inSection(subitem, item.section)
         ));
     });
 
@@ -302,7 +305,11 @@ Ren.FilterModule_SettingsWindow = (() => {
 
             Object.defineProperty(copy, "submenu", {
                 get: () => getMenuItemsForAll(
-                    scope, resolve(item.submenu) || [], path, section, reachesLevels
+                    scope,
+                    resolve(item.submenu) || [],
+                    path,
+                    section,
+                    reachesLevels
                 ),
                 enumerable: true,
                 configurable: true

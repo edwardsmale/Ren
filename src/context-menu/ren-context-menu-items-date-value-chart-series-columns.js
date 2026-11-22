@@ -908,6 +908,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         appendColumnTypeGroups(items, groups);
 
         if (props.subdivideColumn) {
+
             items.push(
                 Ren.MENU_SEPARATOR,
                 chart.subdivisionLimitMenuItem,
@@ -1010,7 +1011,10 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             const isRemovedQuarter = Ren.DateValueChart_InputColumns.getDateColumns(tabularData)
                 .some(column => column.columnIndex === currentColumnIndex && column.isQuarter);
 
-            removedDateEntries.set(visualisation, { entry: removedEntry, isQuarter: isRemovedQuarter });
+            removedDateEntries.set(visualisation, {
+                entry: removedEntry,
+                isQuarter: isRemovedQuarter
+            });
         }
         else if (columnIndex != null) {
 

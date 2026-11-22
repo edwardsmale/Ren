@@ -11,9 +11,10 @@
  *                  settings are of one of several things, such as one of a chart's series, has
  *                  subjects, { label, getOptions }, where getOptions gets [{ key, label }]: a
  *                  dropdown above its settings chooses which, and its key is passed to buildModel
- *                  and the tab's runAction.  subjects.initialKey, if given, is chosen at
- *                  first.  A tab whose subjects are fixed, such as all of a chart's series, has { label, text } instead, shown in a header like the
- *                  dropdown's, so the window keeps its layout as tabs are switched.
+ *                  and the tab's runAction.  subjects.initialKey, if given, is chosen at first.  A
+ *                  tab whose subjects are fixed, such as all of a chart's series, has { label, text
+ *                  } instead, shown in a header like the dropdown's, so the window keeps its layout
+ *                  as tabs are switched.
  *   runAction    - runs what a control does, as the menu would have run it, where a tab has no
  *                  runAction of its own.
  *   onReset      - optional: puts the owner's settings back, from a Reset link at the right of the

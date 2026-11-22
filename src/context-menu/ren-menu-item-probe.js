@@ -44,9 +44,11 @@ Ren.MenuItemProbe = (() => {
             value = fn();
         }
         catch (e) {
+
             value = undefined;
         }
         finally {
+
             trackedDependencies = outerDependencies;
         }
 
@@ -91,9 +93,11 @@ Ren.MenuItemProbe = (() => {
             action.apply(null, actionParameters ?? []);
         }
         catch (e) {
+
             if (e !== STOP_ACTION) result.kind = "error";
         }
         finally {
+
             interception = outerInterception;
         }
 

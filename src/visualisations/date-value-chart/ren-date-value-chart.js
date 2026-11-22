@@ -737,7 +737,8 @@ Ren.CreateDateValueChart = (() => {
         const previousAxes = props.axes;
 
         // A value axis' updateYScaleBehaviour is left unset until chosen, as how it scales by
-        // default depends on what the chart draws (see DateValueChart_Pies.getDefaultScaleBehaviour).
+        // default depends on what the chart draws (see
+        // DateValueChart_Pies.getDefaultScaleBehaviour).
         props.axes = {
             xAxis: {
                 updateXScaleBehaviour: xAxis.updateXScaleBehaviour || "AlwaysUpdate"

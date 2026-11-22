@@ -240,8 +240,8 @@ Ren.VisualisationOriginalSettings = (() => {
 
     /**
      * Puts a visualisation back to a snapshot taken earlier (see snapshot()) and draws it again.
-     * Unlike reset(), where a popup sits and its settings groups are left as they are, as a snapshot
-     * is of the visualisation's own settings alone.
+     * Unlike reset(), where a popup sits and its settings groups are left as they are, as a
+     * snapshot is of the visualisation's own settings alone.
      */
     const restore = (visualisation, settings) => {
 

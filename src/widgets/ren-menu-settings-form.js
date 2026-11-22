@@ -226,6 +226,7 @@ Ren.MenuSettingsForm = (container, options) => {
                 const selectedIndex = node.options.findIndex(option => option.selected);
 
                 optionElements.forEach((element, index) => {
+
                     element.disabled = !!node.options[index].isHidden;
                 });
 
@@ -256,7 +257,7 @@ Ren.MenuSettingsForm = (container, options) => {
             return isNaN(value) ? null : Math.min(node.max, Math.max(node.min, value));
         };
 
-        // As the editor it stands in for, a change shows as it is made and is kept once done.  Where
+        // As the editor it stands in for, a change shows as it is made and is kept once done. Where
         // typed values wait for Enter, the slider's still show as it's slid.
         const apply = (from, isDone) => {
 
@@ -290,6 +291,7 @@ Ren.MenuSettingsForm = (container, options) => {
                 node = newNode;
 
                 inputs.forEach(element => {
+
                     if (!isFocused(element)) element.value = String(node.value ?? "");
                 });
             }
@@ -506,6 +508,7 @@ Ren.MenuSettingsForm = (container, options) => {
             group._append(renderChildren(create("div", "list")._attr("data-list-key", node.key), node.children, depth + 1));
         }
         else {
+
             renderChildren(group, node.children, depth + 1);
         }
 
@@ -753,6 +756,7 @@ Ren.MenuSettingsForm = (container, options) => {
             n.options.forEach(option => { if (!option.isHidden) seenKeys.add(getOptionKey(n, option)); });
         }
         else if (n.type !== "group" && !n.isHidden) {
+
             seenKeys.add(n.key);
         }
     });

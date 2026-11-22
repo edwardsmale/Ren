@@ -54,6 +54,7 @@ Ren.DateValueChart_SettingsWindow = (() => {
             return Ren.ContextMenuRegistry.withOpener(marker, fn);
         }
         finally {
+
             marker.remove();
         }
     };
@@ -90,7 +91,11 @@ Ren.DateValueChart_SettingsWindow = (() => {
 
         const copy = Object.defineProperties({}, Object.getOwnPropertyDescriptors(item));
 
-        Object.defineProperty(copy, "section", { value: "Series", enumerable: true, configurable: true });
+        Object.defineProperty(copy, "section", {
+            value: "Series",
+            enumerable: true,
+            configurable: true
+        });
 
         return copy;
     };
@@ -267,7 +272,10 @@ Ren.DateValueChart_SettingsWindow = (() => {
                 {
                     title: "Chart",
                     buildModel: () => buildModel(
-                        visualisation, runAsChartMenu, isForChart, chartMemory
+                        visualisation,
+                        runAsChartMenu,
+                        isForChart,
+                        chartMemory
                     )
                 },
                 {
@@ -288,7 +296,10 @@ Ren.DateValueChart_SettingsWindow = (() => {
                 },
                 {
                     title: "Individual Series",
-                    subjects: { label: "Series", getOptions: () => getSeriesOptions(visualisation) },
+                    subjects: {
+                        label: "Series",
+                        getOptions: () => getSeriesOptions(visualisation)
+                    },
                     buildModel: (seriesKey) => {
 
                         const seriesIndex = Number(seriesKey);
@@ -305,6 +316,7 @@ Ren.DateValueChart_SettingsWindow = (() => {
                                 getScope: isOneColumn ? null : getSplitSeriesScope(visualisation, seriesIndex)
                             }
                         );
+
                     },
                     runAction: (fn, seriesKey) => runAsSeriesMenu(visualisation, Number(seriesKey), fn)
                 }

@@ -1431,5 +1431,6 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
     };
 };
 
-// Noted on items acting on the value column a split series is split from (see noteActsOnSourceColumn).
+// Noted on items acting on the value column a split series is split from (see
+// noteActsOnSourceColumn).
 Ren.ContextMenuItems_DateValueChart.SOURCE_COLUMN_DEPENDENCY = "source-column";

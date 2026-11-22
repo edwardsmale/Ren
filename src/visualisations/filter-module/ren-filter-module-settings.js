@@ -230,7 +230,8 @@ Ren.FilterModule_Settings = (s) => {
             .concat(itemKey);
     };
 
-    // Gets the keys of the columns of an item a setting is held on (see Ren.FilterModule_ItemLevels).
+    // Gets the keys of the columns of an item a setting is held on (see
+    // Ren.FilterModule_ItemLevels).
     const getItemSettingKeys = (itemKey, settingName) =>
         itemLevels.getSettingKeys(getItemLevelKeys(itemKey), settingName);
 

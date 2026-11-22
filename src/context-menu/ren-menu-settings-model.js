@@ -121,6 +121,7 @@ Ren.MenuSettingsModel = (() => {
             if (node.type === "group") labels.push(...getSelectedLabels(node.children));
             else if (node.type === "toggle" && node.checked) labels.push(node.label);
             else if (node.type === "choice") {
+
                 node.options.filter(option => option.selected).forEach(option => labels.push(option.label));
             }
         });
@@ -393,7 +394,9 @@ Ren.MenuSettingsModel = (() => {
                 isHidden: isAllHidden(options),
                 scope: getCommonScope(options),
                 item: selected
-                    ? { action: () => selected.item.action.apply(null, selected.item.actionParameters ?? []) }
+                    ? {
+                        action: () => selected.item.action.apply(null, selected.item.actionParameters ?? [])
+                    }
                     : null
             });
         }
@@ -403,7 +406,7 @@ Ren.MenuSettingsModel = (() => {
 
     /**
      * Joins the toggles that are options of one choice (see getExclusiveKey) into it, where the
-     * first of them is.  They needn't be neighbours, as each may be followed by settings of its own.
+     * first of them is. They needn't be neighbours, as each may be followed by settings of its own.
      */
     const joinExclusiveToggles = (nodes) => {
 
@@ -506,6 +509,7 @@ Ren.MenuSettingsModel = (() => {
     const setApartScopes = (nodes, parentKey, isTop) => {
 
         nodes.forEach(node => {
+
             if (node.type === "group") node.children = setApartScopes(node.children, node.key, false);
         });
 
@@ -526,7 +530,9 @@ Ren.MenuSettingsModel = (() => {
         });
 
         const scopeGroups = Array.from(nodesByScope, ([scope, children]) =>
-            Object.assign(createGroup(scope, null, parentKey + "/scope:" + scope, children), { isScope: true })
+            Object.assign(createGroup(scope, null, parentKey + "/scope:" + scope, children), {
+                isScope: true
+            })
         );
 
         return nodes.filter((node, index) => !scopes[index]).concat(scopeGroups);
@@ -622,7 +628,10 @@ Ren.MenuSettingsModel = (() => {
             return described;
         };
 
-        const getItemScope = (item, dependencies) => settings.getScope({ item, dependencies }) || null;
+        const getItemScope = (item, dependencies) => settings.getScope({
+            item,
+            dependencies
+        }) || null;
 
         const describeShown = (item, parentKey, looked) => {
 
@@ -667,7 +676,11 @@ Ren.MenuSettingsModel = (() => {
                 if (!nodes.length) return null;
 
                 if (item.isList) {
-                    return { kind: "node", node: Object.assign(createGroup(label, title, key, nodes), { isList: true }) };
+
+                    return {
+                        kind: "node",
+                        node: Object.assign(createGroup(label, title, key, nodes), { isList: true })
+                    };
                 }
 
                 if (countControls(nodes) > MAX_INLINE_CONTROLS) {

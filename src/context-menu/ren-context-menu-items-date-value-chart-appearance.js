@@ -927,12 +927,13 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     });
 
     // What the series are drawn as - the kinds, together so that the settings window shows them as
-    // one choice, then the line style and dot size - then how the chart lays out each kind.  On a series' menu the kinds, line style and dot size
-    // are that series', and the layouts follow under the whole chart's heading.  Where the series
-    // are drawn as a mixture, none of the kinds is ticked.  The series drawn as pies share a pie
-    // per period, drawn over the plot's top half where other series are drawn as bars, lines or
-    // dots.  In a settings form the kinds lead the line style and dot size, set in beneath them, so
-    // that "Draw as" stays in the same place whichever kind is chosen.
+    // one choice, then the line style and dot size - then how the chart lays out each kind.  On a
+    // series' menu the kinds, line style and dot size are that series', and the layouts follow
+    // under the whole chart's heading.  Where the series are drawn as a mixture, none of the kinds
+    // is ticked.  The series drawn as pies share a pie per period, drawn over the plot's top half
+    // where other series are drawn as bars, lines or dots.  In a settings form the kinds lead the
+    // line style and dot size, set in beneath them, so that "Draw as" stays in the same place
+    // whichever kind is chosen.
     const chartTypeMenuItem = {
         section: "Appearance",
         text: "Draw as",

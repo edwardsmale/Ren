@@ -380,6 +380,7 @@ Ren.FormatFunctions = (() => {
                 {},
                 Ren.FunctionResolver.parseJSDocDefaults(spec)
             );
+
             escapeValues = givesHtml(Ren.FormatFunctionUtils.parseFunctionHeader(spec));
         }
 
