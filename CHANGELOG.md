@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.2.1 (2026-11-22)
 
 - Stop a redrawn word cloud drawing a second copy of itself under the first.
 - Run the built-in functions without `unsafe-eval`, and custom ones with a nonce instead.
