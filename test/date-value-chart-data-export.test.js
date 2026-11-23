@@ -165,13 +165,10 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(createProps(), createRows(), EXCEL_FORMATS);
 
-        expect(sheet.schema.map(column => column.column)).toEqual(["Month", "Net sales", "Orders"]);
-        expect(sheet.schema[0].type).toBe(Date);
-        expect(sheet.schema[0].format).toBe("dd/mm/yyyy");
-        expect(sheet.schema[1].type).toBe(Number);
-        expect(sheet.objects.length).toBe(2);
-        expect(sheet.schema.map(column => column.value(sheet.objects[1])))
-            .toEqual([new Date(2026, 1, 1), null, 4]);
+        expect(sheet.columns.map(column => column.heading)).toEqual(["Month", "Net sales", "Orders"]);
+        expect(sheet.columns[0].format).toBe("dd/mm/yyyy");
+        expect(sheet.rows.length).toBe(2);
+        expect(sheet.rows[1]).toEqual([new Date(Date.UTC(2026, 1, 1)), null, 4]);
     });
 
     test("buildExcelSheet_SeriesFormats_ExcelFormats", () => {
@@ -186,7 +183,7 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(props, createRows(), EXCEL_FORMATS);
 
-        expect(sheet.schema.slice(1).map(column => column.format))
+        expect(sheet.columns.slice(1).map(column => column.format))
             .toEqual(["\"£\"0.00", "0", "0.00%"]);
     });
 
@@ -198,8 +195,8 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(props, createRows(), EXCEL_FORMATS);
 
-        expect(sheet.schema[1].format).toBeUndefined();
-        expect(sheet.schema[2].format).toBeUndefined();
+        expect(sheet.columns[1].format).toBeNull();
+        expect(sheet.columns[2].format).toBeNull();
     });
 
     test("buildExcelSheet_DateWithTime_DateTimeFormat", () => {
@@ -210,7 +207,7 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(createProps(), rows, EXCEL_FORMATS);
 
-        expect(sheet.schema[0].format).toBe("dd/mm/yyyy hh:mm");
+        expect(sheet.columns[0].format).toBe("dd/mm/yyyy hh:mm");
     });
 
     test("buildExcelSheet_HiddenSeries_LeftOut", () => {
@@ -221,8 +218,8 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(props, createRows(), EXCEL_FORMATS);
 
-        expect(sheet.schema.map(column => column.column)).toEqual(["Month", "Orders"]);
-        expect(sheet.schema[1].value(sheet.objects[0])).toBe(3);
+        expect(sheet.columns.map(column => column.heading)).toEqual(["Month", "Orders"]);
+        expect(sheet.rows[0][1]).toBe(3);
     });
 
     test("buildExcelSheet_NotANumberOrBadDate_Empty", () => {
@@ -235,7 +232,7 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(createProps(), rows, EXCEL_FORMATS);
 
-        expect(sheet.objects[0]).toEqual([null, null, null]);
+        expect(sheet.rows[0]).toEqual([null, null, null]);
     });
 
     test("buildExcelSheet_SeriesNamedAsDates_KeepsBothColumns", () => {
@@ -246,37 +243,42 @@ describe("Ren.DateValueChart_DataExport", () => {
 
         const sheet = DataExport.buildExcelSheet(props, createRows(), EXCEL_FORMATS);
 
-        expect(sheet.schema[0].value(sheet.objects[0])).toEqual(new Date(2026, 0, 1));
-        expect(sheet.schema[1].value(sheet.objects[0])).toBe(1.5);
+        expect(sheet.columns.map(column => column.heading)).toEqual(["Month", "Month", "Orders"]);
+        expect(sheet.rows[0][0]).toEqual(new Date(Date.UTC(2026, 0, 1)));
+        expect(sheet.rows[0][1]).toBe(1.5);
     });
 
-    test("downloadExcel_WriterOnPage_SheetWritten", () => {
+    test("downloadExcel_PlottedData_SheetNamedAsTheFile", async () => {
 
-        const writeXlsxFile = jest.fn();
+        const download = jest.spyOn(Ren.XlsxWriter, "download").mockResolvedValue(undefined);
         const props = createProps();
 
         props.plottedData = createRows();
-        window.writeXlsxFile = writeXlsxFile;
 
         jest.spyOn(Ren.DateValueChart_ImageExport, "getFileName")
             .mockReturnValue("Sales: by month [2026].xlsx");
 
-        DataExport.downloadExcel(props);
+        await DataExport.downloadExcel(props);
 
-        const options = writeXlsxFile.mock.calls[0][1];
+        const [sheets, fileName] = download.mock.calls[0];
 
-        expect(DataExport.canDownloadExcel()).toBe(true);
-        expect(writeXlsxFile.mock.calls[0][0].length).toBe(2);
-        expect(options.fileName).toBe("Sales: by month [2026].xlsx");
-        expect(options.sheet).toBe("Sales  by month  2026 ");
-        expect(options.schema.length).toBe(3);
+        expect(fileName).toBe("Sales: by month [2026].xlsx");
+        expect(sheets.length).toBe(1);
+        expect(sheets[0].name).toBe("Sales: by month [2026]");
+        expect(sheets[0].columns.length).toBe(3);
+        expect(sheets[0].rows.length).toBe(2);
 
-        delete window.writeXlsxFile;
         jest.restoreAllMocks();
     });
 
-    test("canDownloadExcel_NoWriterOnPage_False", () => {
+    test("downloadExcel_NoPlottedData_NothingSaved", async () => {
 
-        expect(DataExport.canDownloadExcel()).toBe(false);
+        const download = jest.spyOn(Ren.XlsxWriter, "download").mockResolvedValue(undefined);
+
+        await DataExport.downloadExcel(createProps());
+
+        expect(download).not.toHaveBeenCalled();
+
+        jest.restoreAllMocks();
     });
 });

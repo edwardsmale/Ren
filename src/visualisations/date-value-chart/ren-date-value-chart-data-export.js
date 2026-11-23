@@ -241,7 +241,7 @@ Ren.DateValueChart_DataExport = (() => {
         date.getHours() !== 0 || date.getMinutes() !== 0 || date.getSeconds() !== 0;
 
     /**
-     * Gets a date at the same wall-clock time in UTC, as the Excel writer reads a date in UTC, so
+     * Gets a date at the same wall-clock time in UTC, as Ren.XlsxWriter reads a date in UTC, so
      * that a period starting at midnight in summer time isn't written as the day before.
      */
     const toExcelDate = (date) => new Date(Date.UTC(
@@ -254,10 +254,9 @@ Ren.DateValueChart_DataExport = (() => {
     ));
 
     /**
-     * Gets the chart's plotted data as an Excel sheet, as { schema, objects }: a column for the
-     * dates, shown with their times where any has one, then a column for each series shown, in
-     * the series' own format.  Each object is keyed by its column's place, so that a series named
-     * as the dates are can't take their column.
+     * Gets the chart's plotted data as an Excel sheet's { columns, rows } (see Ren.XlsxWriter): a
+     * column for the dates, shown with their times where any has one, then a column for each
+     * series shown, in the series' own format.
      */
     const buildExcelSheet = (props, rows, excelFormats) => {
 
@@ -267,61 +266,45 @@ Ren.DateValueChart_DataExport = (() => {
             ? excelFormats.dateTime
             : excelFormats.date;
 
-        const schema = [{
-            column: props.dateHeading || "Date",
-            type: Date,
+        const columns = [{
+            heading: props.dateHeading || "Date",
             format: dateFormat,
-            width: 14,
-            value: object => object[0]
+            width: 14
         }];
 
         for (let i = 0; i < shown.length; i++) {
 
-            const column = {
-                column: shown[i].name,
-                type: Number,
-                width: Math.max(12, Math.min(String(shown[i].name).length + 2, 40)),
-                value: object => object[i + 1]
-            };
-
-            const numberFormat = getExcelNumberFormat(
-                props.valueColumnFormats?.[shown[i].index],
-                excelFormats
-            );
-
-            if (numberFormat) column.format = numberFormat;
-
-            schema.push(column);
+            columns.push({
+                heading: shown[i].name,
+                format: getExcelNumberFormat(props.valueColumnFormats?.[shown[i].index], excelFormats),
+                width: Math.max(12, Math.min(String(shown[i].name).length + 2, 40))
+            });
         }
 
-        const objects = (rows || []).map((row, rowIndex) => {
+        const sheetRows = (rows || []).map((row, rowIndex) => {
 
-            const object = [isValidDate(dates[rowIndex]) ? toExcelDate(dates[rowIndex]) : null];
+            const sheetRow = [isValidDate(dates[rowIndex]) ? toExcelDate(dates[rowIndex]) : null];
 
             for (let i = 0; i < shown.length; i++) {
 
                 const value = roundValue(row[shown[i].heading], shown[i].format);
 
-                object.push(typeof value === "number" && isFinite(value) ? value : null);
+                sheetRow.push(typeof value === "number" && isFinite(value) ? value : null);
             }
 
-            return object;
+            return sheetRow;
         });
 
-        return { schema, objects };
+        return { columns, rows: sheetRows };
     };
 
     /**
-     * Gets a value indicating whether the page has the Excel writer the data grids save with.
-     */
-    const canDownloadExcel = () => typeof window.writeXlsxFile === "function";
-
-    /**
      * Saves the chart's plotted data as an Excel file, its sheet named as the file is.
+     * @returns {Promise<void>}
      */
     const downloadExcel = (props) => {
 
-        if (!props.plottedData || !canDownloadExcel()) return;
+        if (!props.plottedData) return Promise.resolve();
 
         const chart = getExportedChart(props);
         const sheet = buildExcelSheet(
@@ -332,19 +315,11 @@ Ren.DateValueChart_DataExport = (() => {
 
         const fileName = Ren.DateValueChart_ImageExport.getFileName(props, "xlsx");
 
-        // A sheet's name can't hold some characters, nor run past 31.
-        const sheetName = fileName
-            .replace(/\.xlsx$/, "")
-            .replace(/[\\/*?:[\]]/g, " ")
-            .substring(0, 31);
+        sheet.name = fileName.replace(/\.xlsx$/, "");
 
-        window.writeXlsxFile(sheet.objects, {
-            schema: sheet.schema,
-            sheet: sheetName,
-            fileName,
-            fontFamily: "Calibri",
-            fontSize: 11,
-            stickyRowsCount: 1
+        return Ren.XlsxWriter.download([sheet], fileName).catch((e) => {
+
+            Ren.GlobalErrorHandler.logError("[DateValueChart] Error writing the Excel file:", e);
         });
     };
 
@@ -359,7 +334,6 @@ Ren.DateValueChart_DataExport = (() => {
         downloadCsv,
         canCopyText,
         copyTsv,
-        canDownloadExcel,
         downloadExcel
     };
 })();

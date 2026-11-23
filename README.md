@@ -119,6 +119,5 @@ yourself (see [Developing Ren](docs/development.md)) and serve the files in `dis
 
 ## Licence
 
-MIT (see [LICENSE](LICENSE)).  `ren.js` includes Prism and code ported from d3, and Excel downloads
-use write-excel-file, which a page includes itself if it wants them.  Their licences are in
+MIT (see [LICENSE](LICENSE)).  `ren.js` includes Prism and code ported from d3.  Their licences are in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

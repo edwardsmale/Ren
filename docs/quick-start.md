@@ -6,7 +6,7 @@ Ren finds everything it needs through the page's DOM, a `ren.config`, and some e
 
 To get a grid on a page, you'll need to:
 - Include `ren.css`
-- Include write-excel-file, then `ren.js`
+- Include `ren.js`
 - Add a `<ren-grid>` element pointing at some data
 
 #### A whole report
@@ -16,7 +16,6 @@ Create a page with HTML:
 ```html
 <link rel="stylesheet" href="ren.css">
 
-<script src="write-excel-file.min.js"></script>
 <script src="ren.js"></script>
 
 <ren-grid src="/data/sales.json" show-row-and-column-headings />
@@ -24,14 +23,13 @@ Create a page with HTML:
 On page load, Ren replaces `<ren-grid>` with a grid component using data fetched from your `src`
 endpoint.
 
-(write-excel-file is only used by the Excel downloads, so strictly you only need it if you're
-using them.  Ren draws its charts itself, so they need nothing else.)
+Ren needs no other scripts: it draws its charts and writes its Excel downloads itself, in the
+browser.
 
 In production, use `ren.min.js` and `ren.min.css`, which are the same, minified (about 1.8 MB
 rather than 6 MB of script).  Each has a source map, so errors still point at Ren's own source.
 
-To import Ren as an ES module, use `ren.esm.js` (or `ren.esm.min.js`).  write-excel-file still
-goes on the page as a script, as Ren uses it as a global:
+To import Ren as an ES module, use `ren.esm.js` (or `ren.esm.min.js`):
 
 ```html
 <script type="module">

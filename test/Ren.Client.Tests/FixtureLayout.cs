@@ -68,7 +68,6 @@ public static partial class FixtureLayout
                 <meta charset="utf-8">
                 <title>{{reportName}} - Ren test fixture</title>
                 <link href="/dist/ren.css" rel="stylesheet" />
-                <script src="/examples/lib/write-excel-file.v1.4.27.min.js"></script>
                 <script src="/dist/ren.js"></script>
             {{pageScript}}{{GetFormatFunctionsScript()}}</head>
             <body>

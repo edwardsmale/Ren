@@ -11,6 +11,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 - Replace the JSON settings window's file path and Save button with a Copy all button.
 - Add a `<ren-report-settings src="..." />` element that loads settings from a specific endpoint.
 - Add "Scroll to bottom on load" to data grids' Layout menu.
+- Write Excel downloads with Ren's own code; remove dependency on write-excel-file package.
 
 ## 1.2.2 (2026-11-22)
 

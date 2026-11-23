@@ -3,7 +3,21 @@
  */
 Ren.Excel = (() => {
 
-    const exportToExcel = (dataGrids, downloadDataFilename) => {
+    /**
+     * Gets a link as an Excel formula, with the quotes in its parts doubled as Excel needs, and
+     * its text to show until Excel works the formula out.
+     */
+    const getHyperlinkFormula = (href, text) => {
+
+        const quote = part => "\"" + String(part ?? "").replace(/"/g, "\"\"") + "\"";
+
+        return { formula: `HYPERLINK(${quote(href)}, ${quote(text)})`, value: text };
+    };
+
+    /**
+     * Gets the sheets (see Ren.XlsxWriter) for the given data grids, one each.
+     */
+    const buildSheets = (dataGrids) => {
 
         const excelFormats = Ren.ValueFormatter.getExcelFormats();
 
@@ -27,19 +41,13 @@ Ren.Excel = (() => {
             }
         };
 
-        const sheets = [];
-        const allSchemas = [];
-        const allObjects = [];
-
-        dataGrids.forEach((dataGrid) => {
+        return dataGrids.map((dataGrid) => {
 
             const tabularData = dataGrid.tabularData;
             const columnTypesAndFormats = tabularData.ColumnModels.map(getColumnTypeAndFormat);
 
             const columnCalcFunctions =
                 dataGrid.dataGroupingSettings.getDataRowsColumnFormats().columnCalcFunctions;
-
-            const schema = [];
 
             // Cache visible column indices to avoid repeated function calls
             const visibleColumnIndices = dataGrid.gridState.getVisibleColumnIndices ?
@@ -48,28 +56,13 @@ Ren.Excel = (() => {
                     length: tabularData.ColumnCount
                 }, (_, i) => i).filter(i => dataGrid.gridState.isColumnVisible(i));
 
-            // Build schema for visible columns
-            visibleColumnIndices.forEach((columnIndex) => {
+            const columns = visibleColumnIndices.map(columnIndex => ({
+                heading: tabularData.ColumnModels[columnIndex].Heading,
+                format: columnTypesAndFormats[columnIndex].format,
+                width: dataGrid.gridState.getColumnWidth(columnIndex) / 5
+            }));
 
-                const columnModel = tabularData.ColumnModels[columnIndex];
-                const columnTypeAndFormat = columnTypesAndFormats[columnIndex];
-
-                const schemaColumn = {
-                    column: columnModel.Heading,
-                    type: columnTypeAndFormat.type
-                };
-
-                if (columnTypeAndFormat.format) {
-                    schemaColumn.format = columnTypeAndFormat.format;
-                }
-
-                schemaColumn.value = c => c[columnModel.Heading];
-                schemaColumn.width = dataGrid.gridState.getColumnWidth(columnIndex) / 5;
-
-                schema.push(schemaColumn);
-            });
-
-            const objects = [];
+            const rows = [];
 
             const compiledFilter = dataGrid.dataGroupingSettings.hasFilter() ?
                 Ren.Filter.createCompiledFilter(tabularData, dataGrid.dataGroupingSettings) :
@@ -82,15 +75,12 @@ Ren.Excel = (() => {
 
                 const rowModel = tabularData.RowModels[rowIndex];
 
-                const row = {};
+                const row = [];
 
                 // Built lazily: only allocated for rows where at least one visible column has
                 // a calc function that needs to reference other column values via rowVals.
                 let rowVals = null;
 
-                let columnIndex = 0;
-
-                // Iterate only through visible columns using the cached indices.
                 for (let visibleIndex = 0; visibleIndex < visibleColumnIndices.length; visibleIndex++) {
 
                     const x = visibleColumnIndices[visibleIndex];
@@ -138,11 +128,10 @@ Ren.Excel = (() => {
 
                         if (elems.length === 1 && elems[0].tagName === "A") {
 
-                            const href = elems[0].getAttribute("href");
-                            const text = elems[0].textContent;
-
-                            outputValue = `=HYPERLINK("${href}", "${text}")`;
-                            schema[columnIndex].type = "Formula";
+                            outputValue = getHyperlinkFormula(
+                                elems[0].getAttribute("href"),
+                                elems[0].textContent
+                            );
                         }
                         else {
 
@@ -150,43 +139,40 @@ Ren.Excel = (() => {
                         }
                     }
 
-                    if (columnTypeAndFormat.type === Date && !outputValue.toLocaleDateString) {
+                    // The dates are parsed as UTC, as Ren.XlsxWriter reads them.
+                    if (columnTypeAndFormat.type === Date && !(outputValue instanceof Date)) {
 
                         outputValue = null;
                     }
 
-                    row[tabularData.ColumnModels[x].Heading] = outputValue;
-
-                    columnIndex++;
+                    row.push(outputValue);
                 }
 
-                objects.push(row);
+                rows.push(row);
             }
 
-            let title = tabularData.Title;
-
-            title = title.replace(/&/g, "+");
-            title = title.replace(/[\\/*?:[\]]/g, " ");
-            title = title.substring(0, 31);
-
-            sheets.push(title);
-            allSchemas.push(schema);
-            allObjects.push(objects);
+            return {
+                name: tabularData.Title.replace(/&/g, "+"),
+                columns,
+                rows
+            };
         });
+    };
 
-        // See https://www.npmjs.com/package/write-excel-file
+    /**
+     * Saves the given data grids as an Excel file, a sheet each.
+     * @returns {Promise<void>}
+     */
+    const exportToExcel = (dataGrids, downloadDataFilename) => {
 
-        writeXlsxFile(allObjects, {
-            sheets,
-            schema: allSchemas,
-            fileName: downloadDataFilename,
-            fontFamily: "Calibri",
-            fontSize: 11,
-            stickyRowsCount: 1
+        return Ren.XlsxWriter.download(buildSheets(dataGrids), downloadDataFilename).catch((e) => {
+
+            Ren.GlobalErrorHandler.logError("[Excel] Error writing the Excel file:", e);
         });
     };
 
     return {
+        buildSheets,
         exportToExcel
     };
 })();

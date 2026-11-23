@@ -1365,7 +1365,6 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
                 {
                     text: "Excel",
                     id: "chart-download-data-xlsx",
-                    visible: () => Ren.DateValueChart_DataExport.canDownloadExcel(),
                     action: () => Ren.DateValueChart_DataExport.downloadExcel(props)
                 }
             ]

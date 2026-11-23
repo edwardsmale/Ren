@@ -17,9 +17,6 @@ public class JestFileTests
 {
     private const string Shim = "/test/Ren.Client.Tests/jest-in-the-browser.js";
 
-    // Scripts a page that uses Ren includes, which the Jest setup runs before each file.
-    private static readonly string[] PageScripts = ["/examples/lib/write-excel-file.v1.4.27.min.js"];
-
     public TestContext TestContext { get; set; } = null!;
 
     public static IEnumerable<object[]> TestFiles =>
@@ -50,7 +47,7 @@ public class JestFileTests
 
             var json = await page.EvaluateAsync<JsonElement>(
                 "([file, scripts, env]) => window.__renJest.run(file, scripts, env)",
-                new object[] { "/test/" + fileName, PageScripts.Append(RepoFiles.BuiltScript).ToArray(), env });
+                new object[] { "/test/" + fileName, new[] { RepoFiles.BuiltScript }, env });
 
             var run = json.Deserialize<FileRun>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 

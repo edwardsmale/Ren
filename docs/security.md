@@ -14,9 +14,7 @@ policy, and what it does to the page) and the risks of letting users save report
 - After the page has loaded (injected, lazy-loaded, or by a single-page app), when it starts up
   straight away rather than waiting for `DOMContentLoaded`
 
-However it's loaded, `Ren` is also `window.Ren`, as its elements need it, and
-write-excel-file has to be a global (`window.writeXlsxFile`) before it's used.
-Nothing else Ren declares is a global, except Prism, which it includes and which sets
+However it's loaded, `Ren` is also `window.Ren`, as its elements need it.  Nothing else Ren declares is a global, except Prism, which it includes and which sets
 `window.Prism`.  A page with its own Prism will find it replaced.
 
 #### Content security policy

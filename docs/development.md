@@ -149,7 +149,7 @@ Some things to know:
 ### Unit tests
 
 `test/*.test.js` are Jest tests.  `JestFileTests` runs each file in its own Chrome page, after
-write-excel-file and `ren.js`, so the tests can use `Ren` as a global.
+`ren.js`, so the tests can use `Ren` as a global.
 `test/Ren.Client.Tests/jest-in-the-browser.js` provides the parts of Jest and Node they use.  Each
 file shows as one test, which lists the tests in it that failed.
 
@@ -169,8 +169,8 @@ Helpers and tips:
 ### Browser tests
 
 The tests in `test/Ren.Client.Tests/Browser/` open the pages in `test/browser/fixtures/`, for what
-needs a real page (rendering, `ren.config`, popups).  The pages load `/dist/ren.js` and
-`examples/lib/`, with data from `examples/data/` or a script element.
+needs a real page (rendering, `ren.config`, popups).  The pages load `/dist/ren.js`, with
+data from `examples/data/` or a script element.
 
 A fixture starting with `<!doctype` is served as it is.  Any other fixture is a report view, which
 is put in a layout (see `FixtureLayout.cs`) that adds Ren's files, a report context, a
