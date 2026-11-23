@@ -16,10 +16,13 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
     // context that the editor was opened from.  These are passed in as visualisation options.
     const settingsName = visualisation.settingsName ?? null;
     const isPreset = visualisation.isPreset ?? true;
+    const isDefault = visualisation.isDefault ?? false;
     const reportName = visualisation.settingsReportName ??
         Ren.WebReports.getWebReportName();
 
-    const kind = isPreset ? "preset" : "user";
+    let kind = isPreset ? "preset" : "user";
+
+    if (isDefault) kind = "default";
 
     // Builds the URL of the endpoint that gives the settings' file path, which only the server has.
     const buildFilePathUrl = () => {
@@ -109,9 +112,14 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
 
 /**
  * Opens the JSON report settings editor in a popup window for the given settings name and preset
- * flag.
+ * flag, or for the report's default settings.
  */
-Ren.ShowJsonReportSettingsEditor = (settingsName, isPreset, reportName) => {
+Ren.ShowJsonReportSettingsEditor = (
+    settingsName,
+    isPreset,
+    reportName,
+    { isDefault = false } = {}
+) => {
 
     Ren.VisualisationCreator.createVisualisation({
         visualisationTypeName: "JsonReportSettingsEditor",
@@ -119,6 +127,7 @@ Ren.ShowJsonReportSettingsEditor = (settingsName, isPreset, reportName) => {
         sourceVisualisation: null,
         settingsName: settingsName ?? null,
         isPreset: isPreset ?? true,
+        isDefault,
         settingsReportName: reportName ?? null,
         popupTitle: "JSON settings",
         isPopup: true,
@@ -142,12 +151,22 @@ Ren.ShowJsonReportSettingsEditorForElement = (element) => {
     let isPreset = true;
     let reportName = null;
 
+    // A report context that doesn't say which settings it was rendered from has its default
+    // settings, which are those Ctrl+S saves.
+    let isDefault = true;
+
     if (reportContext) {
 
         settingsName = reportContext.getAttribute("data-settings-name") || null;
         isPreset = reportContext.getAttribute("data-is-preset") !== "false";
         reportName = reportContext.getAttribute("data-report-name") || null;
+        isDefault = !reportContext.hasAttribute("data-is-preset");
     }
 
-    Ren.ShowJsonReportSettingsEditor(settingsName, isPreset, reportName);
+    Ren.ShowJsonReportSettingsEditor(
+        settingsName,
+        isPreset,
+        reportName,
+        { isDefault }
+    );
 };

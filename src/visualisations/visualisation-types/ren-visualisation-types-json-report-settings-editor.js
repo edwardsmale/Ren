@@ -4,6 +4,7 @@ Ren.VisualisationTypes_JsonReportSettingsEditor = {
     availableOptions: {
         settingsName: "String",
         isPreset: "Boolean",
+        isDefault: "Boolean",
         settingsReportName: "String"
     },
     synchronisedOptions: {
