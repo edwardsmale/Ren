@@ -26,7 +26,9 @@ Ren.DateRangeSummariser = (() => {
         return { y, m, d: 1 };
     };
 
-    const quarterNumber = (ymd) => Math.floor((ymd.m - 1) / 3) + 1;
+    const nextDay = (ymd) => Ren.DateUtils.toYmd(new Date(ymd.y, ymd.m - 1, ymd.d + 1));
+
+    const quarterNumber =(ymd) => Math.floor((ymd.m - 1) / 3) + 1;
 
     const isTD = (summary) => summary.endsWith(" to date");
 
@@ -58,7 +60,7 @@ Ren.DateRangeSummariser = (() => {
     };
 
     /**
-     * Returns a human-readable summary of a date range, such as "Q2 2026", "Q2 2026 to date",
+     * Returns a human-readable summary of a date range, such as "Today", "Q2 2026", "Q2 2026 to date",
      * "2025", "2026 to date", "Oct 2026", or "Jun 2026 to date".  Returns null if the range does
      * not align to a recognised period.
      * @param {Date|string} startDate - Start of the range (inclusive).  Date, yyyy-MM-dd, or
@@ -80,6 +82,8 @@ Ren.DateRangeSummariser = (() => {
 
         const today = currentDate ? Ren.DateUtils.toYmd(currentDate) : Ren.DateUtils.toYmd(Ren.DateUtils.todayAsSortableDate());
         const endIsToday = ymdEqual(end, today);
+
+        if (ymdEqual(start, today) && ymdEqual(end, nextDay(today))) return "Today";
 
         if (isYearStart(start)) {
 
