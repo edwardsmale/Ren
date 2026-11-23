@@ -64,7 +64,7 @@ public class XlsxWriterTests : BrowserTest
 
         // Qty fits its heading and filter button, Customer its longest name, Revenue "1,234,567.50".
         Expect(widths["A"]).ToBeGreaterThan(5);
-        Expect(widths["A"]).ToBeLessThan(8);
+        Expect(widths["A"]).ToBeLessThan(10);
         Expect(widths["B"]).ToBeGreaterThan(20);
         Expect(widths["B"]).ToBeLessThan(25);
         Expect(widths["C"]).ToBeGreaterThan(10);

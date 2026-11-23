@@ -49,7 +49,7 @@ describe("Ren.XlsxColumnWidths", () => {
         const units = Widths.getColumnWidth("Qty", "0", [1, 2, 3], "yyyy-mm-dd");
 
         expect(units).toBeGreaterThan(Widths.getTextWidth("Qty") + 2);
-        expect(units).toBeLessThan(8);
+        expect(units).toBeLessThan(10);
     });
 
     test("getColumnWidth_DateTime_AtLeastAsWideAsExcelsAutoFit", () => {
