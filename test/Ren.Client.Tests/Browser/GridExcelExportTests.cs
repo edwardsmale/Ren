@@ -38,4 +38,22 @@ public class GridExcelExportTests : BrowserTest
         Expect(sheet["E2"]!.Number).ToBe(14.0);
         Expect(sheet["E2"]!.NumberFormat).ToMatch(@"0\.00");
     }
+
+    [TestMethod("writes a Boolean column's values as the numbers 1 and 0")]
+    public async Task WritesABooleanColumnsValuesAsTheNumbers1And0()
+    {
+        await Ren.OpenAsync("ported/DataGridColumnTest04.html");
+
+        var sheet = (await ExportAsync()).Sheets.Single();
+        var column = Array.IndexOf(sheet.Headings, "Active");
+
+        Expect(column).ToBeGreaterThanOrEqual(0);
+
+        var letters = Xlsx.ColumnLetters(column);
+        var cells = sheet.Rows.Skip(1).Select(row => row[letters]).ToArray();
+
+        Expect(cells.Length).ToBeGreaterThan(0);
+        Expect(Text.Sorted(cells.Select(cell => cell.Value).Distinct())).ToEqual(new[] { "0", "1" });
+        Expect(cells.All(cell => cell.IsNumber)).ToBe(true);
+    }
 }

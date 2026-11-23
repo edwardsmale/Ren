@@ -36,6 +36,8 @@ Ren.Excel = (() => {
                 case Ren.SpreadsheetColumnFormatEnum.Percentage: return { type: Number, format: "0.00%", getValue: v => parseFloat(v) };
                 case Ren.SpreadsheetColumnFormatEnum.Date: return { type: Date, format: excelFormats.date, getValue: v => Ren.DateUtils.parseYYYYMMDD(v) };
                 case Ren.SpreadsheetColumnFormatEnum.DateTime: return { type: Date, format: excelFormats.dateTime, getValue: v => Ren.DateUtils.parseYYYYMMDD_HHmmss(v) };
+                // A value is 1 or 0 (or, from a calc function, perhaps true or false).
+                case Ren.SpreadsheetColumnFormatEnum.Boolean: return { type: Number, format: null, getValue: v => v === "true" ? 1 : v === "false" ? 0 : parseFloat(v) };
                 case Ren.SpreadsheetColumnFormatEnum.IndexedString: return { type: String, format: null, getValue: v => Ren.IndexedStringUtils.getText(v?.toString()) };
                 default: return { type: String, format: null, getValue: v => v?.toString() };
             }

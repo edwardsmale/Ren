@@ -15,9 +15,14 @@ public static class Xlsx
     private static readonly XNamespace Rels = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
     private static readonly XNamespace PackageRels = "http://schemas.openxmlformats.org/package/2006/relationships";
 
-    /// <summary>A cell: its text or number as written, its formula, and how it's shown.</summary>
-    public sealed record Cell(string Ref, string Value, string? Formula, string? NumberFormat, bool Bold)
+    /// <summary>
+    /// A cell: its text or number as written, its type (null for a number), its formula, and how
+    /// it's shown.
+    /// </summary>
+    public sealed record Cell(string Ref, string Value, string? Type, string? Formula, string? NumberFormat, bool Bold)
     {
+        public bool IsNumber => Type is null or "n";
+
         public double Number => double.Parse(Value, NumberStyles.Float, CultureInfo.InvariantCulture);
 
         /// <summary>Gets the cell's number as a date, as Excel counts days from 30 December 1899.</summary>
@@ -114,7 +119,7 @@ public static class Xlsx
                         ? string.Concat(c.Element(Main + "is")!.Elements(Main + "t").Select(t => t.Value))
                         : c.Element(Main + "v")?.Value ?? "";
 
-                    return new Cell(reference, value, c.Element(Main + "f")?.Value, style.Format, style.Bold);
+                    return new Cell(reference, value, (string?)c.Attribute("t"), c.Element(Main + "f")?.Value, style.Format, style.Bold);
                 })
                 .ToDictionary(cell => cell.Ref.TrimEnd("0123456789".ToCharArray())))
                 .ToArray();
