@@ -36,6 +36,15 @@ Ren.CreateGridSet = (tabularDataSet, visualisation) => {
         });
     });
 
+    const scrollToBottom = () => {
+
+        gridSetViewport.scrollTop = gridSetViewport.scrollHeight;
+    };
+
+    // Set once the grids are created, for a grid whose grid state scrolls it to the bottom when
+    // first shown, and cleared once it has been: when the viewport has been sized to its rows.
+    let isScrollToBottomPending = false;
+
     const getActiveDataTabIndex = () => dataGrids[activeDataGridIndex].tabularData.dataTabIndex;
 
     // Gets the live settings of the grid showing a data tab, or null.  A set's grids share one
@@ -152,6 +161,14 @@ Ren.CreateGridSet = (tabularDataSet, visualisation) => {
             }
 
             maxHeightResizeHandle.updatePosition();
+
+            if (isScrollToBottomPending &&
+                dataGrids[activeDataGridIndex].dimensions?.dataGridHeight &&
+                gridSetViewport.clientHeight) {
+
+                isScrollToBottomPending = false;
+                scrollToBottom();
+            }
         });
     };
 
@@ -338,6 +355,8 @@ Ren.CreateGridSet = (tabularDataSet, visualisation) => {
     selectDataGrid(dataGrids[activeDataGridIndex], gridSet, activeDataGridIndex);
     gridSet.appendChild(gridSetViewport);
 
+    isScrollToBottomPending = !!dataGrids[activeDataGridIndex].gridState.scrollToBottom;
+
     Ren.Messages.Requests.exportData.handle((guid) => {
 
         if (guid === gridSetGuid) {
@@ -423,7 +442,7 @@ Ren.CreateGridSet = (tabularDataSet, visualisation) => {
         else if (!e.ctrlKey && !e.shiftKey && !e.altKey && e.key === "End") {
 
             e.preventDefault();
-            gridSetViewport.scrollTop = gridSetViewport.scrollHeight;
+            scrollToBottom();
         }
     });
 

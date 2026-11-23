@@ -79,6 +79,7 @@ Ren.ContextMenuItems = (
     const dataGridHighlightHoveredRowMenuItems =
         Ren.ContextMenuItems_DataGridHighlightHoveredRow(visualisation);
     const dataGridAutoPreviewMenuItems = Ren.ContextMenuItems_DataGridAutoPreview(visualisation);
+    const dataGridScrollToBottomMenuItems = Ren.ContextMenuItems_DataGridScrollToBottom(gridState);
     const dataGridQuickLinksMenuItems = Ren.ContextMenuItems_DataGridQuickLinks(visualisation);
     const dataGridRowVisualiserMenuItems =
         Ren.ContextMenuItems_DataGridRowVisualiser(dataGridCellSelection);
@@ -446,6 +447,7 @@ Ren.ContextMenuItems = (
         dataGridColumnHeaderDownArrowsMenuItems.getMenuItem(),
         dataGridHighlightHoveredRowMenuItems.getMenuItem(),
         dataGridAutoPreviewMenuItems.getMenuItem(),
+        dataGridScrollToBottomMenuItems.getMenuItem(),
         {
             text: "Totals row",
             id: "layout-totals-row",

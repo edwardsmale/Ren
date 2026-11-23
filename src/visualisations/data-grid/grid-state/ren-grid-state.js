@@ -425,6 +425,9 @@ Ren.GridState = (
         dataGridGuid,
         rowHeadingWidth,
         showRowAndColumnHeadings,
+
+        // Scrolls the grid to its last row when it is first shown (see Ren.CreateGridSet).
+        scrollToBottom: false,
         gridStateGroup,
         notifyColumnWidthChanged,
         // Legacy properties for backward compatibility - computed on demand

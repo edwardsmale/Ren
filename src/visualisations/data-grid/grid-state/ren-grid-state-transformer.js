@@ -158,6 +158,9 @@ Ren.GridStateTransformer = (() => {
 
         transformedSettings.showRowAndColumnHeadings = !!settings.showRowAndColumnHeadings;
 
+        // Only saved when set, as it is off unless a report turns it on.
+        if (settings.scrollToBottom) transformedSettings.scrollToBottom = true;
+
         const isColumnVisible = getColumnVisibilityCheck(settings);
 
         const widthsByColumnName =

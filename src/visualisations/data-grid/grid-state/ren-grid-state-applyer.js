@@ -254,6 +254,10 @@ Ren.GridStateApplyer = (tabularData, gridState, containingReportGuid, gridStateG
         if (deserializedGridState.showRowAndColumnHeadings !== undefined) {
             gridState.showRowAndColumnHeadings = deserializedGridState.showRowAndColumnHeadings ? 1 : 0;
         }
+
+        if (deserializedGridState.scrollToBottom !== undefined) {
+            gridState.scrollToBottom = !!deserializedGridState.scrollToBottom;
+        }
     };
 
     /**
