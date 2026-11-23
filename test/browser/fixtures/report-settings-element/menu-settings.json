@@ -1,0 +1,19 @@
+{
+    "visualisations": [
+        {
+            "visualisationTypeName": "TileGroup",
+            "clientSide": true,
+            "visualisationId": "garden",
+            "targetSelector": ".js-menu",
+            "heading": "Garden"
+        },
+        {
+            "visualisationTypeName": "LinkTile",
+            "clientSide": true,
+            "containerVisualisationId": "garden",
+            "containerOrder": 1,
+            "title": "Seed Trays",
+            "url": "/SeedTrays"
+        }
+    ]
+}

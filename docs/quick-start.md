@@ -245,6 +245,11 @@ A few things to note:
 - All of the settings elements on the page are merged, in the order they appear.
 - `<ren-*>` elements are turned into settings elements when the page is scanned (see Elements), so
   you can mix and match the two.
+- Rather than writing settings into the page, it can name an endpoint that gives them, with
+  `<ren-report-settings src="/reports/sales/settings" />`.  Ren fetches each of these before it
+  reads the page's settings, and puts what the endpoint returns in a settings element where the
+  `<ren-report-settings>` was.  An endpoint with no settings for the page answers with not found,
+  nothing, or `null`, and the element is just removed.
 - `js-ren-report-settings-file` marks the settings loaded from a saved file, as opposed to the ones the
   page was written with.  An embedded report's settings file is skipped, because the containing
   report's file already has its visualisations, and applying both would put two of each on the

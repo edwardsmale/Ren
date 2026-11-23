@@ -6,7 +6,28 @@
  */
 Ren.Scanifier = (() => {
 
+    // Indicates whether a scan is waiting for <ren-report-settings> elements to load.
+    let isWaitingForReportSettings = false;
+
     const scanify = () => {
+
+        const reportSettingsLoaded = Ren.ReportSettingsElementLoader.load();
+
+        if (reportSettingsLoaded) {
+
+            if (!isWaitingForReportSettings) {
+
+                isWaitingForReportSettings = true;
+
+                reportSettingsLoaded.then(() => {
+
+                    isWaitingForReportSettings = false;
+                    scanify();
+                });
+            }
+
+            return;
+        }
 
         Ren.ReportContextElement.upgradeElements();
         Ren.ReportContextGuids.addReportContextGuidAttributes();
