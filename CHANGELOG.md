@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 - Fix sorting by length: shortest first always failed, and longest first misplaced blanks.
+- Show the page's current settings in the JSON settings window.
 
 ## 1.2.2 (2026-11-22)
 

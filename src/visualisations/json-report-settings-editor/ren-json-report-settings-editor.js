@@ -17,6 +17,7 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
     const settingsName = visualisation.settingsName ?? null;
     const isPreset = visualisation.isPreset ?? true;
     const isDefault = visualisation.isDefault ?? false;
+    const isPageReport = visualisation.isPageReport ?? false;
     const reportName = visualisation.settingsReportName ??
         Ren.WebReports.getWebReportName();
 
@@ -47,11 +48,21 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
         }
     };
 
-    // Fetches the current settings JSON and its file path, and populates the editor.
+    // Gets the settings to edit: for the page's own report, those it has now, which Ctrl+S would
+    // save; for a popup report, those saved in the store, as the page's settings aren't its.
+    const getSettingsJson = () => {
+
+        if (isPageReport) {
+            return Promise.resolve(Ren.ReportSerializer.serializeReportSettings());
+        }
+
+        return Ren.SettingsStore.load(kind, reportName, settingsName).catch(() => null);
+    };
+
+    // Fetches the settings JSON and its file path, and populates the editor.
     const loadSettings = async () => {
 
-        const settingsJson = await Ren.SettingsStore.load(kind, reportName, settingsName)
-            .catch(() => null);
+        const settingsJson = await getSettingsJson();
 
         textarea.value = settingsJson || "";
 
@@ -112,13 +123,14 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
 
 /**
  * Opens the JSON report settings editor in a popup window for the given settings name and preset
- * flag, or for the report's default settings.
+ * flag, or for the report's default settings.  For the page's own report, it shows the settings
+ * the page has now rather than those saved.
  */
 Ren.ShowJsonReportSettingsEditor = (
     settingsName,
     isPreset,
     reportName,
-    { isDefault = false } = {}
+    { isDefault = false, isPageReport = false } = {}
 ) => {
 
     Ren.VisualisationCreator.createVisualisation({
@@ -128,6 +140,7 @@ Ren.ShowJsonReportSettingsEditor = (
         settingsName: settingsName ?? null,
         isPreset: isPreset ?? true,
         isDefault,
+        isPageReport,
         settingsReportName: reportName ?? null,
         popupTitle: "JSON settings",
         isPopup: true,
@@ -154,6 +167,7 @@ Ren.ShowJsonReportSettingsEditorForElement = (element) => {
     // A report context that doesn't say which settings it was rendered from has its default
     // settings, which are those Ctrl+S saves.
     let isDefault = true;
+    let isPageReport = true;
 
     if (reportContext) {
 
@@ -161,12 +175,13 @@ Ren.ShowJsonReportSettingsEditorForElement = (element) => {
         isPreset = reportContext.getAttribute("data-is-preset") !== "false";
         reportName = reportContext.getAttribute("data-report-name") || null;
         isDefault = !reportContext.hasAttribute("data-is-preset");
+        isPageReport = reportContext.classList.contains("js-ren-report-context--on-page");
     }
 
     Ren.ShowJsonReportSettingsEditor(
         settingsName,
         isPreset,
         reportName,
-        { isDefault }
+        { isDefault, isPageReport }
     );
 };

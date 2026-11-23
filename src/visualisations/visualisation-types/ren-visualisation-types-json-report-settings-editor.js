@@ -5,6 +5,7 @@ Ren.VisualisationTypes_JsonReportSettingsEditor = {
         settingsName: "String",
         isPreset: "Boolean",
         isDefault: "Boolean",
+        isPageReport: "Boolean",
         settingsReportName: "String"
     },
     synchronisedOptions: {
