@@ -260,13 +260,6 @@
                     ],
                     "description": "Lists a report's settings files. Missing or null hides the feature that uses it."
                 },
-                "getReportSettingsFilePath": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "description": "Gets the path of a report's settings file. Missing or null hides the feature that uses it."
-                },
                 "convertToSettingsOnlyReport": {
                     "type": [
                         "string",

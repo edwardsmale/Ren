@@ -591,8 +591,8 @@ __Everything else__
 The rest are for optional features, and are described in the schema: `generateReport`,
 `updateConnectionHeartbeat`, `disposeConnection`, `renLogInsert`, `eventInsert`, `makeRequest`,
 `makeRequestAndExtract`, `fetchImage`, `listSharedFunctions`, `sharedFunctions`,
-`getReportSettingsFilePath`, `convertToSettingsOnlyReport`, `uploadFiles`, `savePastedData`,
-`autoDetectUploadedFileDelimiter`, `visualisationDimensions` and `upsertVisualisationDimensions`.
+`convertToSettingsOnlyReport`, `uploadFiles`, `savePastedData`, `autoDetectUploadedFileDelimiter`,
+`visualisationDimensions` and `upsertVisualisationDimensions`.
 
 ### The message bus
 
