@@ -1,5 +1,10 @@
+@use "ren-variables" as *;
+
+// Sets its own font, rather than inheriting the host page's, so it looks the same on any page.
 .ren-shadow-module
 {
+    font-family: $webReportFont;
+
     box-sizing: border-box;
     width: fit-content;
 

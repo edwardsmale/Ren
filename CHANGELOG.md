@@ -15,6 +15,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 - Turn filters on in Excel downloads' heading rows.
 - Auto-fit columns in exported Excel files.
 - Summarise a date range as "Today" when applicable.
+- Ensure font styles are consistent.
 
 ## 1.2.2 (2026-11-22)
 
