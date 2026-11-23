@@ -268,16 +268,14 @@ Ren.DateValueChart_DataExport = (() => {
 
         const columns = [{
             heading: props.dateHeading || "Date",
-            format: dateFormat,
-            width: 14
+            format: dateFormat
         }];
 
         for (let i = 0; i < shown.length; i++) {
 
             columns.push({
                 heading: shown[i].name,
-                format: getExcelNumberFormat(props.valueColumnFormats?.[shown[i].index], excelFormats),
-                width: Math.max(12, Math.min(String(shown[i].name).length + 2, 40))
+                format: getExcelNumberFormat(props.valueColumnFormats?.[shown[i].index], excelFormats)
             });
         }
 

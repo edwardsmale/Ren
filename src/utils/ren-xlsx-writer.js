@@ -1,11 +1,13 @@
 /**
  * Writes Excel (.xlsx) workbooks in the browser.  A workbook is a ZIP of XML files (Office Open
  * XML, ECMA-376): this writes the few a workbook needs, with each sheet's first row its column
- * headings, in bold and kept in view as the sheet scrolls.
+ * headings, in bold and kept in view as the sheet scrolls, and filters on, as Data > Filter
+ * turns them on.
  *
  * A sheet is { name, columns, rows }:
  * - columns: [{ heading, format, width }], with format an Excel number format (such as "0.00%")
- *   and width in characters.  Both are optional.
+ *   and width in characters.  Both are optional: a column without a width is fitted to its
+ *   heading and cells, as Excel's AutoFit would (see Ren.XlsxColumnWidths).
  * - rows: an array of cell values per row, in the columns' order.  A value is a number, a string,
  *   a Date, a formula as { formula, value } (without its "=", and value the text shown until
  *   Excel works it out), or null, undefined or "" for an empty cell.
@@ -243,15 +245,21 @@ Ren.XlsxWriter = (() => {
         );
         const dateStyle = formatStyles.get(DEFAULT_DATE_FORMAT) ?? PLAIN_STYLE;
 
+        // A column without a width of its own is fitted to its heading and cells.
         const widths = sheet.columns.map((column, i) => {
 
-            const width = Number(column.width);
+            const given = Number(column.width);
 
-            if (!(width > 0)) return "";
+            const width = given > 0
+                ? Math.min(given, MAX_COLUMN_WIDTH)
+                : Ren.XlsxColumnWidths.getColumnWidth(
+                    column.heading,
+                    column.format,
+                    sheet.rows.map(row => row[i]),
+                    DEFAULT_DATE_FORMAT
+                );
 
-            const clamped = Math.min(width, MAX_COLUMN_WIDTH);
-
-            return `<col min="${i + 1}" max="${i + 1}" width="${clamped}" customWidth="1"/>`;
+            return `<col min="${i + 1}" max="${i + 1}" width="${width}" customWidth="1"/>`;
         }).join("");
 
         const parts = [
@@ -293,12 +301,56 @@ Ren.XlsxWriter = (() => {
             }
         });
 
-        parts.push(part.join("") + "</sheetData></worksheet>");
+        const filterRange = getFilterRange(sheet);
+
+        parts.push(
+            part.join("") +
+            "</sheetData>" +
+            (filterRange ? `<autoFilter ref="${filterRange.from}:${filterRange.to}"/>` : "") +
+            "</worksheet>"
+        );
 
         return parts;
     };
 
-    const buildWorkbook = (sheetNames) => XML_DECLARATION +
+    /**
+     * Gets the cells a sheet's filter covers, as Excel's Data > Filter would set it: from the
+     * headings to the last row, or null for a sheet without columns (which has no filter).
+     */
+    const getFilterRange = (sheet) => {
+
+        if (!sheet.columns.length) return null;
+
+        return {
+            from: "A1",
+            to: getColumnLetters(sheet.columns.length - 1) + (sheet.rows.length + 1)
+        };
+    };
+
+    /**
+     * Gets the hidden names Excel keeps for each sheet's filter, with the range in absolute
+     * references, such as 'Sales'!$A$1:$E$20.
+     */
+    const buildFilterNames = (sheets, sheetNames) => {
+
+        const names = sheets.map((sheet, i) => {
+
+            const range = getFilterRange(sheet);
+
+            if (!range) return "";
+
+            const absolute = ref => ref.replace(/^([A-Z]+)(\d+)$/, "$$$1$$$2");
+            const quotedName = "'" + sheetNames[i].replace(/'/g, "''") + "'";
+
+            return `<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">` +
+                escapeXml(`${quotedName}!${absolute(range.from)}:${absolute(range.to)}`) +
+                "</definedName>";
+        }).join("");
+
+        return names ? `<definedNames>${names}</definedNames>` : "";
+    };
+
+    const buildWorkbook = (sheets, sheetNames) => XML_DECLARATION +
         `<workbook xmlns="${NS_MAIN}" xmlns:r="${NS_RELS}">` +
         "<bookViews><workbookView/></bookViews>" +
         "<sheets>" +
@@ -306,6 +358,7 @@ Ren.XlsxWriter = (() => {
             `<sheet name="${escapeXml(name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`
         ).join("") +
         "</sheets>" +
+        buildFilterNames(sheets, sheetNames) +
         // A formula's value is worked out when the workbook is opened.
         "<calcPr fullCalcOnLoad=\"1\"/>" +
         "</workbook>";
@@ -353,7 +406,7 @@ Ren.XlsxWriter = (() => {
         const files = [
             { name: "[Content_Types].xml", content: buildContentTypes(all.length) },
             { name: "_rels/.rels", content: buildPackageRels() },
-            { name: "xl/workbook.xml", content: buildWorkbook(sheetNames) },
+            { name: "xl/workbook.xml", content: buildWorkbook(all, sheetNames) },
             { name: "xl/_rels/workbook.xml.rels", content: buildWorkbookRels(all.length) },
             { name: "xl/styles.xml", content: buildStyles(formatStyles) },
             ...all.map((sheet, i) => ({

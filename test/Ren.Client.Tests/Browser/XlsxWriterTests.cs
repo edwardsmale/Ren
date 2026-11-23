@@ -35,7 +35,66 @@ public class XlsxWriterTests : BrowserTest
         Expect(sheet.Rows[0].Values.All(cell => cell.Bold)).ToBe(true);
         Expect(sheet.Rows[1].Values.Any(cell => cell.Bold)).ToBe(false);
         Expect(sheet.FrozenRows).ToBe(1);
-        Expect(sheet.ColumnWidths).ToEqual(new Dictionary<string, double> { ["A"] = 20 });
+        Expect(sheet.ColumnWidths["A"]).ToBe(20);
+    }
+
+    [TestMethod("fits a column without a width to its heading and cells")]
+    public async Task FitsAColumnWithoutAWidthToItsHeadingAndCells()
+    {
+        var workbook = await CreateAsync(new[]
+        {
+            new
+            {
+                name = "Sales",
+                columns = new object[]
+                {
+                    new { heading = "Qty" },
+                    new { heading = "Customer" },
+                    new { heading = "Revenue", format = "#,##0.00" }
+                },
+                rows = new[]
+                {
+                    new object[] { 1, "Ann", 12.5 },
+                    new object[] { 22, "Bartholomew Smith-Jones", 1234567.5 }
+                }
+            }
+        });
+
+        var widths = workbook.Sheets.Single().ColumnWidths;
+
+        // Qty fits its heading and filter button, Customer its longest name, Revenue "1,234,567.50".
+        Expect(widths["A"]).ToBeGreaterThan(5);
+        Expect(widths["A"]).ToBeLessThan(8);
+        Expect(widths["B"]).ToBeGreaterThan(20);
+        Expect(widths["B"]).ToBeLessThan(25);
+        Expect(widths["C"]).ToBeGreaterThan(10);
+        Expect(widths["C"]).ToBeLessThan(13);
+    }
+
+    [TestMethod("turns filters on, over the headings and every row, as Data > Filter does")]
+    public async Task TurnsFiltersOnOverTheHeadingsAndEveryRow()
+    {
+        var workbook = await CreateAsync(new object[]
+        {
+            new
+            {
+                name = "Bob's sales",
+                columns = new object[] { new { heading = "Region" }, new { heading = "Units" }, new { heading = "Price" } },
+                rows = new[] { new object[] { "North", 3, 1.5 }, new object[] { "South", 4, 2 } }
+            },
+            new
+            {
+                name = "No rows",
+                columns = new object[] { new { heading = "Region" } },
+                rows = Array.Empty<object[]>()
+            },
+            new { name = "No columns" }
+        });
+
+        Expect(workbook.Sheets.Select(sheet => sheet.Filter).ToArray())
+            .ToEqual(new[] { "A1:C3", "A1:A1", null });
+        Expect(workbook.Sheets.Select(sheet => sheet.FilterName).ToArray())
+            .ToEqual(new[] { "'Bob''s sales'!$A$1:$C$3", "'No rows'!$A$1:$A$1", null });
     }
 
     [TestMethod("writes text and numbers, leaving out an empty cell and one not a number")]

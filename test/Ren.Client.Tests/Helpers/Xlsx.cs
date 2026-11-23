@@ -24,8 +24,17 @@ public static class Xlsx
         public DateTime Date => DateTime.FromOADate(Number);
     }
 
-    /// <summary>A sheet, with its rows' cells by column letter (an empty cell has none).</summary>
-    public sealed record Sheet(string Name, int FrozenRows, Dictionary<string, double> ColumnWidths, Dictionary<string, Cell>[] Rows)
+    /// <summary>
+    /// A sheet, with its rows' cells by column letter (an empty cell has none), the cells its
+    /// filter covers (such as A1:E20), and the range in the hidden name Excel keeps for the filter.
+    /// </summary>
+    public sealed record Sheet(
+        string Name,
+        int FrozenRows,
+        Dictionary<string, double> ColumnWidths,
+        Dictionary<string, Cell>[] Rows,
+        string? Filter,
+        string? FilterName)
     {
         public string[] Headings => Rows[0].Values.Select(cell => cell.Value).ToArray();
 
@@ -73,7 +82,12 @@ public static class Xlsx
                 Bold: boldFonts[(int)xf.Attribute("fontId")!]))
             .ToArray();
 
-        var sheets = workbook.Root!.Element(Main + "sheets")!.Elements(Main + "sheet").Select(sheet =>
+        var filterNames = workbook.Root!.Element(Main + "definedNames")?.Elements(Main + "definedName")
+            .Where(name => (string)name.Attribute("name")! == "_xlnm._FilterDatabase")
+            .ToDictionary(name => (int)name.Attribute("localSheetId")!, name => name.Value)
+            ?? [];
+
+        var sheets = workbook.Root!.Element(Main + "sheets")!.Elements(Main + "sheet").Select((sheet, index) =>
         {
             var xml = Load("xl/" + targets[(string)sheet.Attribute(Rels + "id")!]).Root!;
 
@@ -105,7 +119,13 @@ public static class Xlsx
                 .ToDictionary(cell => cell.Ref.TrimEnd("0123456789".ToCharArray())))
                 .ToArray();
 
-            return new Sheet((string)sheet.Attribute("name")!, frozenRows, widths, rows);
+            return new Sheet(
+                (string)sheet.Attribute("name")!,
+                frozenRows,
+                widths,
+                rows,
+                (string?)xml.Element(Main + "autoFilter")?.Attribute("ref"),
+                filterNames.GetValueOrDefault(index));
         }).ToArray();
 
         return new Workbook(fileName, mimeType, sheets);

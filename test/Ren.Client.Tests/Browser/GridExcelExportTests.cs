@@ -28,6 +28,7 @@ public class GridExcelExportTests : BrowserTest
         Expect(sheet.Name).ToBe("Sales");
         Expect(sheet.Headings).ToEqual(new[] { "Date", "Product", "Category", "Quantity", "Revenue" });
         Expect(sheet.Rows.Length - 1).ToBe(dataRowCount);
+        Expect(sheet.Filter).ToBe($"A1:E{dataRowCount + 1}");
 
         Expect(sheet["A2"]!.Date).ToEqual(new DateTime(2026, 7, 1));
         Expect(sheet["A2"]!.NumberFormat).ToBe("dd/mm/yyyy");

@@ -58,8 +58,7 @@ Ren.Excel = (() => {
 
             const columns = visibleColumnIndices.map(columnIndex => ({
                 heading: tabularData.ColumnModels[columnIndex].Heading,
-                format: columnTypesAndFormats[columnIndex].format,
-                width: dataGrid.gridState.getColumnWidth(columnIndex) / 5
+                format: columnTypesAndFormats[columnIndex].format
             }));
 
             const rows = [];
