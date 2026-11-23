@@ -59,12 +59,33 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
         return Ren.SettingsStore.load(kind, reportName, settingsName).catch(() => null);
     };
 
+    // How often the page's own report's settings are checked for changes while the window is open,
+    // for changes that send none of the messages below.
+    const FOLLOW_INTERVAL_MS = 2000;
+
+    // The messages sent when the page's settings change, on which the window shows them at once.
+    const SETTINGS_CHANGED_EVENT_NAMES = [
+        "columnVisibilityChanged",
+        "dataGridColumnFormattingChanged",
+        "dataGroupingSettingsChanged",
+        "filterChanged",
+        "gridStateChanged",
+        "groupingsChanged",
+        "reportSettingsLoaded",
+        "variationsChanged",
+        "visualisationSettingsChanged"
+    ];
+
+    // The settings JSON last put in the textarea, to tell whether the user has edited it since.
+    let shownSettingsJson = null;
+
     // Fetches the settings JSON and its file path, and populates the editor.
     const loadSettings = async () => {
 
         const settingsJson = await getSettingsJson();
 
         textarea.value = settingsJson || "";
+        shownSettingsJson = textarea.value;
 
         const pathUrl = buildFilePathUrl();
 
@@ -114,7 +135,58 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
         closePopup();
     });
 
-    loadSettings();
+    // Keeps the page's own report's settings up to date as they change, until the text is edited
+    // or the window closes.  The messages show most changes at once, and the polling catches
+    // those that send no message, such as the date/value chart's menu settings.
+    const followPageSettings = () => {
+
+        let hasBeenShown = false;
+        let intervalId = null;
+
+        const listenerOwner = { jsonReportSettingsEditor: visualisation.visualisationGuid };
+
+        const stopFollowing = () => {
+
+            clearInterval(intervalId);
+            Ren.Messages.removeListenersByOwner(listenerOwner);
+        };
+
+        const showChangedSettings = () => {
+
+            if (!element.isConnected) {
+
+                if (hasBeenShown) stopFollowing();
+                return;
+            }
+
+            hasBeenShown = true;
+
+            // Edited text is left alone, so the edits aren't lost.
+            if (textarea.value !== shownSettingsJson) return;
+
+            const settingsJson = Ren.ReportSerializer.serializeReportSettings();
+
+            if (settingsJson === shownSettingsJson) return;
+
+            textarea.value = settingsJson;
+            shownSettingsJson = settingsJson;
+        };
+
+        Ren.Messages.withOwner(listenerOwner, () => {
+
+            for (let i = 0; i < SETTINGS_CHANGED_EVENT_NAMES.length; i++) {
+
+                Ren.Messages.Events[SETTINGS_CHANGED_EVENT_NAMES[i]].handle(showChangedSettings);
+            }
+        });
+
+        intervalId = setInterval(showChangedSettings, FOLLOW_INTERVAL_MS);
+    };
+
+    loadSettings().finally(() => {
+
+        if (isPageReport) followPageSettings();
+    });
 
     return {
         element

@@ -17,6 +17,9 @@ public class JsonReportSettingsEditorTests : BrowserTest
         await Ren.Root.ClickAsync("#json-report-settings");
     }
 
+    // The page's own report, as the window is a report context too.
+    private RenContext PageReport => Ren.Within(".qa-ren-report-context--on-page");
+
     private Task<string> CurrentSettingsAsync() =>
         Page.EvaluateAsync<string>("() => window.Ren.ReportSerializer.serializeReportSettings()");
 
@@ -36,5 +39,67 @@ public class JsonReportSettingsEditorTests : BrowserTest
         Expect(expected).ToContain(OrderCountSummed);
 
         await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(expected);
+    }
+
+    [TestMethod("JsonSettings_SettingsChangedWhileOpen_ShowsTheChange")]
+    public async Task JsonSettings_SettingsChangedWhileOpen_ShowsTheChange()
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await OpenJsonSettingsAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(await CurrentSettingsAsync());
+
+        await PageReport.SelectAggregationTypeAsync("OrderCount", 2, "sum");
+
+        var expected = await CurrentSettingsAsync();
+
+        Expect(expected).ToContain(OrderCountSummed);
+
+        // Sooner than the window's first check, so it's the change's message that shows it.
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(
+            expected,
+            new() { Timeout = 1000 });
+    }
+
+    // A change that sends no message is shown when the window next checks.
+    [TestMethod("JsonSettings_SettingsChangedWithoutAMessage_ShowsTheChange")]
+    public async Task JsonSettings_SettingsChangedWithoutAMessage_ShowsTheChange()
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await OpenJsonSettingsAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(await CurrentSettingsAsync());
+
+        await Page.EvaluateAsync(
+            "() => { window.Ren.GridStateCollection.entries[0].showRowAndColumnHeadings = false; }");
+
+        var expected = await CurrentSettingsAsync();
+
+        Expect(expected).Not.ToContain("\"showRowAndColumnHeadings\": true");
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(expected);
+    }
+
+    [TestMethod("JsonSettings_EditedThenSettingsChanged_KeepsTheEdits")]
+    public async Task JsonSettings_EditedThenSettingsChanged_KeepsTheEdits()
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await OpenJsonSettingsAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(await CurrentSettingsAsync());
+
+        await Page.Locator(TextareaSelector).FillAsync("{ \"edited\": true }");
+
+        await PageReport.SelectAggregationTypeAsync("OrderCount", 2, "sum");
+
+        // Long enough for the window to have checked for changes several times.
+        await Page.WaitForTimeoutAsync(1500);
+
+        Expect(await CurrentSettingsAsync()).ToContain(OrderCountSummed);
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync("{ \"edited\": true }");
     }
 }
