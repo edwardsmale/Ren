@@ -28,20 +28,9 @@
     {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 8px;
         padding: 8px 0 0;
-    }
-
-    &__filepath
-    {
-        // Push the buttons to the right, and truncate a long path rather than wrapping.
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        font-size: 12px;
-        color: #555555;
     }
 
     &__button

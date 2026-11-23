@@ -124,54 +124,6 @@ Ren.DataGridSqlPopup = (() => {
         return lines.join("\n");
     };
 
-    /**
-     * Copies the SQL to the clipboard, reporting the outcome on the button, as the clipboard API is
-     * missing on an insecure origin and can be refused.
-     */
-    const copyAll = (sqlTextArea, copyButton) => {
-
-        sqlTextArea.focus();
-        sqlTextArea.select();
-
-        const reportCopied = () => {
-
-            copyButton.textContent = "Copied";
-
-            setTimeout(() => copyButton.textContent = "Copy all", 1500);
-        };
-
-        const copyWithSelection = () => {
-
-            let copied = false;
-
-            try {
-
-                copied = document.execCommand("copy");
-            }
-            catch (error) {
-
-                copied = false;
-            }
-
-            if (copied) {
-
-                reportCopied();
-            }
-            else {
-
-                copyButton.textContent = "Can't copy";
-            }
-        };
-
-        if (!navigator.clipboard) {
-
-            copyWithSelection();
-            return;
-        }
-
-        navigator.clipboard.writeText(sqlTextArea.value).then(reportCopied, copyWithSelection);
-    };
-
     const renderPopupContent = (options, contentContainer, popup) => {
 
         const wrapper = Ren.HtmlTemplateFunctions.reifyHtmlTemplate("DataGridSqlPopup", {});
@@ -203,7 +155,10 @@ Ren.DataGridSqlPopup = (() => {
             extraButton.hidden = true;
         }
 
-        copyButton.addEventListener("click", () => copyAll(sqlTextArea, copyButton));
+        copyButton.addEventListener(
+            "click",
+            () => Ren.ClipboardUtils.copyAllOfTextArea(sqlTextArea, copyButton)
+        );
         closeButton.addEventListener("click", () => popup.closeWindow());
 
         // The grid's own key handling (e.g. arrow keys) would otherwise act on the textarea.

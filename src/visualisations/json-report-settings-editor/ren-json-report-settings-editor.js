@@ -8,11 +8,10 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
     const element = Ren.HtmlTemplateFunctions.reifyHtmlTemplate("JsonReportSettingsEditor", {});
 
     const textarea = element.querySelector(".js-ren-json-report-settings-editor-textarea");
-    const filePathElement = element.querySelector(".js-ren-json-report-settings-editor-filepath");
-    const saveButton = element.querySelector(".js-ren-json-report-settings-editor-save");
-    const cancelButton = element.querySelector(".js-ren-json-report-settings-editor-cancel");
+    const copyButton = element.querySelector(".js-ren-json-report-settings-editor-copy");
+    const closeButton = element.querySelector(".js-ren-json-report-settings-editor-close");
 
-    // The settings to edit are identified by the settings name and preset flag of the report
+    // The settings shown are identified by the settings name and preset flag of the report
     // context that the editor was opened from.  These are passed in as visualisation options.
     const settingsName = visualisation.settingsName ?? null;
     const isPreset = visualisation.isPreset ?? true;
@@ -25,22 +24,6 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
 
     if (isDefault) kind = "default";
 
-    // Builds the URL of the endpoint that gives the settings' file path, which only the server has.
-    const buildFilePathUrl = () => {
-
-        const path = Ren.Endpoints.getUrl("getReportSettingsFilePath");
-
-        if (!path) return null;
-
-        let url = Ren.UrlUtils.upsertQueryParameter(path, "reportName", reportName);
-
-        if (settingsName) {
-            url = Ren.UrlUtils.upsertQueryParameter(url, "settingsName", settingsName);
-        }
-
-        return Ren.UrlUtils.upsertQueryParameter(url, "isPreset", isPreset);
-    };
-
     const closePopup = () => {
 
         if (visualisation.popup) {
@@ -48,7 +31,7 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
         }
     };
 
-    // Gets the settings to edit: for the page's own report, those it has now, which Ctrl+S would
+    // Gets the settings to show: for the page's own report, those it has now, which Ctrl+S would
     // save; for a popup report, those saved in the store, as the page's settings aren't its.
     const getSettingsJson = () => {
 
@@ -79,61 +62,21 @@ Ren.CreateJsonReportSettingsEditor = (_tabularData, visualisation) => {
     // The settings JSON last put in the textarea, to tell whether the user has edited it since.
     let shownSettingsJson = null;
 
-    // Fetches the settings JSON and its file path, and populates the editor.
+    // Fetches the settings JSON and populates the editor.
     const loadSettings = async () => {
 
         const settingsJson = await getSettingsJson();
 
         textarea.value = settingsJson || "";
         shownSettingsJson = textarea.value;
-
-        const pathUrl = buildFilePathUrl();
-
-        const pathResponse = pathUrl ?
-            await Ren.FetchUtils.fetch(pathUrl, {
-                method: "GET",
-                headers: { "Accept": "text/plain" }
-            }) :
-            null;
-
-        const filePath = pathResponse && pathResponse.ok ? await pathResponse.text() : "";
-        filePathElement.textContent = filePath;
-        filePathElement.title = filePath;
     };
 
-    // Saves the edited JSON to the settings store verbatim.
-    const saveSettings = async () => {
+    copyButton.addEventListener(
+        "click",
+        () => Ren.ClipboardUtils.copyAllOfTextArea(textarea, copyButton)
+    );
 
-        const result =
-            await Ren.SettingsStore.save(kind, reportName, settingsName, textarea.value);
-
-        if (result && result.ok) {
-
-            // Evict any cached embedded-report responses for this report so that the next popup
-            // open re-fetches from the server with the corrected settings JSON.
-            if (reportName) {
-                Ren.EmbeddedReportResponses.invalidateResponsesForReport(reportName);
-            }
-        }
-        else {
-
-            Ren.GlobalErrorHandler.logError(
-                "[JsonReportSettingsEditor] Failed to save report settings."
-            );
-        }
-    };
-
-    saveButton.addEventListener("click", () => {
-
-        // Close the popup regardless of whether the save succeeds, so the button always dismisses
-        // the window as expected.
-        saveSettings().finally(closePopup);
-    });
-
-    cancelButton.addEventListener("click", () => {
-
-        closePopup();
-    });
+    closeButton.addEventListener("click", closePopup);
 
     // Keeps the page's own report's settings up to date as they change, until the text is edited
     // or the window closes.  The messages show most changes at once, and the polling catches

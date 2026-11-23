@@ -102,4 +102,58 @@ public class JsonReportSettingsEditorTests : BrowserTest
 
         await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync("{ \"edited\": true }");
     }
+
+    [TestMethod("JsonSettings_CopyAllClicked_PutsTheJsonOnTheClipboard")]
+    public async Task JsonSettings_CopyAllClicked_PutsTheJsonOnTheClipboard()
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await OpenJsonSettingsAsync();
+
+        var expected = await CurrentSettingsAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveValueAsync(expected);
+
+        // The clipboard is caught rather than read, as reading it needs a permission.
+        await Page.EvaluateAsync("""
+            () => {
+
+                window.caughtClipboardText = null;
+
+                navigator.clipboard.writeText = (text) => {
+
+                    window.caughtClipboardText = text;
+
+                    return Promise.resolve();
+                };
+            }
+            """);
+
+        var copyButton = Page.Locator(".js-ren-json-report-settings-editor-copy");
+
+        await Expect(copyButton).ToHaveAttributeAsync(
+            "title",
+            "Copy all of the JSON settings to the clipboard");
+
+        await copyButton.ClickAsync();
+
+        await Poll(() => Page.EvaluateAsync<string>("() => window.caughtClipboardText")).ToBe(expected);
+
+        await Expect(copyButton).ToHaveTextAsync("Copied");
+        await Expect(copyButton).ToHaveTextAsync("Copy all");
+    }
+
+    [TestMethod("JsonSettings_CloseClicked_ClosesTheWindow")]
+    public async Task JsonSettings_CloseClicked_ClosesTheWindow()
+    {
+        await Ren.OpenAsync(Fixture);
+
+        await OpenJsonSettingsAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToBeVisibleAsync();
+
+        await Page.Locator(".js-ren-json-report-settings-editor-close").ClickAsync();
+
+        await Expect(Page.Locator(TextareaSelector)).ToHaveCountAsync(0);
+    }
 }
