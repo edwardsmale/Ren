@@ -91,6 +91,58 @@ public class TileGroupsTests : BrowserTest
         Expect(await GetSavedTilesAsync()).ToContain("New link 3");
     }
 
+    // Gets the titles of the group's archived tiles, in order.
+    private async Task<string[]> GetArchivedTitlesAsync() =>
+        (await Page.Locator(".ren-tile-group__archived-tiles .ren-link-tile__title").AllTextContentsAsync()).ToArray();
+
+    // Gets each saved link tile as its title and, when set, its slot.
+    private Task<string[]> GetSavedSlotsAsync() => Page.EvaluateAsync<string[]>("""
+        () => window.Ren.ReportSerializer
+            .getReportSettingsObject(false)
+            .visualisations
+            .filter(visualisation => visualisation.visualisationTypeName === "LinkTile")
+            .map(visualisation => [visualisation.title, visualisation.containerSlot]
+                .filter(value => value !== undefined)
+                .join(" "))
+            .sort()
+        """);
+
+    private async Task ToggleArchivedAsync(string title)
+    {
+        await GetTile(title).ClickAsync(new() { Button = MouseButton.Right });
+        await Page.Locator("#link-tile-archive").ClickAsync();
+    }
+
+    [TestMethod("a link tile is archived and restored from its menu")]
+    public async Task ALinkTileIsArchivedAndRestoredFromItsMenu()
+    {
+        await Ren.OpenAsync("tile-groups.html");
+        await Poll(GetTitlesAsync).ToEqual(new[] { "Category Sales", "Brand Sales" });
+
+        var archived = Page.Locator(".ren-tile-group__archived");
+
+        await Expect(archived).ToBeHiddenAsync();
+
+        await ToggleArchivedAsync("Category Sales");
+
+        await Poll(GetTitlesAsync).ToEqual(new[] { "Brand Sales" });
+        await Poll(GetArchivedTitlesAsync).ToEqual(new[] { "Category Sales" });
+        await Expect(archived).ToBeVisibleAsync();
+        await Expect(GetTile("Category Sales")).Not.ToBeInViewportAsync();
+        Expect(await GetSavedSlotsAsync()).ToEqual(new[] { "Brand Sales", "Category Sales archived" });
+
+        await Page.Locator(".ren-tile-group__archived-title-row").ClickAsync();
+        await Expect(GetTile("Category Sales")).ToBeInViewportAsync();
+
+        await GetTile("Category Sales").ClickAsync(new() { Button = MouseButton.Right });
+        await Expect(Page.Locator("#link-tile-archive")).ToHaveClassAsync(new Regex("ren-is-checked"));
+        await Page.Locator("#link-tile-archive").ClickAsync();
+
+        await Poll(GetTitlesAsync).ToEqual(new[] { "Brand Sales", "Category Sales" });
+        await Expect(archived).ToBeHiddenAsync();
+        Expect(await GetSavedSlotsAsync()).ToEqual(new[] { "Brand Sales", "Category Sales" });
+    }
+
     // Takes the mouse down on the first tile and across to the far side of the second.
     private async Task<LocatorBoundingBoxResult> DragCategorySalesOverBrandSalesAsync()
     {

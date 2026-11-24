@@ -48,18 +48,56 @@
         display: none;
     }
 
-    // A tile's height, so a group with no tiles still has somewhere to right-click.
-    &__tiles
+    &__tiles,
+    &__archived-tiles
     {
         display: flex;
         flex-wrap: wrap;
         gap: var(--ren-tile-group-tile-gap, $standard-horizontal-spacing);
-        min-height: 6rem;
 
         // Visualisations are full width by default, which would put each tile on its own row.
         > .ren-visualisation
         {
             width: auto;
         }
+    }
+
+    // A tile's height, so a group with no tiles still has somewhere to right-click.
+    &__tiles
+    {
+        min-height: 6rem;
+    }
+
+    // The archived tiles, collapsed under their own title row as an expandable module's are.  It
+    // is hidden while there are none.
+    &__archived
+    {
+        margin-top: 1rem;
+    }
+
+    &__archived-title-row
+    {
+        align-items: center;
+        width: fit-content;
+        margin-bottom: 0.5rem;
+        color: gray;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    &__archived-tiles
+    {
+        height: 0;
+    }
+
+    &__archived--expanded &__archived-tiles
+    {
+        height: fit-content;
+        overflow: visible;
+    }
+
+    &__archived--expanded .ren-expandable-module__expand-icon::before
+    {
+        content: '-';
     }
 }

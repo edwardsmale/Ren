@@ -328,13 +328,16 @@ __The container types__
 
 - `TileGroup` lays out its tiles in rows that wrap, under a `heading` and an optional
   `subheading` (shown after the heading, in a lighter style).  `tileWidth` (16rem by default) and
-  `tileGap` are CSS lengths.  Link tiles are the only thing its context menu will add.
+  `tileGap` are CSS lengths.  Link tiles are the only thing its context menu will add.  Tiles in
+  its `"archived"` slot are shown below the others, collapsed under an "Archived" row that's
+  clicked to expand them, which is hidden while there are none.
 - `LinkTile` isn't a container, but it's what goes in a tile group: an image with a `title`
   underneath, the whole tile being a link to `url`.  `imageFilter` is a CSS filter for the image,
   which is how I get several colours out of one icon.  The `url` and `imageUrl` go through
   `Ren.HostUrls`, so if the page defines `reportUrl()` and `imageUrl()` (see Page globals) the
   host gets to map them, and otherwise they're used as they are.  The title, link, image and
-  filter can all be edited from the tile's context menu.
+  filter can all be edited from the tile's context menu, and ticking "Archive tile" there moves
+  the tile into its group's archived slot (`"containerSlot": "archived"`), unticking it back.
 - `TaskBoard` has a row of `columns` across the top, each `{ "id", "heading", "subheading" }`,
   and its children are task lanes, one under the other.  `columnWidth` (15.5rem by default) and
   `laneHeadingWidth` (8rem) are CSS lengths.

@@ -6,6 +6,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 
 ## Unreleased
 
+- Add "Archive tile" to link tiles, which collapses them into their tile group's "Archived" section.
 - Treat a calculated column as the type its calc function returns, e.g. offer Sum for string lengths.
 - Keep group sort orders when a calc function is set, rather than losing them on the next expand.
 - Offer number formats for sums and averages of a calc function's numbers, e.g. average string length.
