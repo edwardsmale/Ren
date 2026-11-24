@@ -16,6 +16,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 - Auto-fit columns in exported Excel files.
 - Summarise a date range as "Today" when applicable.
 - Ensure font styles are consistent.
+- Add a hidden `__Count` column in `TabularDataSetCollectionBuilder`.
 
 ## 1.2.2 (2026-11-22)
 

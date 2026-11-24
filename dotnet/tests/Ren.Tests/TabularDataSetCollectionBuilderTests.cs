@@ -32,11 +32,11 @@ namespace Ren.Tests
             var columns = this.builder.AddTab("Products", table).Build()
                 .TabularDataSets[0].TabularDatas[0].ColumnModels;
 
-            Assert.AreEqual(TabularDataColumnFormatEnum.General, columns[0].ColumnFormat);
-            Assert.AreEqual(TabularDataColumnFormatEnum.Integer, columns[1].ColumnFormat);
-            Assert.AreEqual(TabularDataColumnFormatEnum.Number, columns[2].ColumnFormat);
-            Assert.AreEqual(TabularDataColumnFormatEnum.Boolean, columns[3].ColumnFormat);
-            Assert.AreEqual(TabularDataColumnFormatEnum.DateTime, columns[4].ColumnFormat);
+            Assert.AreEqual(TabularDataColumnFormatEnum.General, columns[1].ColumnFormat);
+            Assert.AreEqual(TabularDataColumnFormatEnum.Integer, columns[2].ColumnFormat);
+            Assert.AreEqual(TabularDataColumnFormatEnum.Number, columns[3].ColumnFormat);
+            Assert.AreEqual(TabularDataColumnFormatEnum.Boolean, columns[4].ColumnFormat);
+            Assert.AreEqual(TabularDataColumnFormatEnum.DateTime, columns[5].ColumnFormat);
         }
 
         [TestMethod]
@@ -57,8 +57,8 @@ namespace Ren.Tests
             var tabularData = collection.TabularDataSets[0].TabularDatas[0];
 
             Assert.AreEqual(2, tabularData.RowModels.Count);
-            Assert.AreEqual("Pad", this.GetText(collection, tabularData.RowModels[1].CV[0]));
-            Assert.AreEqual(7m, tabularData.RowModels[1].CV[1]);
+            Assert.AreEqual("Pad", this.GetText(collection, tabularData.RowModels[1].CV[1]));
+            Assert.AreEqual(7m, tabularData.RowModels[1].CV[2]);
         }
 
         [TestMethod]
@@ -72,11 +72,11 @@ namespace Ren.Tests
             var columns = this.builder.AddTab("Lines", items).Build()
                 .TabularDataSets[0].TabularDatas[0].ColumnModels;
 
-            Assert.AreEqual("Product", columns[0].Heading);
-            Assert.AreEqual("Quantity", columns[1].Heading);
-            Assert.AreEqual("OrderId", columns[2].Heading);
-            Assert.AreEqual("Ordered", columns[3].Heading);
-            Assert.AreEqual("Status", columns[4].Heading);
+            Assert.AreEqual("Product", columns[1].Heading);
+            Assert.AreEqual("Quantity", columns[2].Heading);
+            Assert.AreEqual("OrderId", columns[3].Heading);
+            Assert.AreEqual("Ordered", columns[4].Heading);
+            Assert.AreEqual("Status", columns[5].Heading);
         }
 
         [TestMethod]
@@ -87,8 +87,8 @@ namespace Ren.Tests
             var columns = this.builder.AddTab("Lines", items).Build()
                 .TabularDataSets[0].TabularDatas[0].ColumnModels;
 
-            Assert.AreEqual(AggregationTypeEnum.Sum, columns[1].AggregationType);
-            Assert.AreEqual(AggregationTypeEnum.NoTotal, columns[2].AggregationType);
+            Assert.AreEqual(AggregationTypeEnum.Sum, columns[2].AggregationType);
+            Assert.AreEqual(AggregationTypeEnum.NoTotal, columns[3].AggregationType);
         }
 
         [TestMethod]
@@ -99,8 +99,8 @@ namespace Ren.Tests
             var collection = this.builder.AddTab("Lines", items).Build();
             var row = collection.TabularDataSets[0].TabularDatas[0].RowModels[0];
 
-            Assert.AreEqual(TabularData.NULL_SENTINEL, this.GetText(collection, row.CV[0]));
-            Assert.IsNull(row.CV[3]);
+            Assert.AreEqual(TabularData.NULL_SENTINEL, this.GetText(collection, row.CV[1]));
+            Assert.IsNull(row.CV[4]);
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@ namespace Ren.Tests
             var row = this.builder.AddTab("Lines", items).Build()
                 .TabularDataSets[0].TabularDatas[0].RowModels[0];
 
-            Assert.AreEqual(this.GetEpochMilliseconds(ordered), row.CV[3]);
+            Assert.AreEqual(this.GetEpochMilliseconds(ordered), row.CV[4]);
         }
 
         [TestMethod]
@@ -134,12 +134,12 @@ namespace Ren.Tests
 
             Assert.AreEqual(
                 TabularData.VALUE_ENCODING_DATE_EPOCH_MS,
-                tabularData.ColumnValueEncodings[3]
+                tabularData.ColumnValueEncodings[4]
             );
 
             Assert.AreEqual(
                 this.GetEpochMilliseconds(new DateTime(2024, 1, 15)),
-                tabularData.RowModels[0].CV[3]
+                tabularData.RowModels[0].CV[4]
             );
         }
 
@@ -151,7 +151,7 @@ namespace Ren.Tests
             var collection = this.builder.AddTab("Lines", items).Build();
             var row = collection.TabularDataSets[0].TabularDatas[0].RowModels[0];
 
-            Assert.AreEqual("Despatched", this.GetText(collection, row.CV[4]));
+            Assert.AreEqual("Despatched", this.GetText(collection, row.CV[5]));
         }
 
         [TestMethod]
@@ -174,10 +174,10 @@ namespace Ren.Tests
 
             Assert.AreEqual(
                 TabularDataColumnFormatEnum.General,
-                tabularData.ColumnModels[1].ColumnFormat
+                tabularData.ColumnModels[2].ColumnFormat
             );
 
-            Assert.AreEqual("Pair", this.GetText(collection, tabularData.RowModels[0].CV[1]));
+            Assert.AreEqual("Pair", this.GetText(collection, tabularData.RowModels[0].CV[2]));
         }
 
         [TestMethod]
@@ -223,8 +223,8 @@ namespace Ren.Tests
             var rowModels = this.builder.AddTab("Ratios", table).Build()
                 .TabularDataSets[0].TabularDatas[0].RowModels;
 
-            Assert.IsNull(rowModels[0].CV[0]);
-            Assert.AreEqual(0.25m, rowModels[1].CV[0]);
+            Assert.IsNull(rowModels[0].CV[1]);
+            Assert.AreEqual(0.25m, rowModels[1].CV[1]);
         }
 
         [TestMethod]
@@ -237,7 +237,7 @@ namespace Ren.Tests
             var collection = this.builder.AddTab("Hashes", table).Build();
             var row = collection.TabularDataSets[0].TabularDatas[0].RowModels[0];
 
-            Assert.AreEqual("0AFF", this.GetText(collection, row.CV[0]));
+            Assert.AreEqual("0AFF", this.GetText(collection, row.CV[1]));
         }
 
         [TestMethod]
@@ -263,6 +263,75 @@ namespace Ren.Tests
             Assert.ThrowsException<InvalidOperationException>(
                 () => this.builder.AddTab("More", new List<OrderLine>())
             );
+        }
+
+        [TestMethod]
+        public void AddTab_ByDefault_StartsWithAHiddenCountColumnOfOnes()
+        {
+            var table = new DataTable();
+            table.Columns.Add("Name", typeof(string));
+            table.Rows.Add("Pen");
+            table.Rows.Add("Pad");
+
+            var tabularData = this.builder.AddTab("Products", table).Build()
+                .TabularDataSets[0].TabularDatas[0];
+
+            var countColumn = tabularData.ColumnModels[0];
+
+            Assert.AreEqual(TabularDataSetCollectionBuilder.COUNT_COLUMN_ID, countColumn.ColumnId);
+            Assert.AreEqual("Count", countColumn.Heading);
+            Assert.IsFalse(countColumn.Visible);
+            Assert.AreEqual(AggregationTypeEnum.Count, countColumn.AggregationType);
+            Assert.AreEqual(2, tabularData.ColumnModels.Count);
+            Assert.AreEqual(1m, tabularData.RowModels[0].CV[0]);
+            Assert.AreEqual(1m, tabularData.RowModels[1].CV[0]);
+        }
+
+        [TestMethod]
+        public void AddTab_CountColumnTurnedOff_HasOnlyTheSourceColumns()
+        {
+            var items = new List<OrderLine> { new OrderLine { Product = "Pen" } };
+
+            var collection = new TabularDataSetCollectionBuilder { AddCountColumn = false }
+                .AddTab("Lines", items)
+                .Build();
+
+            var tabularData = collection.TabularDataSets[0].TabularDatas[0];
+
+            Assert.AreEqual(5, tabularData.ColumnModels.Count);
+            Assert.AreEqual("Product", tabularData.ColumnModels[0].Heading);
+            Assert.AreEqual("Pen", this.GetText(collection, tabularData.RowModels[0].CV[0]));
+        }
+
+        [TestMethod]
+        public void AddTab_SourceHasACountColumn_DoesNotAddAnother()
+        {
+            var table = new DataTable();
+            table.Columns.Add(TabularDataSetCollectionBuilder.COUNT_COLUMN_ID, typeof(int));
+            table.Columns.Add("Name", typeof(string));
+            table.Rows.Add(1, "Pen");
+
+            var tabularData = this.builder.AddTab("Products", table).Build()
+                .TabularDataSets[0].TabularDatas[0];
+
+            Assert.AreEqual(2, tabularData.ColumnModels.Count);
+            Assert.AreEqual(1m, tabularData.RowModels[0].CV[0]);
+        }
+
+        [TestMethod]
+        public void AddTab_SourceColumnHeadedCount_IsFoundBeforeTheCountColumn()
+        {
+            var table = new DataTable();
+            table.Columns.Add("Count", typeof(int));
+            table.Rows.Add(5);
+
+            var columns = this.builder
+                .AddTab("Stock", table, c => c["Count"].Heading = "In stock")
+                .Build()
+                .TabularDataSets[0].TabularDatas[0].ColumnModels;
+
+            Assert.AreEqual("Count", columns[0].Heading);
+            Assert.AreEqual("In stock", columns[1].Heading);
         }
 
         [TestMethod]

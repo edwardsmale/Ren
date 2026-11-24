@@ -20,6 +20,16 @@ namespace Ren.Building
     /// </remarks>
     public class TabularDataSetCollectionBuilder
     {
+        /// <summary>
+        /// The ID of the hidden column each tab starts with, which is 1 in every row, so that
+        /// adding it up counts the rows of a group.
+        /// </summary>
+        public const string COUNT_COLUMN_ID = "__Count";
+
+        private const string COUNT_COLUMN_HEADING = "Count";
+
+        private const string COUNT_COLUMN_VALUE = "1";
+
         private readonly TabularDataSetCollection collection;
         private readonly TabularDataColumnFactory columnFactory = new TabularDataColumnFactory();
 
@@ -42,6 +52,14 @@ namespace Ren.Building
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
+
+        /// <summary>
+        /// Gets or sets whether each tab added from now on starts with a hidden
+        /// <see cref="COUNT_COLUMN_ID"/> column, which Ren counts rows with (e.g. for the row
+        /// counts in filter modules and charts).  On by default.  A source that already has a
+        /// column with that name doesn't get another.
+        /// </summary>
+        public bool AddCountColumn { get; set; } = true;
 
         /// <summary>
         /// Starts a new set, which the tabs added after it go into.  A tab added before any set
@@ -78,7 +96,7 @@ namespace Ren.Building
             }
 
             var tab = this.CreateTab(title, dataTabGroup, 0, names, types, configure);
-            var converters = this.CreateConverters(tab);
+            var converters = this.CreateConverters(tab, names.Length);
             var values = new object[reader.FieldCount];
 
             while (reader.Read())
@@ -137,7 +155,7 @@ namespace Ren.Building
                 configure
             );
 
-            var converters = this.CreateConverters(tab);
+            var converters = this.CreateConverters(tab, getters.Length);
             var values = new object[getters.Length];
 
             foreach (var item in items)
@@ -180,6 +198,11 @@ namespace Ren.Building
 
             var tab = new TabularData(title, dataTabGroup, rowCount);
 
+            if (this.AddCountColumn && !names.Contains(COUNT_COLUMN_ID))
+            {
+                tab.ColumnModels.Add(this.CreateCountColumn());
+            }
+
             for (var index = 0; index < names.Length; index++)
             {
                 tab.ColumnModels.Add(this.columnFactory.Create(names[index], types[index]));
@@ -196,6 +219,21 @@ namespace Ren.Building
             this.currentSet.TabularDatas.Add(tab);
 
             return tab;
+        }
+
+        /// <summary>
+        /// Creates the hidden count column, the same as the report app's, whose values are all 1.
+        /// </summary>
+        private TabularDataColumn CreateCountColumn()
+        {
+            return new TabularDataColumn
+            {
+                Heading = COUNT_COLUMN_HEADING,
+                ColumnId = COUNT_COLUMN_ID,
+                ColumnFormat = TabularDataColumnFormatEnum.Integer,
+                Visible = false,
+                AggregationType = AggregationTypeEnum.Count
+            };
         }
 
         /// <summary>
@@ -219,18 +257,32 @@ namespace Ren.Building
             }
         }
 
-        private ColumnValueConverter[] CreateConverters(TabularData tab)
+        /// <summary>
+        /// Creates a converter for each of the tab's columns, except for a count column added in
+        /// front of the source's, which gets null, as its values are always 1.
+        /// </summary>
+        private ColumnValueConverter[] CreateConverters(TabularData tab, int sourceColumnCount)
         {
-            return tab.ColumnModels.Select(c => new ColumnValueConverter(c)).ToArray();
+            var countColumnCount = tab.ColumnModels.Count - sourceColumnCount;
+
+            return tab.ColumnModels
+                .Select((c, index) => index < countColumnCount ? null : new ColumnValueConverter(c))
+                .ToArray();
         }
 
         private TabularDataRow ConvertRow(object[] values, ColumnValueConverter[] converters)
         {
             var rowValues = new List<string>(converters.Length);
+            var countColumnCount = converters.Length - values.Length;
 
-            for (var index = 0; index < converters.Length; index++)
+            for (var index = 0; index < countColumnCount; index++)
             {
-                rowValues.Add(converters[index].Convert(values[index]));
+                rowValues.Add(COUNT_COLUMN_VALUE);
+            }
+
+            for (var index = 0; index < values.Length; index++)
+            {
+                rowValues.Add(converters[countColumnCount + index].Convert(values[index]));
             }
 
             return new TabularDataRow(rowValues);

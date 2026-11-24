@@ -32,7 +32,7 @@ namespace Ren.Tests
             Assert.AreEqual("Lines", (string)set["Title"]);
             Assert.AreEqual(
                 "Product",
-                (string)set["TabularDatas"][0]["ColumnModels"][0]["Heading"]
+                (string)set["TabularDatas"][0]["ColumnModels"][1]["Heading"]
             );
             Assert.IsNotNull(json["CompressionDictionary"]);
         }

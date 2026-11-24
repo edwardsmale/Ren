@@ -25,13 +25,16 @@ namespace Ren.Building
 
         /// <summary>
         /// Gets the column with the given heading, which is the source column's name until the
-        /// heading is changed.
+        /// heading is changed.  A source column headed "Count" is found before the builder's count
+        /// column, which has the same heading.
         /// </summary>
         public TabularDataColumn this[string heading]
         {
             get
             {
-                var column = this.columns.Find(c => c.Heading == heading);
+                var column =
+                    this.columns.Find(c => c.Heading == heading && !IsCountColumn(c)) ??
+                    this.columns.Find(c => c.Heading == heading);
 
                 if (column == null)
                 {
@@ -44,6 +47,11 @@ namespace Ren.Building
 
                 return column;
             }
+        }
+
+        private static bool IsCountColumn(TabularDataColumn column)
+        {
+            return column.ColumnId == TabularDataSetCollectionBuilder.COUNT_COLUMN_ID;
         }
 
         public IEnumerator<TabularDataColumn> GetEnumerator()

@@ -19,6 +19,9 @@ namespace Ren.Tests
     /// <remarks>
     /// After a deliberate change to the output, set REN_WRITE_GOLDEN_FILES=1 and run these tests to
     /// rewrite the files, then run the Jest tests against them.
+    /// <br /><br />
+    /// The builders leave out the count column, as these check the format, not the builder, and
+    /// the Jest tests expect the source's columns only.
     /// </remarks>
     [TestClass]
     public class RenPackGoldenFilesTests
@@ -74,7 +77,7 @@ namespace Ren.Tests
                 }
             };
 
-            var collection = new TabularDataSetCollectionBuilder()
+            var collection = new TabularDataSetCollectionBuilder { AddCountColumn = false }
                 .AddSet("Sales")
                 .AddTab("Lines", lines, columns =>
                 {
@@ -100,7 +103,7 @@ namespace Ren.Tests
                 new RegionTotal { Region = "South", Total = 7 }
             };
 
-            var collection = new TabularDataSetCollectionBuilder()
+            var collection = new TabularDataSetCollectionBuilder { AddCountColumn = false }
                 .AddSet("Sales")
                 .AddTab("By region", regions)
                 .AddTab("Empty", new List<RegionTotal>())
@@ -126,7 +129,7 @@ namespace Ren.Tests
 
             names.Add(new RegionTotal { Region = new string('x', 300), Total = 300 });
 
-            var collection = new TabularDataSetCollectionBuilder()
+            var collection = new TabularDataSetCollectionBuilder { AddCountColumn = false }
                 .AddTab("Names", names)
                 .Build();
 
@@ -160,7 +163,7 @@ namespace Ren.Tests
                 table.Rows.Add(values);
             }
 
-            var collection = new TabularDataSetCollectionBuilder()
+            var collection = new TabularDataSetCollectionBuilder { AddCountColumn = false }
                 .AddTab("Cells", table)
                 .Build();
 

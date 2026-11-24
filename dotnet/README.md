@@ -39,6 +39,10 @@ Some things worth knowing:
   format, a heading or an aggregation, hide a column, or give a column `EnumValues`.  (A numeric
   column given `EnumValues` becomes General, since the names it's mapped to aren't numbers.)
   Asking for a heading that isn't there throws, listing the ones that are.
+- Each tab starts with a hidden `__Count` column (headed "Count"), which is 1 in every row.  Ren
+  counts rows with it, such as for the row counts in filter modules and charts.  It's in the
+  callback's columns too, so the source's columns start at index 1.  Set `AddCountColumn = false`
+  on the builder to leave it out.  A source with its own `__Count` column doesn't get another.
 - An integer or number column whose name ends in "Id" isn't totalled.  It doesn't make sense to
   sum IDs.
 - A list of objects gets a column for each public readable property, in the order they're
