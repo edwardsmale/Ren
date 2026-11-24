@@ -223,6 +223,24 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
     };
 
     /**
+     * Gets a value indicating whether a grouping's aggregation of a column leaves the grouping's
+     * calc function on it unapplied (see Ren.AggregationTypeFormatConverter's
+     * ignoresCalcFunction).
+     *
+     * @param {Object} columns The grouping's columns settings.
+     */
+    const ignoresCalcFunction = (columnIndex, columns, aggType) => {
+
+        const columnModel = tabularData.ColumnModels[columnIndex];
+
+        return Ren.AggregationTypeFormatConverter.ignoresCalcFunction(
+            aggType,
+            columns?.[columnModel.ColumnIdOrHeading]?.calcFunction,
+            columnModel.ColumnFormat
+        );
+    };
+
+    /**
      * Compiles a calc function setting where it names numbers as the kind of value it gives, and
      * otherwise gives null.
      */
@@ -1030,6 +1048,7 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
     return {
         callAggFunc,
         getAggregatedValue,
-        getPerValueCalcFunctions
+        getPerValueCalcFunctions,
+        ignoresCalcFunction
     };
 };

@@ -52,6 +52,23 @@
                 return valueFormat !== null && isArithmetic(valueFormat) ? valueFormat : null;
             };
 
+            // Gets a value indicating whether the grouping's aggregation of a column leaves its calc
+            // function unapplied (see Ren.AggregationTypeFormatConverter's ignoresCalcFunction).
+            const ignoresCalcFunction = (columnIdOrHeading) => {
+
+                const columnIndex = tabularData.columnResolver.getColumnIndex(columnIdOrHeading);
+
+                if (columnIndex === null || groupByColumnIndexes?.includes(columnIndex)) return false;
+
+                const column = newGroupingColumns[columnIdOrHeading];
+
+                return Ren.AggregationTypeFormatConverter.ignoresCalcFunction(
+                    getEnumValue(aggregationTypeEnum, column.aggregationType),
+                    column.calcFunction,
+                    colModels[columnIndex].ColumnFormat
+                );
+            };
+
             /**
              * Gets the format of the values a column's aggregation reads.  Every grouping
              * aggregates the data rows, so the first grouping's are those the data rows' calc
@@ -230,6 +247,9 @@
                 if (!newGroupingColumn.calcFunction || newGroupingColumn.valueFormat === undefined) {
                     continue;
                 }
+
+                // A count shows as it is, without its calc function.
+                if (ignoresCalcFunction(columnIdOrHeading)) continue;
 
                 const calcValueFormat = getCalcFunctionsValueFormat(
                     newGroupingColumn.calcFunction,

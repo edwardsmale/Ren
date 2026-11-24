@@ -323,11 +323,12 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             position++;
         });
 
-        // The columns whose calc function is applied to each value before aggregating them rather
-        // than to the aggregated value (see Ren.Aggregation's getPerValueCalcFunctions), which
-        // applyCalcFunctionsToGroups is to leave alone.
-        const columnsCalculatedPerValue = new Set();
-        grouping.columnsCalculatedPerValue = columnsCalculatedPerValue;
+        // The columns whose calc function applyCalcFunctionsToGroups is to leave alone: those it is
+        // applied to each value of before aggregating them, rather than to the aggregated value
+        // (see Ren.Aggregation's getPerValueCalcFunctions), and those whose count it is not
+        // applied to at all (see its ignoresCalcFunction).
+        const columnsSkippingCalcFunctions = new Set();
+        grouping.columnsSkippingCalcFunctions = columnsSkippingCalcFunctions;
 
         const paras = getParas();
 
@@ -391,7 +392,9 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
                 const calcFunctions =
                     aggregation.getPerValueCalcFunctions(columnIndex, columns, aggType, paras);
 
-                if (calcFunctions) columnsCalculatedPerValue.add(columnIndex);
+                if (calcFunctions || aggregation.ignoresCalcFunction(columnIndex, columns, aggType)) {
+                    columnsSkippingCalcFunctions.add(columnIndex);
+                }
 
                 for (let groupIndex = 0; groupIndex < groupCount; groupIndex++) {
 
@@ -566,7 +569,7 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsCalculatedPerValue
+            grouping.columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groups);
@@ -762,7 +765,7 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsCalculatedPerValue
+            grouping.columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groups);
@@ -829,7 +832,7 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsCalculatedPerValue
+            grouping.columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groupsMap);
@@ -1016,7 +1019,7 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsCalculatedPerValue
+            grouping.columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groupsMap);

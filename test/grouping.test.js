@@ -150,6 +150,11 @@ describe("Calc functions that change a column's kind of value", () => {
         expect(entry.columns.Product.valueFormat).toBe(Format.Integer);
     });
 
+    // The Region grouping's entry, as the format menu reads its formats.
+    const getRegionEntry = (settings) => settings.groupings.entries.find((entry) =>
+        entry.groupByColumnIndexes.length === 1 &&
+        entry.groupByColumnIndexes[0] === REGION_COLUMN_INDEX);
+
     // A calc function on the grouping, as choosing one on a group row sets.
     const groupProductsByRegionCalculatingLengths = (aggregationType) => Grouping.create({
         tabularData,
@@ -179,13 +184,23 @@ describe("Calc functions that change a column's kind of value", () => {
         expect(String(lengths.get("South"))).toBe("4");
     });
 
-    // A count isn't of the function's results, so the function is applied to the count as before.
-    test("create_GroupingCalculatesLengthsAndCounts_TakesTheCountsLength", () => {
+    // The function is about the products, and a count isn't one, so it is left out rather than
+    // taking the count's length.
+    test("create_GroupingCalculatesLengthsAndCounts_ShowsTheCounts", () => {
 
-        const lengths =
-            readProductLengthsByRegion(groupProductsByRegionCalculatingLengths("Count"));
+        const settings = groupProductsByRegionCalculatingLengths("Count");
+        const counts = readProductLengthsByRegion(settings);
 
-        expect(String(lengths.get("North"))).toBe("1");
+        expect(String(counts.get("North"))).toBe("2");
+        expect(getRegionEntry(settings).columns.Product.valueFormat).toBe(Format.Integer);
+    });
+
+    test("create_GroupingCalculatesLengthsAndCountsDistinct_ShowsTheCounts", () => {
+
+        const counts =
+            readProductLengthsByRegion(groupProductsByRegionCalculatingLengths("CountDistinct"));
+
+        expect(String(counts.get("North"))).toBe("2");
     });
 
     // Grouped by the lengths of the products within each region, as binning a grouping by string
@@ -232,11 +247,6 @@ describe("Calc functions that change a column's kind of value", () => {
         expect(String(lengths.get("North"))).toBe("9");
         expect(String(lengths.get("South"))).toBe("7");
     });
-
-    // The Region grouping's entry, as the format menu reads its formats.
-    const getRegionEntry = (settings) => settings.groupings.entries.find((entry) =>
-        entry.groupByColumnIndexes.length === 1 &&
-        entry.groupByColumnIndexes[0] === REGION_COLUMN_INDEX);
 
     test("create_GroupingCalculatesLengthsAndAverages_GivesANumberFormat", () => {
 

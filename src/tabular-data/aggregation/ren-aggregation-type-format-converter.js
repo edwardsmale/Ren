@@ -84,8 +84,35 @@ Ren.AggregationTypeFormatConverter = (() => {
             || aggregationType === Ren.AggregationTypeEnum.Median;
     };
 
+    /**
+     * Gets a value indicating whether a grouping's aggregation of a column leaves out the
+     * grouping's calc function on it.  A calc function giving numbers from the column's values
+     * (string-length, say) is about those values, so a sum or average applies it to each of them
+     * (see Ren.Aggregation's getPerValueCalcFunctions), but a count is not one of them, so is
+     * shown as it is rather than having the function applied to it.
+     *
+     * @param {*} calcFunction The grouping's calc function on the column.
+     * @param {number} columnValueFormat The format of the column's values.
+     */
+    const ignoresCalcFunction = (aggregationType, calcFunction, columnValueFormat) => {
+
+        if (aggregationType !== Ren.AggregationTypeEnum.Count &&
+            aggregationType !== Ren.AggregationTypeEnum.CountDistinct) {
+
+            return false;
+        }
+
+        if (!calcFunction) return false;
+
+        const valueFormat =
+            Ren.FunctionTags.getCalcFunctionsValueFormat(calcFunction, columnValueFormat);
+
+        return valueFormat !== null && Ren.SpreadsheetColumnFormatEnum.IsArithmetic(valueFormat);
+    };
+
     return {
         getAggregatedValueFormat,
+        ignoresCalcFunction,
         isNumericAggregation
     };
 })();
