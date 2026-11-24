@@ -331,4 +331,37 @@ public class CellFilterMenuTests : BrowserTest
 
         Expect(await TileStateAsync("CreatedOn grouping")).ToBe("expanded");
     }
+
+    // Null Column is numeric and NULL on every row, so its cell value is null rather than the null
+    // sentinel a compressed column holds.
+    private const string NumericNullFixture = "ported/ColumnFilteringTest15.html";
+
+    private async Task<int> IdCountAsync() => (await Filters.ColumnDistinctValuesAsync(Ren, "Id")).Length;
+
+    [TestMethod("ExcludeThisValue_NumericNull_HidesTheNullRows")]
+    public async Task ExcludeThisValue_NumericNull_HidesTheNullRows()
+    {
+        await Ren.OpenAsync(NumericNullFixture);
+
+        Expect(await IdCountAsync()).ToBeGreaterThan(0);
+
+        await ChooseFromFilterMenuAsync(2, "#filter-exclude-this-value", "Null Column");
+
+        await Poll(IdCountAsync).ToBe(0);
+    }
+
+    [TestMethod("FilterToThisValueOnly_NumericNull_KeepsTheNullRows")]
+    public async Task FilterToThisValueOnly_NumericNull_KeepsTheNullRows()
+    {
+        await Ren.OpenAsync(NumericNullFixture);
+
+        var idsBefore = await IdCountAsync();
+
+        Expect(idsBefore).ToBeGreaterThan(0);
+
+        await ChooseFromFilterMenuAsync(2, "#filter-this-value-only", "Null Column");
+
+        // Read as no values at all, the filter would keep no rows.
+        Expect(await IdCountAsync()).ToBe(idsBefore);
+    }
 }

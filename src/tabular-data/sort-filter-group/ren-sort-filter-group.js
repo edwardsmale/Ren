@@ -230,9 +230,17 @@ Ren.SortFilterGroup = (tabularData, dataGroupingSettings, expandedGroups, groupi
         getQuarterSortCalcFunction(columnIndex)
     );
 
+    /**
+     * Gets filter values as the strings filters hold.  A numeric column's NULL cell value is null,
+     * which filters as the sentinel; a lone one is kept as a value rather than read as no values.
+     */
+    const toFilterValues = (values) =>
+        (values == null ? [null] : Ren.ArrayUtils.ensureArray(values))
+            .map(v => v == null ? Ren.NullSentinel : v.toString());
+
     const filter = (columnIdOrHeading, filterValues) => {
 
-        filterValues = Ren.ArrayUtils.ensureArray(filterValues).map(v => v?.toString());
+        filterValues = toFilterValues(filterValues);
 
         handleFilterAction(() => {
 
@@ -254,7 +262,7 @@ Ren.SortFilterGroup = (tabularData, dataGroupingSettings, expandedGroups, groupi
      */
     const excludeValues = (columnIdOrHeading, excludedValues) => {
 
-        excludedValues = Ren.ArrayUtils.ensureArray(excludedValues);
+        excludedValues = toFilterValues(excludedValues);
 
         handleFilterAction(
             () => dataGroupingSettings.excludeColumnFilterValues(columnIdOrHeading, excludedValues)
@@ -411,7 +419,7 @@ Ren.SortFilterGroup = (tabularData, dataGroupingSettings, expandedGroups, groupi
                 grouping,
                 tabularData,
                 columnIdOrHeading,
-                Ren.ArrayUtils.ensureArray(filterValues)
+                toFilterValues(filterValues)
             );
         });
     };
@@ -426,7 +434,7 @@ Ren.SortFilterGroup = (tabularData, dataGroupingSettings, expandedGroups, groupi
             grouping,
             tabularData,
             columnIdOrHeading,
-            Ren.ArrayUtils.ensureArray(excludedValues)
+            toFilterValues(excludedValues)
         ));
     };
 

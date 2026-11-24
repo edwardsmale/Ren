@@ -359,7 +359,7 @@ Ren.DataGroupingSettings_Services_FilterAccessors = (() => {
             const excludedValueSet = new Set();
 
             for (let i = 0; i < excludedValues.length; i++) {
-                excludedValueSet.add(excludedValues[i]?.toString() ?? "");
+                excludedValueSet.add(excludedValues[i]?.toString() ?? Ren.NullSentinel);
             }
 
             for (let i = 0; i < existingValues.length; i++) {
@@ -377,7 +377,8 @@ Ren.DataGroupingSettings_Services_FilterAccessors = (() => {
 
         for (let i = 0; i < excludedValues.length; i++) {
 
-            const excludedValue = excludedValues[i]?.toString() ?? "";
+            // A numeric column's NULL is a null value, which filters as the sentinel.
+            const excludedValue = excludedValues[i]?.toString() ?? Ren.NullSentinel;
 
             if (filterValues.indexOf(excludedValue) === -1) filterValues.push(excludedValue);
         }

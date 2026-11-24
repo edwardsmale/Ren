@@ -35,8 +35,9 @@
                         columnIndex
                     );
 
+                    // A numeric column's NULL is null, which filters as the sentinel.
                     const groupValueStr =
-                        (groupValue == null || groupValue === "") ? "" : String(groupValue);
+                        groupValue == null ? Ren.NullSentinel : String(groupValue);
 
                     if (!matchers[i](groupValueStr)) {
                         return false;

@@ -803,8 +803,8 @@ Ren.SortFilterGroup_Applyer = (tabularData, dataGroupingSettings, expandedGroups
                 columnIndex
             );
 
-            const groupValueAsString =
-                (groupValue == null || groupValue === "") ? "" : String(groupValue);
+            // A numeric column's NULL is null, which filters as the sentinel.
+            const groupValueAsString = groupValue == null ? Ren.NullSentinel : String(groupValue);
 
             if (!matchers[i](groupValueAsString)) {
                 return false; // Group doesn't match this column's filter
