@@ -150,18 +150,52 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
 
             if (calcFunctions) value = applyCalcFunctions(calcFunctions, value, columnIndex);
 
-            if (value == null || value === "" || value === Ren.NullSentinel) {
-
-                numberBuffer[i] = null;
-                continue;
-            }
-
-            const number = typeof value === "number" ? value : Number(value);
-
-            numberBuffer[i] = Number.isFinite(number) ? number : null;
+            numberBuffer[i] = toNumber(value);
         }
 
         return numberBuffer;
+    };
+
+    // Gets the number a value stands for, or null for a blank or NULL or anything not a number.
+    const toNumber = (value) => {
+
+        if (value == null || value === "" || value === Ren.NullSentinel) return null;
+
+        const number = typeof value === "number" ? value : Number(value);
+
+        return Number.isFinite(number) ? number : null;
+    };
+
+    /**
+     * Gets a function reading a column's value on a data row as the number a grouping's sum,
+     * average or the like of the column reads it as: the data rows' calc function's result where
+     * there is one, through the grouping's calc function applied to each value where there is
+     * one (see getPerValueCalcFunctions), and null for a blank or NULL or anything not a number.
+     *
+     * @param {Object} groupingColumns The grouping's columns settings.
+     * @param {Object} paras The containing report's parameters, which the functions read as paras.
+     * @returns {function(number): ?number} Reads the number for a data row index.
+     */
+    const getRowNumberReader = (columnIndex, groupingColumns, paras) => {
+
+        const decompressValue = tabularData.CompressionDictionary.decompressValue;
+        const values = getTransformedColumn(columnIndex) ?? tabularData.getColumnCV(columnIndex);
+
+        const calcFunctions = getPerValueCalcFunctions(
+            columnIndex,
+            groupingColumns,
+            Ren.AggregationTypeEnum.Sum,
+            paras
+        );
+
+        return (rowIndex) => {
+
+            let value = decompressValue(values[rowIndex], columnIndex);
+
+            if (calcFunctions) value = applyCalcFunctions(calcFunctions, value, columnIndex);
+
+            return toNumber(value);
+        };
     };
 
     /**
@@ -1049,6 +1083,7 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         callAggFunc,
         getAggregatedValue,
         getPerValueCalcFunctions,
+        getRowNumberReader,
         ignoresCalcFunction
     };
 };

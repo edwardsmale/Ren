@@ -10,6 +10,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 - Keep group sort orders when a calc function is set, rather than losing them on the next expand.
 - Offer number formats for sums and averages of a calc function's numbers, e.g. average string length.
 - Show a count as it is, rather than applying a calc function such as string length to it.
+- Fix "Show as" percentages for calculated columns, which read the raw stored values.
 - Fix sorting by length: shortest first always failed, and longest first misplaced blanks.
 - Show the page's current settings in the JSON settings window.
 - Replace the JSON settings window's file path and Save button with a Copy all button.

@@ -190,4 +190,22 @@ public class AggregationMenuTests : BrowserTest
 
         await Expect(Ren.Root.Locator("#format-as-number")).Not.ToHaveCountAsync(0);
     }
+
+    // The fixture's product names come to 526 characters, 160 of them in the first group's, which
+    // averages 40.  The share is of the lengths, as the averages are, rather than of the names.
+    [TestMethod("ShowAsPercentageOfGroupTotal_StringLengthsAveraged_ShowsShareOfLengths")]
+    public async Task ShowAsPercentageOfGroupTotal_StringLengthsAveraged_ShowsShareOfLengths()
+    {
+        await Ren.OpenAsync(StringColumnsFixture);
+        await GroupByParentCategoryThenProductNameLengthAsync();
+
+        await Ren.Report.ChooseFromCellMenuAsync("ProductName", 2, ".qa-ren-aggregation-menu-item", AverageItem);
+        await Poll(() => Ren.Report.CellTextAsync("ProductName", 2)).ToBe("40");
+
+        await Ren.Report.ChooseFromCellMenuAsync(
+            "ProductName", 2, ".qa-ren-formatting-menu-item", "#format-show-as",
+            "#format-show-as-percentage-of-group-sum", "#format-show-as-percentage-of-group-sum-2-dp");
+
+        await Poll(() => Ren.Report.CellTextAsync("ProductName", 2)).ToBe("7.60%");
+    }
 }

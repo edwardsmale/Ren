@@ -75,17 +75,19 @@ Ren.SummaryStats = (tabularData, dataGroupingSettings) => {
     };
 
     /**
-     * Adds the values in the specified column of a group's data rows to the values to aggregate.
+     * Adds the numbers in a column of a group's data rows to the values to aggregate.
+     *
+     * @param {function(number): ?number} readNumber Reads the number for a data row index (see
+     *   Ren.Aggregation's getRowNumberReader).
      */
-    const addRowValues = (valuesToAggregate, group, columnIndex) => {
+    const addRowValues = (valuesToAggregate, group, readNumber) => {
 
-        const rowModels = tabularData.RowModels;
         const buffer = group.containedRowIndexBuffer;
         const start = group.containedRowIndexStart;
         const count = group.containedRowIndexCount;
 
         for (let index = 0; index < count; index++) {
-            valuesToAggregate.push(parseFloat(rowModels[buffer[start + index]].CV[columnIndex]));
+            valuesToAggregate.push(readNumber(buffer[start + index]));
         }
     };
 
@@ -109,11 +111,12 @@ Ren.SummaryStats = (tabularData, dataGroupingSettings) => {
         });
     };
 
+    // The values aggregated are numbers already, rather than dictionary indexes.
+    const numberAggFuncs = Ren.AggregationFns(null);
+
     const aggregate = (valueFormatType, aggTypeName, valuesToAggregate, columnIndex) => {
 
-        const value = dataGroupingSettings.aggregation.callAggFunc(
-            valueFormatType,
-            aggregationTypesByKey.get(aggTypeName),
+        const value = numberAggFuncs.aggFunc(valueFormatType, aggregationTypesByKey.get(aggTypeName))(
             valuesToAggregate,
             columnIndex,
             0,
@@ -162,7 +165,19 @@ Ren.SummaryStats = (tabularData, dataGroupingSettings) => {
             ? dataGroupingSettings.groupings.entries
             : [grouping];
 
+        const paras = Ren.ReportInputParameters.getInputParametersForGuid(
+            dataGroupingSettings.containingReportGuid
+        );
+
         groupings.forEach(grouping => {
+
+            // The data rows' values as the grouping's sum of them reads them, which is what its
+            // group rows show: string lengths, say, where a calc function gives those.
+            const readNumber = dataGroupingSettings.aggregation.getRowNumberReader(
+                columnIndex,
+                grouping.columns,
+                paras
+            );
 
             const isOutermost =
                 !grouping.parentGroupingIndex && grouping.parentGroupingIndex !== 0;
@@ -184,22 +199,22 @@ Ren.SummaryStats = (tabularData, dataGroupingSettings) => {
                 // Stats are over data rows, not child group rows, whose values are aggregations
                 // themselves and need not even be numbers.
                 if (!isOutermost) {
-                    addRowValues(valuesToAggregate, group, columnIndex);
+                    addRowValues(valuesToAggregate, group, readNumber);
                 }
                 else if (group.containedGroups.size) {
 
                     // The outermost group's own buffer would be built as a full-length range.
                     group.containedGroups.forEach(childGroup => {
 
-                        addRowValues(valuesToAggregate, childGroup, columnIndex);
+                        addRowValues(valuesToAggregate, childGroup, readNumber);
                     });
                 }
                 else {
 
-                    const rowModels = tabularData.RowModels;
+                    const rowCount = tabularData.RowModels.length;
 
-                    for (let rowIndex = 0; rowIndex < rowModels.length; rowIndex++) {
-                        valuesToAggregate.push(parseFloat(rowModels[rowIndex].CV[columnIndex]));
+                    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                        valuesToAggregate.push(readNumber(rowIndex));
                     }
                 }
 
