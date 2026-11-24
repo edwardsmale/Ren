@@ -6,7 +6,7 @@
         No data grid variations yet.
     </div>`
     ||
-    `<ren-grid data-source-uri="@parameters.dataSourceUri"
+    `<ren-grid data-source-uri="@Ren.HtmlUtils.escapeAttribute(parameters.dataSourceUri)"
                settings-group="DataGridVariationsWindow"
                is-child-visualisation="true"
                max-height="12.5rem"
@@ -17,7 +17,7 @@
                variations="false" />
 
         <script class="js-ren-report-settings" type="application/json">
-            @parameters.reportSettings
+            @Ren.HtmlUtils.escapeScriptClosingTag(parameters.reportSettings)
         </scr` + `ipt>`
     )
 

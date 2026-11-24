@@ -3,7 +3,7 @@
     <div class="ren-embedded-report__error-panel-message">
         Sorry, the report doesn't exist!
         <br /><br />
-        <strong>@parameters.reportName</strong>
+        <strong>@Ren.HtmlUtils.escapeHtml(parameters.reportName)</strong>
         <br /><br />
         <button class="ren-embedded-report__error-panel-close-button js-ren-close-popup">Close</button>
     </div>

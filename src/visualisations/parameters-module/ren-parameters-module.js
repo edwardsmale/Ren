@@ -32,6 +32,17 @@ Ren.CreateParametersModule = (_tabularData, visualisation) => {
         return paramSpec.Value;
     };
 
+    // The display value as HTML: the value escaped, as it may come from the request, or the styled
+    // "Not set" when there is none.
+    const getDisplayValueHtml = (paramSpec) => {
+
+        const value = getDisplayValue(paramSpec);
+
+        return Ren.TextUtils.convertNullOrUndefinedToStyledNotSet(
+            value == null ? value : Ren.HtmlUtils.escapeHtml(value)
+        );
+    };
+
     const isToggleInputType = (paramSpec) => {
 
         return Ren.ObjectUtils.getEnumValue(Ren.ReportInputTypeEnum, paramSpec.InputType) ===
@@ -95,7 +106,7 @@ Ren.CreateParametersModule = (_tabularData, visualisation) => {
             "ParametersModuleParameter",
             {
                 key,
-                value: Ren.TextUtils.convertNullOrUndefinedToStyledNotSet(getDisplayValue(paramSpec)),
+                value: getDisplayValueHtml(paramSpec),
                 label: paramSpec.Label,
                 hideButtons: isDisabled(),
                 isClearButtonDisabled: !paramSpec.Value,

@@ -135,7 +135,7 @@ Ren.CreateUploadedFilesModule = (_tabularData, visualisation) => {
         return value;
     };
 
-    // Gets the text shown for a setting's stored value.
+    // Gets the HTML shown for a setting's stored value.
     const formatDisplayValue = (descriptor, value) => {
 
         if (value === undefined || value === null || value === "") return null;
@@ -148,9 +148,11 @@ Ren.CreateUploadedFilesModule = (_tabularData, visualisation) => {
         }
 
         if (descriptor.key === "uploadedFiles") return formatFileList(value);
-        if (descriptor.key === "uploadedFilesDelimiter") return formatDelimiter(value);
+        if (descriptor.key === "uploadedFilesDelimiter") {
+            return Ren.HtmlUtils.escapeHtml(formatDelimiter(value));
+        }
 
-        return value;
+        return Ren.HtmlUtils.escapeHtml(value);
     };
 
     // A missing-files message replaces the Filenames value when the group's last data request

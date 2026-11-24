@@ -6,8 +6,8 @@
         No report settings files actually.
     </div>`
     ||
-    `<ren-grid data-source-uri="@parameters.dataSourceUri"
-               settings-group="@parameters.settingsGroup"
+    `<ren-grid data-source-uri="@Ren.HtmlUtils.escapeAttribute(parameters.dataSourceUri)"
+               settings-group="@Ren.HtmlUtils.escapeAttribute(parameters.settingsGroup)"
                is-transitive="true"
                is-child-visualisation="true"
                exclude-from-serialization="true"
@@ -20,7 +20,7 @@
 
         <script class="js-ren-report-settings"
                 type="application/json">
-            @parameters.reportSettings
+            @Ren.HtmlUtils.escapeScriptClosingTag(parameters.reportSettings)
         </scr` + `ipt>`
     )
 

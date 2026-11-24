@@ -17,6 +17,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 - Summarise a date range as "Today" when applicable.
 - Ensure font styles are consistent.
 - Add a hidden `__Count` column in `TabularDataSetCollectionBuilder`.
+- Ensure text put into HTML templates is escaped where necessary.
 
 ## 1.2.2 (2026-11-22)
 
