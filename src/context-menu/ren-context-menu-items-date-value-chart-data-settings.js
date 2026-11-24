@@ -302,8 +302,8 @@ Ren.ContextMenuItems_DateValueChart_DataSettings = (chart) => {
      */
     const writeChartFormatFunction = (columnIndex, valueFormatFunction) => {
 
-        // Use heading as the key, consistent with how initGroupingEntry looks up columns.
-        const key = tabularData?.columnResolver?.getColumnHeading(columnIndex);
+        // Keyed by column ID or heading, as the chart's rows and other column settings are.
+        const key = tabularData?.columnResolver?.getColumnIdOrHeading(columnIndex);
 
         if (!key) return;
 

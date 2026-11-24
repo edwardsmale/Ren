@@ -466,7 +466,7 @@ Ren.ContextMenuItems_DateValueChart = (tabularData, contextMenu, visualisation, 
                 }
 
                 valueColumns = valueColumns.filter(
-                    column => !InputColumns.isInternalColumn(column)
+                    column => InputColumns.isOfferedColumn(visualisation, column)
                 );
 
                 valueColumnsInputData = props.rawInputData;

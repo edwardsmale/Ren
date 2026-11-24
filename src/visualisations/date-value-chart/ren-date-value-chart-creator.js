@@ -26,14 +26,6 @@ Ren.CreateDateValueChartCreator = (() => {
         const secondLastGrouping = entries[entries.length - 2];
         const columns = secondLastGrouping?.columns;
 
-        if (columns) {
-
-            for (const k in columns) {
-
-                if (!Object.prototype.hasOwnProperty.call(columns, k)) continue;
-            }
-        }
-
         if (!columns) return null;
 
         const aggregations = {};
@@ -137,6 +129,11 @@ Ren.CreateDateValueChartCreator = (() => {
         const initialChartDataRowColumnSettings =
             extractDataRowColumnSettings(source.dataGroupingSettings);
 
+        // The chart names its series and axes as the grid names its columns, such as a calculated
+        // column made of the hidden __Count column.
+        const initialChartColumnLabels =
+            dataGridCellSelection.getSelectedColumnDisplayHeadings?.() ?? null;
+
         Ren.VisualisationCreator.createVisualisation({
             dataSourceUri: sourceDataGridVisualisation.dataSourceUri,
             sqlFilename: sourceDataGridVisualisation.sqlFilename,
@@ -152,6 +149,7 @@ Ren.CreateDateValueChartCreator = (() => {
             initialChartSplitColumn: countedColumn,
             initialChartGroupColumnAggregations,
             initialChartDataRowColumnSettings,
+            initialChartColumnLabels,
 
             // The chart's own group starts with no settings, so the SQL's ---GroupBy directives
             // would give it group rows whose Date column aggregates to empty, leaving no date

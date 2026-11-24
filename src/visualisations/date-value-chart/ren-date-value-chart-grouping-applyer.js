@@ -149,6 +149,58 @@ Ren.DateValueChart_GroupingApplyer = (() => {
     };
 
     /**
+     * Re-keys an entry's column settings by column ID or heading, as the rows are keyed, along
+     * with the columns they are aggregated with respect to.  Charts once keyed them by heading,
+     * which left a column whose ID differs from its heading, such as the hidden __Count column,
+     * unconfigured: summed, with no calc or format function.  A key that names no column, or
+     * whose column already has settings under its own key, is left as it is.
+     */
+    const keyColumnsAsRows = (entry, columnResolver) => {
+
+        const columns = entry?.columns;
+
+        if (!columns || !columnResolver) return;
+
+        const toRowKey = (columnIdOrHeading) => {
+
+            const columnIndex = columnResolver.getColumnIndex(columnIdOrHeading);
+
+            return columnIndex == null
+                ? columnIdOrHeading
+                : columnResolver.getColumnIdOrHeading(columnIndex) ?? columnIdOrHeading;
+        };
+
+        let isRekeyed = false;
+        const rekeyed = {};
+
+        for (const key in columns) {
+
+            if (!Object.prototype.hasOwnProperty.call(columns, key)) continue;
+
+            const settings = columns[key];
+            const withRespectTo = settings?.aggregateWithRespectToColumn;
+
+            if (withRespectTo != null && toRowKey(withRespectTo) !== withRespectTo) {
+                settings.aggregateWithRespectToColumn = toRowKey(withRespectTo);
+            }
+
+            const rowKey = toRowKey(key);
+
+            if (rowKey !== key && !Object.prototype.hasOwnProperty.call(columns, rowKey)) {
+
+                rekeyed[rowKey] = settings;
+                isRekeyed = true;
+            }
+            else {
+
+                rekeyed[key] = settings;
+            }
+        }
+
+        if (isRekeyed) entry.columns = rekeyed;
+    };
+
+    /**
      * Gets the column the data is split by, as { heading, format }, or null where it isn't split.
      */
     const getSplitColumn = (chartDataGroupingSettings, columnResolver, columnFormats) => {
@@ -196,6 +248,8 @@ Ren.DateValueChart_GroupingApplyer = (() => {
             Ren.DateValueChart_GroupingEntries.getAggregationEntry(chartDataGroupingSettings);
 
         if (!aggregationEntry) return null;
+
+        keyColumnsAsRows(aggregationEntry, columnResolver);
 
         // A chart without a date column is drawn as an all-time chart, its rows all given one date.
         const dateEntry = getDateEntry(chartDataGroupingSettings);

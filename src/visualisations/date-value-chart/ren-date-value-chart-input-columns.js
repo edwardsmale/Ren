@@ -284,8 +284,87 @@ Ren.DateValueChart_InputColumns = (() => {
             || !!column?.Heading?.includes("__");
     };
 
+    /**
+     * Gets a value indicating whether the chart calculates a column's values from others after
+     * aggregating them, as a grid's calculated column, such as one made of the hidden __Count
+     * column, is.  Such a column is plotted for its calculated values, so the menus offer it even
+     * where it is internal.
+     */
+    const isCalculatedColumn = (visualisation, columnKey) => {
+
+        const columns = Ren.DateValueChart_GroupingEntries
+            .getAggregationEntry(visualisation?.chartDataGroupingSettings)?.columns;
+
+        const calcFunction = columns?.[columnKey]?.calcFunction;
+
+        return Array.isArray(calcFunction) ? calcFunction.length > 0 : !!calcFunction;
+    };
+
+    /**
+     * Gets a value indicating whether the chart's menus offer a column as one to plot.
+     */
+    const isOfferedColumn = (visualisation, column) =>
+        !isInternalColumn(column) || isCalculatedColumn(
+            visualisation,
+            typeof column === "string" ? column : column?.ColumnIdOrHeading
+        );
+
+    /**
+     * Gets what the grid the chart was made from shows a column as, where it has renamed it, or
+     * null.  The latest of the grid's states is the one in use.  A chart loaded from saved
+     * settings has no source grid, so is matched to the grid whose state group it shares.
+     */
+    const getSourceGridDisplayHeading = (visualisation, columnKey) => {
+
+        const sourceGuid = visualisation?.sourceVisualisation?.visualisationGuid;
+        const gridStateGroup = visualisation?.gridStateGroup;
+        const gridStates = Ren.GridStateCollection?.entries;
+
+        if ((!sourceGuid && !gridStateGroup) || !gridStates) return null;
+
+        for (let i = gridStates.length - 1; i >= 0; i--) {
+
+            const isSourceGrid = sourceGuid
+                ? gridStates[i].visualisationGuid === sourceGuid
+                : gridStates[i].gridStateGroup === gridStateGroup;
+
+            if (!isSourceGrid) continue;
+
+            const columns = gridStates[i].columns || [];
+
+            for (let c = 0; c < columns.length; c++) {
+
+                if (columns[c].column === columnKey) return columns[c].displayHeadingOverride || null;
+            }
+
+            return null;
+        }
+
+        return null;
+    };
+
+    /**
+     * Gets what a column is called on the chart: what the grid the chart was made from shows it
+     * as, or else its heading, or else its ID or heading itself.
+     */
+    const getColumnLabel = (visualisation, columnResolver, columnKey) => {
+
+        const gridLabel = getSourceGridDisplayHeading(visualisation, columnKey)
+            || visualisation?.initialChartColumnLabels?.[columnKey];
+
+        if (gridLabel) return gridLabel;
+
+        const columnIndex = columnResolver?.getColumnIndex(columnKey) ?? null;
+
+        return (columnIndex !== null ? columnResolver.getColumnHeading(columnIndex) : null)
+            || columnKey;
+    };
+
     return {
         isInternalColumn,
+        isCalculatedColumn,
+        isOfferedColumn,
+        getColumnLabel,
         getRequiredColumnIndexes,
         rowsHoldColumns,
         getValueColumns,

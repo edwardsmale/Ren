@@ -35,9 +35,6 @@ Ren.CreateDateValueChart = (() => {
     };
 
     /**
-     * Gets a column ID or heading's heading, or the identifier itself where it does not resolve.
-     */
-    /**
      * Gets the distinct headings of the columns the given series take their values from, leaving
      * out the series gathering others, which belongs to no column.
      */
@@ -61,6 +58,9 @@ Ren.CreateDateValueChart = (() => {
         return headings;
     };
 
+    /**
+     * Gets a column ID or heading's heading, or the identifier itself where it does not resolve.
+     */
     const resolveColumnHeading = (columnResolver, columnIdOrHeading) => {
 
         const columnIndex = columnResolver.getColumnIndex(columnIdOrHeading);
@@ -70,6 +70,21 @@ Ren.CreateDateValueChart = (() => {
             : null;
 
         return heading ?? columnIdOrHeading;
+    };
+
+    /**
+     * Gets the key a column's values are held under in the chart's rows - its ID, or its heading
+     * where it has none - from either, or the identifier itself where it does not resolve.
+     */
+    const resolveColumnKey = (columnResolver, columnIdOrHeading) => {
+
+        const columnIndex = columnResolver.getColumnIndex(columnIdOrHeading);
+
+        const key = columnIndex !== null
+            ? columnResolver.getColumnIdOrHeading(columnIndex)
+            : null;
+
+        return key ?? columnIdOrHeading;
     };
 
     /**
@@ -111,10 +126,10 @@ Ren.CreateDateValueChart = (() => {
     };
 
     /**
-     * Re-keys the aggregation settings copied from the source grid's grouping by heading, as the
-     * chart's grouping applyer and its rows are keyed.  The data rows' value format functions are
-     * merged in too, as the chart reads its format overrides from this entry; the grouping's own
-     * format function wins, being the one the grid uses for the aggregated values.
+     * Keys the aggregation settings copied from the source grid's grouping by column ID or heading,
+     * as the chart's rows are keyed.  The data rows' value format functions are merged in too, as
+     * the chart reads its format overrides from this entry; the grouping's own format function
+     * wins, being the one the grid uses for the aggregated values.
      */
     const buildInitialGroupingColumns = (
         sourceAggregations, sourceDataRowColumns, columnResolver
@@ -124,8 +139,8 @@ Ren.CreateDateValueChart = (() => {
 
         if (!sourceAggregations && !sourceDataRowColumns) return columns;
 
-        const resolveToHeading = (columnIdOrHeading) =>
-            resolveColumnHeading(columnResolver, columnIdOrHeading);
+        const resolveToKey = (columnIdOrHeading) =>
+            resolveColumnKey(columnResolver, columnIdOrHeading);
 
         const columnIdOrHeadings = collectColumnKeys(sourceAggregations, sourceDataRowColumns);
 
@@ -142,7 +157,7 @@ Ren.CreateDateValueChart = (() => {
             if (settings.aggregateWithRespectToColumn != null) {
 
                 columnSettings.aggregateWithRespectToColumn =
-                    resolveToHeading(settings.aggregateWithRespectToColumn);
+                    resolveToKey(settings.aggregateWithRespectToColumn);
             }
 
             if (settings.calcFunction != null) {
@@ -159,16 +174,15 @@ Ren.CreateDateValueChart = (() => {
                     Ren.ArrayUtils.ensureArray(valueFormatFunction);
             }
 
-            const resolvedHeading = resolveToHeading(columnIdOrHeading);
-            columns[resolvedHeading] = columnSettings;
+            columns[resolveToKey(columnIdOrHeading)] = columnSettings;
         }
 
         return columns;
     };
 
     /**
-     * Re-keys the data row calculation functions copied from the source grid by heading, so the
-     * chart plots the calculated values the grid shows.  Returns null when there are none.
+     * Keys the data row calculation functions copied from the source grid by column ID or heading,
+     * so the chart plots the calculated values the grid shows.  Returns null when there are none.
      */
     const buildInitialDataRowColumns = (sourceDataRowColumns, columnResolver) => {
 
@@ -187,9 +201,7 @@ Ren.CreateDateValueChart = (() => {
 
             if (calcFunction == null) continue;
 
-            const resolvedHeading = resolveColumnHeading(columnResolver, columnIdOrHeading);
-
-            columns[resolvedHeading] = {
+            columns[resolveColumnKey(columnResolver, columnIdOrHeading)] = {
                 calcFunction: Ren.ArrayUtils.ensureArray(calcFunction)
             };
             hasAny = true;
@@ -374,7 +386,7 @@ Ren.CreateDateValueChart = (() => {
                     inputData,
                     selectedColumns,
                     props.dateHeading,
-                    column => columns[resolveColumnHeading(columnResolver, column)]
+                    column => columns[resolveColumnKey(columnResolver, column)]
                 );
 
             if (initialSplitColumn != null) {
@@ -693,6 +705,31 @@ Ren.CreateDateValueChart = (() => {
             tabularData?.columnResolver
         );
 
+        // What each value column is called on the chart, such as on its axis: what the grid the
+        // chart was made from showed it as, or else its heading rather than its ID, as an internal
+        // column such as __Count has.
+        props.valueColumnLabels = {};
+
+        for (let i = 0; i < props.allSeriesSourceHeadings.length; i++) {
+
+            const sourceHeading = props.allSeriesSourceHeadings[i];
+
+            props.valueColumnLabels[sourceHeading] = Ren.DateValueChart_InputColumns
+                .getColumnLabel(visualisation, columnResolver, sourceHeading);
+        }
+
+        // A series of a whole column, unsplit, is named as its column is where it has no name of
+        // its own.
+        const getDefaultSeriesLabel = (index) => {
+
+            if (seriesColumns || index >= props.valueHeadings.length) return null;
+
+            const column = props.valueHeadings[index];
+            const label = props.valueColumnLabels[column];
+
+            return label && label !== column ? label : null;
+        };
+
         props.seriesSplit = seriesColumns
             ? {
                 columnIndex: splitColumnIndex,
@@ -799,8 +836,7 @@ Ren.CreateDateValueChart = (() => {
                 props.valueColumnFormats[i] = columnFormats.format;
                 props.valueColumnFormatFunctions[i] = columnFormats.formatFunction;
 
-                // Chart format overrides are keyed by heading, so initGroupingEntry can resolve
-                // them.
+                // Chart format overrides are keyed by column ID or heading, as the rows are.
                 const chartEntry = visualisation.chartDataGroupingSettings?.groupings?.entries?.[0];
                 const colKey = props.seriesSourceHeadings[i];
                 const chartColOverride = chartEntry?.columns?.[colKey];
@@ -889,8 +925,14 @@ Ren.CreateDateValueChart = (() => {
 
             const seriesCategory = getTypeCategory(props.valueColumnFormats[index]);
 
+            // Named as the grid named the column, if it renamed it.
+            const initialLabel = seriesColumns
+                ? null
+                : visualisation.initialChartColumnLabels?.[props.valueHeadings[index]];
+
             return Object.assign({
                 column: props.valueHeadings[index],
+                ...(initialLabel ? { label: initialLabel } : {}),
                 valueAxis: formatCategories.length > 1 && seriesCategory === "percentage"
                     ? "rightAxis"
                     : "leftAxis",
@@ -1096,7 +1138,7 @@ Ren.CreateDateValueChart = (() => {
                 chartType: seriesSettings.chartType !== undefined ? seriesSettings.chartType : defaultChartType,
                 showValueLabels: seriesSettings.showValueLabels !== undefined ? seriesSettings.showValueLabels : true,
                 showNameInBars: seriesSettings.showNameInBars === true,
-                label: seriesSettings.label || null,
+                label: seriesSettings.label || getDefaultSeriesLabel(i),
                 colourFilter: seriesSettings.colourFilter || null,
                 colourFunction: seriesSettings.colourFunction || null,
                 lineShape: Ren.DateValueChartCalculator.getLineShape(seriesSettings),

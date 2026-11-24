@@ -22,7 +22,13 @@ Ren.DateValueChart_Render_AxisLabel = (() => {
      * series is nearest to hand.
      */
     const getSeriesSourceHeading = (props, seriesIndex) =>
-        props.seriesSourceHeadings?.[seriesIndex] ?? props.valueHeadings[seriesIndex];
+        getColumnLabel(
+            props,
+            props.seriesSourceHeadings?.[seriesIndex] ?? props.valueHeadings[seriesIndex]
+        );
+
+    // What a value column is called on the chart (see props.valueColumnLabels).
+    const getColumnLabel = (props, column) => props.valueColumnLabels?.[column] ?? column;
 
     const renderDateValueChartAxisLabel = (props) => {
 
@@ -57,7 +63,7 @@ Ren.DateValueChart_Render_AxisLabel = (() => {
         }
         else if (showLeftHeading) {
 
-            const leftLabel = props.axes.leftAxis.label || props.valueHeading;
+            const leftLabel = props.axes.leftAxis.label || getColumnLabel(props, props.valueHeading);
             appendAxisLabel(props.svg, "ren-value-axis-label", leftLabel);
         }
     };

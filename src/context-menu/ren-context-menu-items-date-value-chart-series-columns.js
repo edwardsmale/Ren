@@ -8,6 +8,13 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
 
     const removedDateEntries = Ren.ContextMenuItems_DateValueChart_SeriesColumns.removedDateEntries;
 
+    // What a column is offered as: what the grid showed it as, or its heading.
+    const getColumnLabel = column => Ren.DateValueChart_InputColumns.getColumnLabel(
+        visualisation,
+        tabularData?.columnResolver,
+        column
+    );
+
     const {
         getTargetSeriesIndexes,
         getTargetSeriesIndex,
@@ -243,7 +250,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         if (valueColumns.length <= 1) return [];
 
         return valueColumns.map(column => ({
-            text: column,
+            text: getColumnLabel(column),
             action: () => setValueColumn(column),
             ticked: () => {
 
@@ -391,7 +398,9 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
                 ),
                 chartType: Ren.SeriesChartTypeEnum.Bar,
                 showValueLabels: true,
-                label: null,
+
+                // Named as the grid named the column, if it renamed it.
+                label: visualisation.initialChartColumnLabels?.[column] ?? null,
                 colourFilter: null,
                 lineShape: "straight",
                 lineStyle: "solid",
@@ -408,6 +417,12 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             // Ahead of the settings of any removed series, which follow those drawn.
             if (!visualisation.series) visualisation.series = [];
             visualisation.series.splice(newIndex, 0, Object.assign({}, newSeries));
+
+            // Drawn named as its column is, as detecting the columns again would name it, without
+            // saving the name as the series' own.
+            if (!newSeries.label && getColumnLabel(column) !== column) {
+                newSeries.label = getColumnLabel(column);
+            }
 
             if (Array.isArray(visualisation.includedSeries)) {
                 visualisation.includedSeries.push(column);
@@ -435,7 +450,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
         get submenu() {
 
             return getValueColumnsFromData().map(column => ({
-                text: column,
+                text: getColumnLabel(column),
                 action: () => addOrRemoveSeries(column),
                 ticked: () => getBaseValueHeadings().indexOf(column) !== -1
             }));
@@ -833,7 +848,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             const column = tabularData.ColumnModels[i];
             const columnKey = column.ColumnIdOrHeading;
 
-            if (Ren.DateValueChart_InputColumns.isInternalColumn(column)) continue;
+            if (!Ren.DateValueChart_InputColumns.isOfferedColumn(visualisation, column)) continue;
             if (Ren.SpreadsheetColumnFormatEnum.IsDate(column.ColumnFormat)) continue;
             if (columnKey === props.dateHeading || columnKey === splitColumn) continue;
             if (columnKey === props.subdivideColumn) continue;
@@ -973,7 +988,7 @@ Ren.ContextMenuItems_DateValueChart_SeriesColumns = (chart) => {
             return baseHeadings[0];
         },
         buildValueColumnMenuItems: () => getValueColumnOptions().map(column => ({
-            text: column,
+            text: getColumnLabel(column),
             action: () => switchValueColumn(getBaseValueHeadings()[0], column),
             ticked: () => column === getBaseValueHeadings()[0]
         })),

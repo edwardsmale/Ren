@@ -312,6 +312,29 @@ Ren.DataGridCellSelection = (tabularData, dataGroupingSettings, dataGridGuid, gr
         updateUI();
     });
 
+    /**
+     * Gets what the grid shows each selected column as where its heading has been overridden,
+     * keyed by column ID or heading, or null where none has.
+     */
+    const getSelectedColumnDisplayHeadings = () => {
+
+        let displayHeadings = null;
+        const columnIndexes = getSelectedColumnIndexes();
+
+        for (let i = 0; i < columnIndexes.length; i++) {
+
+            const override = gridState?.getDisplayHeadingOverride(columnIndexes[i]);
+
+            if (!override) continue;
+
+            displayHeadings ??= {};
+            displayHeadings[tabularData.columnResolver.getColumnIdOrHeading(columnIndexes[i])] =
+                override;
+        }
+
+        return displayHeadings;
+    };
+
     return {
         findNext,
         selectMatchingRows,
@@ -323,6 +346,7 @@ Ren.DataGridCellSelection = (tabularData, dataGroupingSettings, dataGridGuid, gr
         addRowHeadingContextMenus,
         getSelectedColumnIndexes,
         getSelectedColumnIdsOrHeadings,
+        getSelectedColumnDisplayHeadings,
         getSelectedCells,
         areMultipleCellsSelected,
         areSelectedCellsAllInSameColumn,
