@@ -387,10 +387,29 @@ Ren.DataGroupingSettings = (
 
     const repopulateGroupings = function () {
 
+        const previousEntries = this.groupings.entries.slice();
+
         // groupingsAdder is added by addDataGroupingSettingsServices.
-        this.groupingsAdder.populateGroupings(
-            this.groupings.entries.slice()
-        );
+        this.groupingsAdder.populateGroupings(previousEntries);
+
+        // The groupings are created afresh, unsorted, so each takes back the sort order it had.
+        // Without it the groups keep their sorted places only until the next layout, such as
+        // expanding a group, which then shows them in their natural order.
+        const entries = this.groupings.entries;
+
+        for (let i = 0; i < entries.length; i++) {
+
+            const sortOrder = previousEntries[i]?.sortOrder;
+
+            if (!sortOrder || entries[i] === previousEntries[i]) continue;
+
+            entries[i].setSortOrder(
+                sortOrder.columnIndex,
+                sortOrder.isDescending,
+                sortOrder.sortCalcFunction,
+                sortOrder.thenBy
+            );
+        }
     };
 
     const dataSourceUri = visualisation.dataSourceUri;

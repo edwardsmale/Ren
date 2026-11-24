@@ -25,7 +25,7 @@ describe("Grouping sort orders", () => {
      * shown.  The sort only shows in the rows' display positions, which derived settings don't
      * track, so these are settings that would be rendered.
      */
-    const readRegionOrder = (sortOrder) => {
+    const createSettings = (sortOrder) => {
 
         const settings = Ren.DataGroupingSettingsFactory.createDataGroupingSettings(
             tabularData,
@@ -45,6 +45,14 @@ describe("Grouping sort orders", () => {
             }]
         });
 
+        return settings;
+    };
+
+    /**
+     * Gets the regions in the order the given settings show them.
+     */
+    const readShownRegionOrder = (settings) => {
+
         const decompressValue = tabularData.CompressionDictionary.decompressValue;
         const shownGroups = [];
 
@@ -63,6 +71,8 @@ describe("Grouping sort orders", () => {
 
         return shownGroups.map((shownGroup) => shownGroup.region);
     };
+
+    const readRegionOrder = (sortOrder) => readShownRegionOrder(createSettings(sortOrder));
 
     test("sortOrder_ByTheGroupColumn_SortsAlphabetically", () => {
 
@@ -100,5 +110,22 @@ describe("Grouping sort orders", () => {
             isDescending: false,
             thenBy: [{ column: "Sales", isDescending: true }]
         })).toEqual(["South", "East", "North", "West"]);
+    });
+
+    test("sortOrder_AfterAGroupCalcFunctionIsSet_IsKept", () => {
+
+        const settings = createSettings({ column: "Sales", isDescending: true });
+        const regionGrouping = settings.groupings.secondToLastGrouping();
+
+        // Setting a calc function rebuilds the groupings, and expanding a group lays them out
+        // again: the order shown must still be the sort's rather than the groups' natural one.
+        settings.setCalcFunction(
+            tabularData.findColumnIndex("Manager"),
+            regionGrouping.firstGroup().groupRowIndex,
+            { name: "string-length" }
+        );
+        settings.sortFilterGroup.expandGroup(settings.groupings.secondToLastGrouping().firstGroup());
+
+        expect(readShownRegionOrder(settings)).toEqual(["South", "North", "East", "West"]);
     });
 });
