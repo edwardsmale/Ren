@@ -71,8 +71,12 @@ Ren.CalcFunctionsApplyer = (() => {
      *   column a result had to be appended to the compression dictionary for.
      * @param {Object} paras - The containing report's parameters, which the functions read as
      *   paras.
+     * @param {Set} [skippedColumnIndexes] The columns whose calc functions were applied to each
+     *   value before aggregating, and so are not to be applied again.
      */
-    const applyCalcFunctionsToGroups = (groupsMap, columns, tabularData, appendedColumns, paras) => {
+    const applyCalcFunctionsToGroups = (
+        groupsMap, columns, tabularData, appendedColumns, paras, skippedColumnIndexes
+    ) => {
 
         if (!columns || typeof columns !== "object") return;
 
@@ -89,7 +93,7 @@ Ren.CalcFunctionsApplyer = (() => {
             if (!specs || !specs.length) continue;
 
             const columnIndex = columnResolver.getColumnIndex(columnIdOrHeading);
-            if (columnIndex === null) continue;
+            if (columnIndex === null || skippedColumnIndexes?.has(columnIndex)) continue;
 
             const compiledFunctions = compileCalcFunctions(specs, columnIdOrHeading, "", paras);
 

@@ -337,6 +337,25 @@ Ren.ContextMenuItems = (
                tabularData.ColumnModels[columnIndex].ColumnFormat;
     };
 
+    /**
+     * Gets the value format of the values a column's calc function reads in a grouping: the
+     * column's own on the data rows, and on a group row its aggregated values, before any calc
+     * function the grouping has changed them (see getColumnValueFormat, which gives the format
+     * after).  Choosing a calc function replaces the one there, so the functions offered are
+     * those for these values rather than for the current function's results.
+     */
+    const getColumnCalcInputValueFormat = (columnIndex, grouping) => {
+
+        const columnModel = tabularData.ColumnModels[columnIndex];
+
+        if (columnModel === undefined) return Ren.SpreadsheetColumnFormatEnum.General;
+
+        if (!grouping || isLeafGrouping(grouping)) return columnModel.ColumnFormat;
+
+        return grouping.columns[columnModel.ColumnIdOrHeading]?.aggregatedValueFormat ??
+               getColumnValueFormat(columnIndex, grouping);
+    };
+
     const columnFilterMenuItemsHelper = Ren.ColumnFilterMenuItemsHelper(
         tabularData,
         visualisation,
@@ -432,7 +451,12 @@ Ren.ContextMenuItems = (
         addFormattingMenuItems(columnIndex, rowIndex, columnValueFormat, element);
         addMenuItems(element, stylingMenuItems.getMenuItems(columnIndex, rowIndex));
         addMenuItems(element, tooltipMenuItems.getCellMenuItems(columnIndex, rowIndex));
-        addCalculationMenuItems(columnIndex, rowIndex, columnValueFormat, element);
+        addCalculationMenuItems(
+            columnIndex,
+            rowIndex,
+            getColumnCalcInputValueFormat(columnIndex, grouping),
+            element
+        );
         addAggregationMenuItems(columnIndex, rowIndex, grouping, element);
         addSemanticMenuItems(columnIndex, element, cellValue, rowVals);
     };

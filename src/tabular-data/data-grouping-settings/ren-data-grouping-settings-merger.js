@@ -1,13 +1,5 @@
 Ren.DataGroupingSettingsMerger = (tabularData, dataGroupingSettings) => {
 
-/**
- * Determines if a calc function returns numeric values.
- */
-const isNumericCalcFunction = (calcFunctionName) => {
-
-    return calcFunctionName === "string-length";
-};
-
 const EXPAND_ICON_FORMAT_FUNCTION_NAME = "expand-icon";
 
 /**
@@ -60,13 +52,13 @@ const getColumnValueFormats = (tabularData, columns) => {
         }
         else if (state.calcFunction) {
 
-            const calcFunctionSpec = Ren.ArrayUtils.ensureArray(state.calcFunction)[0];
-            const calcFunctionName = calcFunctionSpec?.name;
-
-            if (isNumericCalcFunction(calcFunctionName)) {
-
-                columnValueFormats[columnIndex] = Ren.SpreadsheetColumnFormatEnum.Integer;
-            }
+            // The values shown are the calc function's, so have the format it gives them.  A
+            // grouping's columns always have a valueFormat, which already allows for it (see
+            // Ren.GroupingsAdder_SetColumnValueFormats).
+            columnValueFormats[columnIndex] = Ren.FunctionTags.getCalcFunctionsValueFormat(
+                state.calcFunction,
+                columnValueFormats[columnIndex]
+            ) ?? columnValueFormats[columnIndex];
         }
 
         const valueFormatFunctionSpecs = state.valueFormatFunction

@@ -3,6 +3,7 @@
  *
  * TAGS: format, calculation, binning
  * BINNING: numbers, "0 1 10 100+", 10
+ * OUTPUT: text
  */
 if (Ren.IsNull(value)) return "-";
 if (value === 0) return "000¬0";

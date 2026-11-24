@@ -3,6 +3,7 @@
  *
  * TAGS: format, calculation, binning
  * BINNING: numbers, "Zero / Non-zero", 60
+ * OUTPUT: text
  */
 if (value === 0 || value === "0") return "0¬Zero";
 return "1¬Non-zero";

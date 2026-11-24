@@ -30,6 +30,48 @@ Ren.ContextMenuItems_Aggregation = (tabularData, dataGroupingSettings) => {
         return false;
     };
 
+    // Gets the value format a calc function names for its results, or null where it names none.
+    const getCalcValueFormat = (calcFunction, columnIndex) => calcFunction
+        ? Ren.FunctionTags.getCalcFunctionsValueFormat(
+            calcFunction,
+            tabularData.ColumnModels[columnIndex].ColumnFormat
+        )
+        : null;
+
+    /**
+     * Gets a value indicating whether the values a column's aggregation in a grouping reads cannot
+     * be summed or averaged.  A calc function giving numbers (the lengths of a column of strings,
+     * say) that the grouping has, or where it has none, that the column is grouped by the results
+     * of, is applied to
+     * each value before a sum or average, so they can be (see Ren.Aggregation's
+     * getPerValueCalcFunctions).  Otherwise they are the data rows' calc function's results where
+     * it has one naming the kind it gives, and otherwise the column's own values.
+     */
+    const aggregatesNonArithmeticValues = (columnIndex, columnIdOrHeading, grouping) => {
+
+        const isArithmetic = Ren.SpreadsheetColumnFormatEnum.IsArithmetic;
+
+        const perValueCalcFunction = grouping.columns?.[columnIdOrHeading]?.calcFunction ??
+            Ren.FunctionTags.getGroupByCalcFunction(
+                dataGroupingSettings.groupings?.entries,
+                columnIndex,
+                columnIdOrHeading
+            );
+
+        const perValueFormat = getCalcValueFormat(perValueCalcFunction, columnIndex);
+
+        if (perValueFormat !== null && isArithmetic(perValueFormat)) return false;
+
+        const dataRowsCalcValueFormat = getCalcValueFormat(
+            dataGroupingSettings.dataRows?.columns?.[columnIdOrHeading]?.calcFunction,
+            columnIndex
+        );
+
+        return dataRowsCalcValueFormat === null
+            ? columnHoldsStringValues(columnIndex)
+            : !isArithmetic(dataRowsCalcValueFormat);
+    };
+
     // The column parameters let the multi-select wrapper pass this through like the column setters.
     const setAggregationIndicatorForAllColumns = (columnIndex, grouping, mode) => {
 
@@ -125,8 +167,13 @@ Ren.ContextMenuItems_Aggregation = (tabularData, dataGroupingSettings) => {
         const aggregationTypes = Ren.AggregationTypeEnum;
 
         // Sum and Average only mean anything for numbers, so they are left out for a column of
-        // strings (or of compressed values, which are strings or dates).
-        const hideNumericAggregations = columnHoldsStringValues(columnIndex);
+        // strings (or of compressed values, which are strings or dates) that no calc function
+        // turns into numbers.
+        const hideNumericAggregations = aggregatesNonArithmeticValues(
+            columnIndex,
+            columnIdOrHeading,
+            grouping
+        );
 
         for (let i = 0; i < aggregationTypes.Values.length; i++) {
 

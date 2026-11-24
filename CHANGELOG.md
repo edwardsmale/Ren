@@ -6,6 +6,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 
 ## Unreleased
 
+- Treat a calculated column as the type its calc function returns, e.g. offer Sum for string lengths.
 - Fix sorting by length: shortest first always failed, and longest first misplaced blanks.
 - Show the page's current settings in the JSON settings window.
 - Replace the JSON settings window's file path and Save button with a Copy all button.

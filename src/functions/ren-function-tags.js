@@ -10,8 +10,10 @@
  * A function tagged binning without one is not offered on a menu.  A BINNING: line implies the
  * binning tag, so a header can never claim a menu place the menus would then filter out.
  *
- * An OUTPUT: line names the kind of value the function gives ("text", "number" or "date"), so a
- * compare filter on its results offers the operators for that kind.  Without one it gives text.
+ * An OUTPUT: line names the kind of value the function gives ("text", "number", "integer" or
+ * "date"), so a compare filter on its results offers the operators for that kind, and a column
+ * calculated with it is treated as holding that kind (see getCalcFunctionsValueFormat).  Without
+ * one a compare filter takes it to give text, and a calculated column keeps its own kind.
  */
 Ren.FunctionTags = (() => {
 
@@ -114,9 +116,86 @@ Ren.FunctionTags = (() => {
     };
 
     /**
-     * Gets the kind of value a function's OUTPUT: line names, or "text" where it names none.
+     * Gets the kind of value a function's OUTPUT: line names, or "text" where it names none.  An
+     * integer is a number, as far as a compare filter is concerned.
      */
-    const getOutputKind = (functionName) => getMetadata(functionName)?.output ?? "text";
+    const getOutputKind = (functionName) => {
+
+        const output = getMetadata(functionName)?.output ?? "text";
+
+        return output === "integer" ? "number" : output;
+    };
+
+    /**
+     * Gets the value format a column's values have once a chain of calc functions has run on them:
+     * the format the last OUTPUT: line in the chain names, or null where no function in it names
+     * one (a custom function among them), so that the caller keeps the format the values had.
+     *
+     * A date output keeps a date format the values already had, since it can't say which of
+     * Date and DateTime it is.
+     *
+     * @param {*} calcFunction - The calc function specs, as a column's calcFunction holds them.
+     * @param {number} inputValueFormat - The SpreadsheetColumnFormatEnum the values had before.
+     * @returns {number|null} The SpreadsheetColumnFormatEnum the values have after, or null.
+     */
+    const getCalcFunctionsValueFormat = (calcFunction, inputValueFormat) => {
+
+        const formats = Ren.SpreadsheetColumnFormatEnum;
+        const specs = Ren.ArrayUtils.ensureArray(calcFunction);
+        let valueFormat = null;
+
+        for (let i = 0; i < specs.length; i++) {
+
+            const functionName = Ren.FormatFunctionUtils.getFunctionName(specs[i]);
+            const output = functionName ? getMetadata(functionName)?.output : null;
+
+            if (!output) continue;
+
+            const previousFormat = valueFormat ?? inputValueFormat;
+
+            switch (output) {
+
+                case "integer": valueFormat = formats.Integer; break;
+                case "number": valueFormat = formats.Number; break;
+                case "date":
+                    valueFormat = formats.IsDate(previousFormat) ? previousFormat : formats.Date;
+                    break;
+                default: valueFormat = formats.General; break;
+            }
+        }
+
+        return valueFormat;
+    };
+
+    /**
+     * Gets the calc function a grouping by a column turns its values into the results of
+     * (string-length, say, showing the lengths), or null where none does.  That is the function
+     * the column is grouped by the results of, or a calc function on the column in a grouping by
+     * it, which changes the value each of its groups shows.  The outermost such grouping's is
+     * taken, as the groupings within it group by the column too.
+     *
+     * @param {Array} groupingEntries The groupings, innermost first, each with its
+     *   groupByColumnIndexes, their groupByCalcFunctions and its columns settings.
+     */
+    const getGroupByCalcFunction = (groupingEntries, columnIndex, columnIdOrHeading) => {
+
+        if (!groupingEntries) return null;
+
+        for (let i = groupingEntries.length - 1; i >= 0; i--) {
+
+            const entry = groupingEntries[i];
+            const position = entry.groupByColumnIndexes?.indexOf(columnIndex) ?? -1;
+
+            if (position === -1) continue;
+
+            const calcFunction = entry.groupByCalcFunctions?.[position] ??
+                entry.columns?.[columnIdOrHeading]?.calcFunction;
+
+            if (calcFunction) return calcFunction;
+        }
+
+        return null;
+    };
 
     return {
         BINNING_GROUPS,
@@ -125,6 +204,8 @@ Ren.FunctionTags = (() => {
         getTags,
         getBinningFunctions,
         getBinningText,
-        getOutputKind
+        getOutputKind,
+        getCalcFunctionsValueFormat,
+        getGroupByCalcFunction
     };
 })();

@@ -238,6 +238,7 @@ Ren.DataGroupingSettingsTransformer = (() => {
 
                 const column = columns[columnIdOrHeading];
                 delete column.valueFormat;
+                delete column.aggregatedValueFormat;
 
                 if (column.aggregationType !== undefined) {
                     column.aggregationType = Ren.AggregationTypeEnum.AsString(column.aggregationType);

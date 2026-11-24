@@ -3,6 +3,7 @@
  *
  * TAGS: format, calculation, binning
  * BINNING: numbers, "Positive/Zero/Negative", 50
+ * OUTPUT: text
  */
 const val = Ren.TextUtils.parseFloat(value);
 if (val === null) return "";

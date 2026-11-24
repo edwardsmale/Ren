@@ -2,6 +2,7 @@
  * Bins a number into ranges of a hundred, as a sortable value and the label to show.
  *
  * TAGS: format, calculation, binning
+ * OUTPUT: text
  */
 if (value === null || value === undefined) return "-";
 if (typeof value !== "number") return value;

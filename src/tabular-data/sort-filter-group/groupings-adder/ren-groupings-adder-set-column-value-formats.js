@@ -15,6 +15,32 @@
             const getAggregatedValueFormat = Ren.AggregationTypeFormatConverter.getAggregatedValueFormat;
             const groupByCalcFunctions = newGrouping.groupByCalcFunctions;
             const groupByColumnIndexes = newGrouping.groupByColumnIndexes;
+            const getCalcFunctionsValueFormat = Ren.FunctionTags.getCalcFunctionsValueFormat;
+            const dataRowsColumns = dataGroupingSettings.dataRows?.columns;
+
+            /**
+             * Gets the format of the values a column's aggregation reads.  Every grouping
+             * aggregates the data rows, so the first grouping's are those the data rows' calc
+             * function gives (string lengths, say, rather than the strings), and each later one
+             * follows on from the one before's aggregated values - before that grouping's own calc
+             * function changed them, as those are not what is aggregated.
+             */
+            const getAggregationInputValueFormat = (columnIndex, columnIdOrHeading) => {
+
+                if (prevColumns) {
+
+                    const previousColumn = prevColumns[columnIdOrHeading];
+
+                    return previousColumn.aggregatedValueFormat ?? previousColumn.valueFormat;
+                }
+
+                const columnFormat = colModels[columnIndex].ColumnFormat;
+                const dataRowsCalcFunction = dataRowsColumns?.[columnIdOrHeading]?.calcFunction;
+
+                return dataRowsCalcFunction
+                    ? getCalcFunctionsValueFormat(dataRowsCalcFunction, columnFormat) ?? columnFormat
+                    : columnFormat;
+            };
 
             const isBinningCalcFunction = (calcFunctionName) => {
 
@@ -55,9 +81,8 @@
                 if (!newGroupingColumn) {
                     newGroupingColumn = newGroupingColumns[columnIdOrHeading] = {};
                 }
-                const previousValueFormat = prevColumns
-                    ? prevColumns[columnIdOrHeading].valueFormat
-                    : colModels[columnIndex].ColumnFormat;
+                const previousValueFormat =
+                    getAggregationInputValueFormat(columnIndex, columnIdOrHeading);
                 const aggregationType = newGroupingColumn.aggregationType;
 
                 if (aggregationType !== undefined) {
@@ -136,6 +161,31 @@
                     dataGroupingSettings.dataRows.columns[columnIdOrHeading] ??= {};
                     dataGroupingSettings.dataRows.columns[columnIdOrHeading].calcFunction = columnDefault.calcFunction;
                 }
+            }
+
+            // A calc function on the grouping replaces its aggregated values with its own, so the
+            // values shown - and sorted, formatted and offered menus by - have the format it gives
+            // them.  The format before it is kept as the one its calc function reads, and the one
+            // the next grouping's aggregation follows on from.  Neither is saved with the settings.
+            for (const columnIdOrHeading in newGroupingColumns) {
+
+                const newGroupingColumn = newGroupingColumns[columnIdOrHeading];
+
+                delete newGroupingColumn.aggregatedValueFormat;
+
+                if (!newGroupingColumn.calcFunction || newGroupingColumn.valueFormat === undefined) {
+                    continue;
+                }
+
+                const calcValueFormat = getCalcFunctionsValueFormat(
+                    newGroupingColumn.calcFunction,
+                    newGroupingColumn.valueFormat
+                );
+
+                if (calcValueFormat === null) continue;
+
+                newGroupingColumn.aggregatedValueFormat = newGroupingColumn.valueFormat;
+                newGroupingColumn.valueFormat = calcValueFormat;
             }
         };
     };

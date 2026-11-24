@@ -51,9 +51,21 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         return columnSettings && !!columnSettings.calcFunction;
     };
 
-    // Memoised per column: the check depends only on the settings and column model, but
-    // aggregation runs once per group x column.
+    // Memoised per column, as aggregation runs once per group x column.  The answers depend on the
+    // data rows' calc functions, and the transformed columns are worked out afresh whenever those
+    // change, so the memos are kept for one set of transformed columns and cleared for the next.
     const columnHasDataRowCalcFunctionCache = new Array(tabularData.ColumnModels.length);
+    const aggregatesCalculatedNumbersCache = new Array(tabularData.ColumnModels.length);
+    let cachedForTransformedDataColumns = null;
+
+    const clearCachesIfStale = (transformedDataColumns) => {
+
+        if (transformedDataColumns === cachedForTransformedDataColumns) return;
+
+        columnHasDataRowCalcFunctionCache.fill(undefined);
+        aggregatesCalculatedNumbersCache.fill(undefined);
+        cachedForTransformedDataColumns = transformedDataColumns;
+    };
 
     /**
      * Gets the column-major transformed values array for a column that has a data-row calc
@@ -64,6 +76,8 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         const transformedDataColumns = dataGroupingSettings.transformedDataColumns;
         if (!transformedDataColumns) return null;
 
+        clearCachesIfStale(transformedDataColumns);
+
         let hasCalcFunc = columnHasDataRowCalcFunctionCache[columnIndex];
 
         if (hasCalcFunc === undefined) {
@@ -73,6 +87,195 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         }
 
         return hasCalcFunc ? transformedDataColumns[columnIndex] : null;
+    };
+
+    /**
+     * Gets a value indicating whether a column is compressed but its data rows' calc function
+     * turns its values into numbers (the lengths of a column of strings, say).  Its transformed
+     * values are then dictionary indexes standing for numbers, which have to be read as the numbers
+     * for any aggregation doing arithmetic on them or comparing them.
+     */
+    const aggregatesCalculatedNumbers = (columnIndex) => {
+
+        if (!getTransformedColumn(columnIndex)) return false;
+
+        let result = aggregatesCalculatedNumbersCache[columnIndex];
+
+        if (result === undefined) {
+
+            const columnModel = tabularData.ColumnModels[columnIndex];
+
+            const calcValueFormat = tabularData.IsColumnCompressed?.[columnIndex]
+                ? Ren.FunctionTags.getCalcFunctionsValueFormat(
+                    dataGroupingSettings.dataRows.columns[columnModel.ColumnIdOrHeading]
+                        .calcFunction,
+                    columnModel.ColumnFormat
+                )
+                : null;
+
+            result = calcValueFormat !== null
+                && Ren.SpreadsheetColumnFormatEnum.IsArithmetic(calcValueFormat);
+
+            aggregatesCalculatedNumbersCache[columnIndex] = result;
+        }
+
+        return result;
+    };
+
+    /**
+     * Gets a value indicating whether the aggregation type does arithmetic on the values or
+     * compares them with each other, and so has to read numbers as numbers.
+     */
+    const isNumericAggregation = (aggType) => {
+
+        return aggType === Ren.AggregationTypeEnum.Sum
+            || aggType === Ren.AggregationTypeEnum.Average
+            || isOrderedByValueAggregation(aggType);
+    };
+
+    // The aggregation functions for values that are not dictionary indexes, built on first use.
+    let uncompressedAggFuncs = null;
+
+    // A third reused buffer, for a calc'd column's values read as the numbers they stand for.
+    let numberBuffer = [];
+
+    /**
+     * Returns the numbers a group's gathered dictionary indexes stand for, with null for a blank
+     * or NULL and for anything that is not a number.
+     */
+    const decompressValuesToNumbers = (values, valueCount, columnIndex, calcFunctions) => {
+
+        const decompressValue = tabularData.CompressionDictionary.decompressValue;
+
+        if (numberBuffer.length < valueCount) numberBuffer = new Array(valueCount);
+
+        for (let i = 0; i < valueCount; i++) {
+
+            let value = decompressValue(values[i], columnIndex);
+
+            if (calcFunctions) value = applyCalcFunctions(calcFunctions, value, columnIndex);
+
+            if (value == null || value === "" || value === Ren.NullSentinel) {
+
+                numberBuffer[i] = null;
+                continue;
+            }
+
+            const number = typeof value === "number" ? value : Number(value);
+
+            numberBuffer[i] = Number.isFinite(number) ? number : null;
+        }
+
+        return numberBuffer;
+    };
+
+    /**
+     * Passes a value through a chain of compiled calc functions, logging (and passing on the value
+     * as it stood) where one throws.
+     */
+    const applyCalcFunctions = (calcFunctions, value, columnIndex) => {
+
+        for (let k = 0; k < calcFunctions.length; k++) {
+
+            try {
+
+                value = calcFunctions[k](value, {}, null, null, null);
+            }
+            catch (e) {
+
+                Ren.GlobalErrorHandler.logError(
+                    "[Aggregation] Error applying calcFunction for column '" +
+                    tabularData.ColumnModels[columnIndex].ColumnIdOrHeading + "':",
+                    e
+                );
+            }
+        }
+
+        return value;
+    };
+
+    // The compiled functions for each calc function applied value by value, keyed by the calc
+    // function setting, so they are compiled once for each setting.  A setting that is a bare
+    // string of code cannot key it, and is compiled each time.
+    const perValueCalcFunctionsCache = new WeakMap();
+
+    /**
+     * Gets the compiled calc functions a grouping applies to each of a column's values before
+     * aggregating them, or null where it applies its calc function (if any) to the aggregated value
+     * as usual.  A calc function that gives numbers from what may not be numbers (the lengths of
+     * strings, say) makes the column one of numbers, so an aggregation doing arithmetic on the
+     * values or comparing them works on the function's results.  That is the grouping's own calc
+     * function for the column, or where it has none, the one the column is grouped by the results
+     * of elsewhere.
+     *
+     * @param {Object} columns The grouping's columns settings.
+     * @param {Object} paras The containing report's parameters, which the functions read as paras.
+     */
+    const getPerValueCalcFunctions = (columnIndex, columns, aggType, paras) => {
+
+        if (!isNumericAggregation(aggType)) return null;
+
+        const columnModel = tabularData.ColumnModels[columnIndex];
+
+        const calcFunction = columns?.[columnModel.ColumnIdOrHeading]?.calcFunction ??
+            Ren.FunctionTags.getGroupByCalcFunction(
+                dataGroupingSettings.groupings?.entries,
+                columnIndex,
+                columnModel.ColumnIdOrHeading
+            );
+
+        return compileArithmeticCalcFunctions(calcFunction, columnModel, paras);
+    };
+
+    /**
+     * Compiles a calc function setting where it names numbers as the kind of value it gives, and
+     * otherwise gives null.
+     */
+    const compileArithmeticCalcFunctions = (calcFunction, columnModel, paras) => {
+
+        if (!calcFunction) return null;
+
+        const isCacheable = typeof calcFunction === "object";
+
+        let compiled = isCacheable ? perValueCalcFunctionsCache.get(calcFunction) : undefined;
+
+        if (compiled === undefined) {
+
+            const valueFormat = Ren.FunctionTags.getCalcFunctionsValueFormat(
+                calcFunction,
+                columnModel.ColumnFormat
+            );
+
+            compiled = null;
+
+            if (valueFormat !== null && Ren.SpreadsheetColumnFormatEnum.IsArithmetic(valueFormat)) {
+
+                compiled = [];
+
+                for (const spec of Ren.ArrayUtils.ensureArray(calcFunction)) {
+
+                    try {
+
+                        const fn = Ren.FormatFunctions.createFunction(spec, paras);
+                        if (fn) compiled.push(fn);
+                    }
+                    catch (e) {
+
+                        Ren.GlobalErrorHandler.logError(
+                            "[Aggregation] Error creating calcFunction for column '" +
+                            columnModel.ColumnIdOrHeading + "':",
+                            e
+                        );
+                    }
+                }
+
+                if (!compiled.length) compiled = null;
+            }
+
+            if (isCacheable) perValueCalcFunctionsCache.set(calcFunction, compiled);
+        }
+
+        return compiled;
     };
 
     // Rows excluded by the outer filter are marked in a reused epoch-stamped array rather than
@@ -755,7 +958,8 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         aggType,
         wrtColumnIndex,
         compiledFilter,
-        hasFilter
+        hasFilter,
+        calcFunctions
     ) => {
 
         // CountDistinct fast path: with no with-respect-to column, count in a single fused pass.
@@ -791,6 +995,27 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
         const valueCount = gatheredValueCount;
         const orderKeys = gatheredOrderKeys;
 
+        if (calcFunctions ||
+            (isNumericAggregation(aggType) && aggregatesCalculatedNumbers(columnIndex))) {
+
+            uncompressedAggFuncs ??= Ren.AggregationFns(null);
+
+            return uncompressedAggFuncs.aggFunc(null, aggType)(
+                decompressValuesToNumbers(
+                    compressedValuesToAggregate,
+                    valueCount,
+                    columnIndex,
+                    calcFunctions
+                ),
+                columnIndex,
+                0,
+                valueCount,
+                group.groupRowIndex,
+                isOutermostGrouping,
+                orderKeys
+            );
+        }
+
         const valuesToAggregate =
             isOrderedByValueAggregation(aggType) && transformedColumnHasAppendedValues(columnIndex)
                 ? decompressValuesToAggregate(compressedValuesToAggregate, valueCount, columnIndex)
@@ -809,6 +1034,7 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
 
     return {
         callAggFunc,
-        getAggregatedValue
+        getAggregatedValue,
+        getPerValueCalcFunctions
     };
 };
