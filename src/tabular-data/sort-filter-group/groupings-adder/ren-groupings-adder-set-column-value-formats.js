@@ -17,6 +17,40 @@
             const groupByColumnIndexes = newGrouping.groupByColumnIndexes;
             const getCalcFunctionsValueFormat = Ren.FunctionTags.getCalcFunctionsValueFormat;
             const dataRowsColumns = dataGroupingSettings.dataRows?.columns;
+            const isArithmetic = Ren.SpreadsheetColumnFormatEnum.IsArithmetic;
+
+            // The columns whose calc function the grouping's aggregation applies to each value,
+            // mapped to the format of the values before it: the one it reads, and the one the
+            // next grouping's aggregation follows on from.
+            const calculatedPerValueInputFormats = new Map();
+
+            /**
+             * Gets the format of the numbers a calc function gives where the grouping's
+             * aggregation of a column applies it to each value (see Ren.Aggregation's
+             * getPerValueCalcFunctions), and otherwise null.
+             */
+            const getPerValueCalcValueFormat = (columnIndex, columnIdOrHeading, aggregationType) => {
+
+                if (!Ren.AggregationTypeFormatConverter.isNumericAggregation(aggregationType)) {
+                    return null;
+                }
+
+                if (groupByColumnIndexes?.includes(columnIndex)) return null;
+
+                const calcFunction = Ren.FunctionTags.getPerValueCalcFunction(
+                    dataGroupingSettings.groupings?.entries,
+                    newGroupingColumns,
+                    columnIndex,
+                    columnIdOrHeading
+                );
+
+                if (!calcFunction) return null;
+
+                const valueFormat =
+                    getCalcFunctionsValueFormat(calcFunction, colModels[columnIndex].ColumnFormat);
+
+                return valueFormat !== null && isArithmetic(valueFormat) ? valueFormat : null;
+            };
 
             /**
              * Gets the format of the values a column's aggregation reads.  Every grouping
@@ -85,7 +119,18 @@
                     getAggregationInputValueFormat(columnIndex, columnIdOrHeading);
                 const aggregationType = newGroupingColumn.aggregationType;
 
-                if (aggregationType !== undefined) {
+                const perValueCalcValueFormat =
+                    getPerValueCalcValueFormat(columnIndex, columnIdOrHeading, aggregationType);
+
+                if (perValueCalcValueFormat !== null) {
+
+                    // Aggregates the calc function's numbers, which are what it shows.
+                    newGroupingColumn.valueFormat =
+                        getAggregatedValueFormat(perValueCalcValueFormat, aggregationType);
+
+                    calculatedPerValueInputFormats.set(columnIdOrHeading, previousValueFormat);
+                }
+                else if (aggregationType !== undefined) {
 
                     newGroupingColumn.valueFormat = getAggregatedValueFormat(previousValueFormat, aggregationType);
                 }
@@ -172,6 +217,15 @@
                 const newGroupingColumn = newGroupingColumns[columnIdOrHeading];
 
                 delete newGroupingColumn.aggregatedValueFormat;
+
+                // Its calc function has already been allowed for, applied to each value.
+                if (calculatedPerValueInputFormats.has(columnIdOrHeading)) {
+
+                    newGroupingColumn.aggregatedValueFormat =
+                        calculatedPerValueInputFormats.get(columnIdOrHeading);
+
+                    continue;
+                }
 
                 if (!newGroupingColumn.calcFunction || newGroupingColumn.valueFormat === undefined) {
                     continue;

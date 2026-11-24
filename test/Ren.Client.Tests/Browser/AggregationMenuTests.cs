@@ -174,4 +174,20 @@ public class AggregationMenuTests : BrowserTest
 
         await Poll(() => Ren.Report.CellTextAsync("ProductName", 2)).ToMatch(@"^[1-9][0-9,]+$");
     }
+
+    // The averaged lengths are numbers, so they can be formatted as numbers.
+    [TestMethod("FormatMenu_OutsideGroupingByStringLengthsAveraged_OffersNumberFormats")]
+    public async Task FormatMenu_OutsideGroupingByStringLengthsAveraged_OffersNumberFormats()
+    {
+        await Ren.OpenAsync(StringColumnsFixture);
+        await GroupByParentCategoryThenProductNameLengthAsync();
+
+        await Ren.Report.ChooseFromCellMenuAsync("ProductName", 2, ".qa-ren-aggregation-menu-item", AverageItem);
+        await Poll(() => Ren.Report.CellTextAsync("ProductName", 2)).ToMatch(@"^[0-9.,]+$");
+
+        await Ren.Root.RightClickAsync(await Ren.Report.CellSelectorAsync("ProductName", 2));
+        await Ren.Root.MouseOverAsync(".qa-ren-formatting-menu-item");
+
+        await Expect(Ren.Root.Locator("#format-as-number")).Not.ToHaveCountAsync(0);
+    }
 }

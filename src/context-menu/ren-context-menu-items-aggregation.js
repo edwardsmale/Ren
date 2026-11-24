@@ -51,12 +51,12 @@ Ren.ContextMenuItems_Aggregation = (tabularData, dataGroupingSettings) => {
 
         const isArithmetic = Ren.SpreadsheetColumnFormatEnum.IsArithmetic;
 
-        const perValueCalcFunction = grouping.columns?.[columnIdOrHeading]?.calcFunction ??
-            Ren.FunctionTags.getGroupByCalcFunction(
-                dataGroupingSettings.groupings?.entries,
-                columnIndex,
-                columnIdOrHeading
-            );
+        const perValueCalcFunction = Ren.FunctionTags.getPerValueCalcFunction(
+            dataGroupingSettings.groupings?.entries,
+            grouping.columns,
+            columnIndex,
+            columnIdOrHeading
+        );
 
         const perValueFormat = getCalcValueFormat(perValueCalcFunction, columnIndex);
 

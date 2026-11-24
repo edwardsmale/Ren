@@ -233,6 +233,39 @@ describe("Calc functions that change a column's kind of value", () => {
         expect(String(lengths.get("South"))).toBe("7");
     });
 
+    // The Region grouping's entry, as the format menu reads its formats.
+    const getRegionEntry = (settings) => settings.groupings.entries.find((entry) =>
+        entry.groupByColumnIndexes.length === 1 &&
+        entry.groupByColumnIndexes[0] === REGION_COLUMN_INDEX);
+
+    test("create_GroupingCalculatesLengthsAndAverages_GivesANumberFormat", () => {
+
+        const settings = groupProductsByRegionCalculatingLengths("Average");
+        const productColumn = getRegionEntry(settings).columns.Product;
+
+        // A whole number's format would show the averages without their decimals.
+        expect(productColumn.valueFormat).toBe(Format.Number);
+        expect(productColumn.aggregatedValueFormat).toBe(Format.General);
+    });
+
+    test("create_GroupingShowsLengthsInsideRegionsAveraged_GivesANumberFormat", () => {
+
+        const settings = Grouping.create({
+            tabularData,
+            namePrefix: "test",
+            entries: [
+                {
+                    groupByColumns: ["Region", "Product"],
+                    columns: { Product: { calcFunction: [{ name: "string-length" }] } }
+                },
+                { groupByColumns: ["Region"], columns: { Product: { aggregationType: "Average" } } }
+            ],
+            totalColumns: {}
+        });
+
+        expect(getRegionEntry(settings).columns.Product.valueFormat).toBe(Format.Number);
+    });
+
     test("getCalcFunctionsValueFormat_NamesTheFormatTheOutputLineGives", () => {
 
         const getFormat = Ren.FunctionTags.getCalcFunctionsValueFormat;

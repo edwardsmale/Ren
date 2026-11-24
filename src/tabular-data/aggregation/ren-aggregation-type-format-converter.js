@@ -71,7 +71,21 @@ Ren.AggregationTypeFormatConverter = (() => {
         return valueFormat;
     };
 
+    /**
+     * Gets a value indicating whether an aggregation reads its values as numbers - adding them up,
+     * averaging them or ordering them by size - rather than as the values they are.
+     */
+    const isNumericAggregation = (aggregationType) => {
+
+        return aggregationType === Ren.AggregationTypeEnum.Sum
+            || aggregationType === Ren.AggregationTypeEnum.Average
+            || aggregationType === Ren.AggregationTypeEnum.Min
+            || aggregationType === Ren.AggregationTypeEnum.Max
+            || aggregationType === Ren.AggregationTypeEnum.Median;
+    };
+
     return {
-        getAggregatedValueFormat
+        getAggregatedValueFormat,
+        isNumericAggregation
     };
 })();

@@ -126,12 +126,7 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
      * Gets a value indicating whether the aggregation type does arithmetic on the values or
      * compares them with each other, and so has to read numbers as numbers.
      */
-    const isNumericAggregation = (aggType) => {
-
-        return aggType === Ren.AggregationTypeEnum.Sum
-            || aggType === Ren.AggregationTypeEnum.Average
-            || isOrderedByValueAggregation(aggType);
-    };
+    const isNumericAggregation = Ren.AggregationTypeFormatConverter.isNumericAggregation;
 
     // The aggregation functions for values that are not dictionary indexes, built on first use.
     let uncompressedAggFuncs = null;
@@ -217,12 +212,12 @@ Ren.Aggregation = (tabularData, dataGroupingSettings) => {
 
         const columnModel = tabularData.ColumnModels[columnIndex];
 
-        const calcFunction = columns?.[columnModel.ColumnIdOrHeading]?.calcFunction ??
-            Ren.FunctionTags.getGroupByCalcFunction(
-                dataGroupingSettings.groupings?.entries,
-                columnIndex,
-                columnModel.ColumnIdOrHeading
-            );
+        const calcFunction = Ren.FunctionTags.getPerValueCalcFunction(
+            dataGroupingSettings.groupings?.entries,
+            columns,
+            columnIndex,
+            columnModel.ColumnIdOrHeading
+        );
 
         return compileArithmeticCalcFunctions(calcFunction, columnModel, paras);
     };

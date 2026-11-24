@@ -197,6 +197,21 @@ Ren.FunctionTags = (() => {
         return null;
     };
 
+    /**
+     * Gets the calc function a grouping's sum, average or the like applies to each of a column's
+     * values before aggregating them, where it gives numbers (see Ren.Aggregation's
+     * getPerValueCalcFunctions): the grouping's own calc function on the column, or where it has
+     * none, the one the column is grouped by the results of (see getGroupByCalcFunction).
+     * Whether it does give numbers is the caller's to check.
+     *
+     * @param {Array} groupingEntries The groupings, innermost first.
+     * @param {Object} groupingColumns The grouping's columns settings.
+     */
+    const getPerValueCalcFunction = (
+        groupingEntries, groupingColumns, columnIndex, columnIdOrHeading
+    ) => groupingColumns?.[columnIdOrHeading]?.calcFunction ??
+        getGroupByCalcFunction(groupingEntries, columnIndex, columnIdOrHeading);
+
     return {
         BINNING_GROUPS,
         hasTag,
@@ -206,6 +221,7 @@ Ren.FunctionTags = (() => {
         getBinningText,
         getOutputKind,
         getCalcFunctionsValueFormat,
-        getGroupByCalcFunction
+        getGroupByCalcFunction,
+        getPerValueCalcFunction
     };
 })();
