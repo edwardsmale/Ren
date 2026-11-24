@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.2.3 (2026-11-24)
 - Fix charts based on calculated columns.
 - Add "Archive tile" to link tiles, which collapses them into their tile group's "Archived" section.
 - Treat a calculated column as the type its calc function returns, e.g. offer Sum for string lengths.
