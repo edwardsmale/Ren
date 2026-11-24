@@ -75,7 +75,7 @@
     }
 }
 
-// A lane's colour, on its heading and along the top of its cells, is --ren-task-lane-colour.
+// A lane's colour, on its heading, is --ren-task-lane-colour.
 .ren-task-lane
 {
     display: grid;
@@ -110,6 +110,5 @@
         gap: 0.75rem;
         min-height: 2rem;
         padding-top: 0.75rem;
-        border-top: 3px solid var(--ren-task-lane-colour, #3046b8);
     }
 }
