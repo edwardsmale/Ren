@@ -29,4 +29,61 @@ describe("Ren.DateValueChart_Axes", () => {
 
         expect(scale.getTicks(tickCount)).toEqual([0, 500, 1000, 1500, 2000, 2500]);
     });
+
+    test("buildValueAxis_NoSavedAxis_Defaults", () => {
+
+        expect(Axes.buildValueAxis(undefined)).toStrictEqual({
+            maxY: undefined,
+            label: undefined,
+            yExtent: [0, 0],
+            format: undefined,
+            formatFunction: undefined,
+            showValueLabels: true,
+            fromSettings: false,
+            updateYScaleBehaviour: undefined,
+            startAtZero: true,
+            logScale: false
+        });
+    });
+
+    test("buildValueAxis_SavedAxis_Applied", () => {
+
+        const formatFunction = value => value + " units";
+
+        expect(Axes.buildValueAxis({
+            maxY: 40,
+            label: "Widgets",
+            format: "#,##0",
+            formatFunction,
+            showValueLabels: false,
+            fromSettings: true,
+            updateYScaleBehaviour: "Ratchet",
+            startAtZero: false,
+            logScale: true
+        })).toStrictEqual({
+            maxY: 40,
+            label: "Widgets",
+            yExtent: [0, 40],
+            format: "#,##0",
+            formatFunction,
+            showValueLabels: false,
+            fromSettings: true,
+            updateYScaleBehaviour: "Ratchet",
+            startAtZero: false,
+            logScale: true
+        });
+    });
+
+    test("buildValueAxis_SavedExtent_Kept", () => {
+
+        expect(Axes.buildValueAxis({ maxY: 40, yExtent: [5, 30] }).yExtent).toEqual([5, 30]);
+    });
+
+    test("buildValueAxis_SameSavedAxis_ExtentNotShared", () => {
+
+        const savedAxis = {};
+
+        expect(Axes.buildValueAxis(savedAxis).yExtent)
+            .not.toBe(Axes.buildValueAxis(savedAxis).yExtent);
+    });
 });

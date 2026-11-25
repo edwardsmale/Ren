@@ -766,9 +766,6 @@ Ren.CreateDateValueChart = (() => {
             columnResolver
         };
 
-        const leftAxis = visualisation.leftAxis || {};
-        const rightAxis = visualisation.rightAxis || {};
-        const hiddenAxis = visualisation.hiddenAxis || {};
         const xAxis = visualisation.xAxis || {};
 
         const previousAxes = props.axes;
@@ -780,43 +777,12 @@ Ren.CreateDateValueChart = (() => {
             xAxis: {
                 updateXScaleBehaviour: xAxis.updateXScaleBehaviour || "AlwaysUpdate"
             },
-            leftAxis: {
-                maxY: leftAxis.maxY,
-                label: leftAxis.label,
-                yExtent: leftAxis.yExtent || [0, leftAxis.maxY || 0],
-                format: leftAxis.format,
-                formatFunction: leftAxis.formatFunction,
-                showValueLabels: leftAxis.showValueLabels !== undefined ? leftAxis.showValueLabels : true,
-                fromSettings: leftAxis.fromSettings !== undefined ? leftAxis.fromSettings : false,
-                updateYScaleBehaviour: leftAxis.updateYScaleBehaviour,
-                startAtZero: leftAxis.startAtZero !== false,
-                logScale: leftAxis.logScale === true
-            },
-            rightAxis: {
-                maxY: rightAxis.maxY,
-                label: rightAxis.label,
-                yExtent: rightAxis.yExtent || [0, rightAxis.maxY || 0],
-                format: rightAxis.format,
-                formatFunction: rightAxis.formatFunction,
-                showValueLabels: rightAxis.showValueLabels !== undefined ? rightAxis.showValueLabels : true,
-                fromSettings: rightAxis.fromSettings !== undefined ? rightAxis.fromSettings : false,
-                updateYScaleBehaviour: rightAxis.updateYScaleBehaviour,
-                startAtZero: rightAxis.startAtZero !== false,
-                logScale: rightAxis.logScale === true
-            },
+            leftAxis: Ren.DateValueChart_Axes.buildValueAxis(visualisation.leftAxis),
+            rightAxis: Ren.DateValueChart_Axes.buildValueAxis(visualisation.rightAxis),
 
             // Scales the series assigned to it independently of the left and right axes, but is
             // never drawn, e.g. for a percentage line alongside currency bars and a quantity line.
-            hiddenAxis: {
-                maxY: hiddenAxis.maxY,
-                yExtent: hiddenAxis.yExtent || [0, hiddenAxis.maxY || 0],
-                format: hiddenAxis.format,
-                formatFunction: hiddenAxis.formatFunction,
-                showValueLabels:
-                    hiddenAxis.showValueLabels !== undefined ? hiddenAxis.showValueLabels : true,
-                fromSettings: hiddenAxis.fromSettings !== undefined ? hiddenAxis.fromSettings : false,
-                updateYScaleBehaviour: hiddenAxis.updateYScaleBehaviour
-            }
+            hiddenAxis: Ren.DateValueChart_Axes.buildValueAxis(visualisation.hiddenAxis)
         };
 
         props.valueColumnHasOwnFormat = [];
@@ -1230,128 +1196,7 @@ Ren.CreateDateValueChart = (() => {
             props.axisPeriod = props.datePeriod;
         }
 
-        if (props.axes.leftAxis.maxY && !props.axes.leftAxis.yExtent) {
-            props.axes.leftAxis.yExtent = [0, props.axes.leftAxis.maxY];
-        }
-
-        if (props.axes.rightAxis.maxY && !props.axes.rightAxis.yExtent) {
-            props.axes.rightAxis.yExtent = [0, props.axes.rightAxis.maxY];
-        }
-
-        if (visualisation.barNarrowingRatio) {
-
-            // Rounded on the visualisation too, as a client-side chart is written to settings
-            // whole.
-            visualisation.barNarrowingRatio =
-                Ren.NumberUtils.round(visualisation.barNarrowingRatio, 4);
-
-            props.barNarrowingRatio = Ren.NumberUtils.round(visualisation.barNarrowingRatio, 2);
-        }
-
-        props.barLayout = visualisation.barLayout || Ren.BarLayoutEnum.SideBySide;
-
-        // The screen pixels left clear between one period's bars and the next's; none by default.
-        props.periodGap = visualisation.periodGap > 0 ? Number(visualisation.periodGap) : 0;
-
-        // A <ren-date-value-chart> attribute states the enum by name.
-        props.lineLayout = typeof visualisation.lineLayout === "string"
-            ? Ren.ObjectUtils.getEnumValue(Ren.LineLayoutEnum, visualisation.lineLayout)
-            : visualisation.lineLayout ?? Ren.LineLayoutEnum.Overlayed;
-
-        props.shadeLines = visualisation.shadeLines === true;
-
-        props.subdivideColumn = visualisation.subdivideColumn || null;
-        props.subdivisionLabels = visualisation.subdivisionLabels || "names";
-        props.subdivisionLabelPlacement = visualisation.subdivisionLabelPlacement || "inside";
-        props.subdivisionLimit = visualisation.subdivisionLimit > 0 ? visualisation.subdivisionLimit : null;
-
-        // A share of each pie's radius; left undefined when unset, for no hole.
-        props.pieHoleRadius = visualisation.pieHoleRadius !== undefined
-            ? Number(visualisation.pieHoleRadius)
-            : undefined;
-
-        props.pieLabels = visualisation.pieLabels || "outside";
-        props.pieLabelNames = visualisation.pieLabelNames !== false;
-        props.pieLabelValues = visualisation.pieLabelValues === true;
-        props.pieValuePosition = visualisation.pieValuePosition || "inline";
-        props.pieLabelPercentages = visualisation.pieLabelPercentages !== false;
-        props.pieSharesInside = visualisation.pieSharesInside !== false;
-        props.pieHoleTotals = visualisation.pieHoleTotals !== false;
-
-        // Left undefined when unset, for the style updater to apply its own default.
-        props.lineShadingOpacity = visualisation.lineShadingOpacity !== undefined
-            ? Number(visualisation.lineShadingOpacity)
-            : undefined;
-
-        props.showLegend = visualisation.showLegend !== undefined ? visualisation.showLegend : true;
-        props.chartTitle = visualisation.chartTitle || "";
-        props.chartSubtitle = visualisation.chartSubtitle || "";
-        props.barValueLabelLayout = visualisation.barValueLabelLayout || "auto";
-        props.lineNames = visualisation.lineNames || "auto";
-        props.showValueLabelsWhenHighlighted =
-            visualisation.showValueLabelsWhenHighlighted === true;
-
-        // Hiding an axis leaves its heading alone; the two are settled separately.
-        props.showLeftAxis = visualisation.showLeftAxis !== false;
-        props.showRightAxis = visualisation.showRightAxis !== false;
-        props.showDateAxis = visualisation.showDateAxis !== false;
-        props.showLeftAxisHeading = visualisation.showLeftAxisHeading !== false;
-        props.showRightAxisHeading = visualisation.showRightAxisHeading !== false;
-        props.showGridlines = visualisation.showGridlines === true;
-
-        props.showHoverDateLine = visualisation.showHoverDateLine === true;
-        props.hoverDateLineFullHeight = visualisation.hoverDateLineFullHeight === true;
-        props.showHoverValues = visualisation.showHoverValues === true;
-        props.showHoverChange = visualisation.showHoverChange === true;
-        props.enableCrossFiltering = visualisation.enableCrossFiltering === true;
-        props.periodSlider = visualisation.periodSlider || null;
-        props.multiChartPeriod = visualisation.multiChartPeriod || null;
-        props.multiChartMaxCount = visualisation.multiChartMaxCount ?? null;
-        props.multiChartShowDateRange = visualisation.multiChartShowDateRange !== false;
-        props.multiChartSlider = visualisation.multiChartSlider === true;
-        props.multiChartKeepEmptyPeriods = visualisation.multiChartKeepEmptyPeriods !== false;
-
-        // A <ren-date-value-chart> attribute states the enum by name.
-        props.showIncompleteLastPeriod = typeof visualisation.showIncompleteLastPeriod === "string"
-            ? Ren.ObjectUtils.getEnumValue(
-                Ren.ShowIncompleteLastPeriodEnum,
-                visualisation.showIncompleteLastPeriod
-            )
-            : visualisation.showIncompleteLastPeriod ?? Ren.ShowIncompleteLastPeriodEnum.Always;
-
-        props.seasonallyAdjustEstimate = visualisation.seasonallyAdjustEstimate !== false;
-        props.showAsShareOfTotal = visualisation.showAsShareOfTotal === true;
-        props.showAsIndex = visualisation.showAsIndex === true;
-        props.showAsChange = visualisation.showAsChange === true;
-        props.showAsYearOnYearChange = visualisation.showAsYearOnYearChange === true;
-        props.showPerDay = visualisation.showPerDay === true;
-        props.valueLines = Array.isArray(visualisation.valueLines) ? visualisation.valueLines : [];
-        props.valueBands = Array.isArray(visualisation.valueBands) ? visualisation.valueBands : [];
-
-        // In px; left undefined when unset, for the style updater to apply its own defaults.
-        props.valueLabelFontSize = visualisation.valueLabelFontSize !== undefined
-            ? Number(visualisation.valueLabelFontSize)
-            : undefined;
-
-        props.axisLabelFontSize = visualisation.axisLabelFontSize !== undefined
-            ? Number(visualisation.axisLabelFontSize)
-            : undefined;
-
-        props.seriesNamesInBarsFontSize = visualisation.seriesNamesInBarsFontSize !== undefined
-            ? Number(visualisation.seriesNamesInBarsFontSize)
-            : undefined;
-
-        props.lineNamesFontSize = visualisation.lineNamesFontSize !== undefined
-            ? Number(visualisation.lineNamesFontSize)
-            : undefined;
-
-        props.pieLabelFontSize = visualisation.pieLabelFontSize !== undefined
-            ? Number(visualisation.pieLabelFontSize)
-            : undefined;
-
-        // Marker line columns are deliberately not selected columns; they are resolved from the raw
-        // rows at render time.
-        props.markerLines = visualisation.markerLines || null;
+        Ren.DateValueChart_Settings.applySettings(props, visualisation);
 
         props.visualisation = visualisation;
 
@@ -1363,35 +1208,13 @@ Ren.CreateDateValueChart = (() => {
      */
     const initialiseDrawState = (props) => {
 
+        const initialValueAxis = { updateYScaleBehaviour: "AlwaysUpdate" };
+
         props.axes = {
             xAxis: { updateXScaleBehaviour: "AlwaysUpdate" },
-            leftAxis: {
-                maxY: undefined,
-                yExtent: [0, 0],
-                format: undefined,
-                formatFunction: undefined,
-                showValueLabels: true,
-                fromSettings: false,
-                updateYScaleBehaviour: "AlwaysUpdate"
-            },
-            rightAxis: {
-                maxY: undefined,
-                yExtent: [0, 0],
-                format: undefined,
-                formatFunction: undefined,
-                showValueLabels: true,
-                fromSettings: false,
-                updateYScaleBehaviour: "AlwaysUpdate"
-            },
-            hiddenAxis: {
-                maxY: undefined,
-                yExtent: [0, 0],
-                format: undefined,
-                formatFunction: undefined,
-                showValueLabels: true,
-                fromSettings: false,
-                updateYScaleBehaviour: "AlwaysUpdate"
-            }
+            leftAxis: Ren.DateValueChart_Axes.buildValueAxis(initialValueAxis),
+            rightAxis: Ren.DateValueChart_Axes.buildValueAxis(initialValueAxis),
+            hiddenAxis: Ren.DateValueChart_Axes.buildValueAxis(initialValueAxis)
         };
         props.series = [];
         props.valueColumnFormats = [];

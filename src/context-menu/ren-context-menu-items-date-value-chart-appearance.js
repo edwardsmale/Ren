@@ -610,13 +610,15 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
     );
 
     /**
-     * Builds the menu item toggling one of the chart's boolean properties.  Pass config.redraws
-     * false where the property is read off the props as the chart is used, and config.onChanged
-     * to restyle the chart as drawn.
+     * Builds the menu item toggling one of the chart's boolean properties, which takes its default
+     * from Ren.DateValueChart_Settings.  Pass config.redraws false where the property is read off
+     * the props as the chart is used, and config.onChanged to restyle the chart as drawn.
      */
     const buildPropertyToggle = (config) => {
 
-        const isTurnedOn = () => config.defaultValue
+        const defaultValue = Ren.DateValueChart_Settings.getDefaultValue(config.propertyName);
+
+        const isTurnedOn = () => defaultValue
             ? props[config.propertyName] !== false
             : props[config.propertyName] === true;
 
@@ -645,7 +647,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Show legend",
         id: "show-legend",
         propertyName: "showLegend",
-        defaultValue: true,
         redraws: true
     });
 
@@ -654,7 +655,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Show value labels when highlighted",
         id: "show-value-labels-when-highlighted",
         propertyName: "showValueLabelsWhenHighlighted",
-        defaultValue: false,
         redraws: false,
         onChanged: () => Ren.DateValueChart_StyleUpdater.updateHighlightedValueLabels(props),
         visible: () => !Ren.DateValueChart_Pies.isShown(props)
@@ -726,7 +726,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         id: "shade-lines",
         title: "Fills beneath each line, down to the line below where they are stacked",
         propertyName: "shadeLines",
-        defaultValue: false,
         redraws: true
     });
 
@@ -832,7 +831,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         id: "pie-hole-totals",
         title: "Writes each pie's total in its hole, where it fits",
         propertyName: "pieHoleTotals",
-        defaultValue: true,
         redraws: true,
         visible: () => Ren.DateValueChart_Pies.getHoleRadius(props) > 0
     });
@@ -965,12 +963,11 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
 
     const pieLabelPlacements = Ren.DateValueChart_PieLabels.PLACEMENTS;
 
-    const buildPieLabelContentToggle = (text, id, propertyName, defaultValue) =>
+    const buildPieLabelContentToggle = (text, id, propertyName) =>
         buildPropertyToggle({
             text,
             id,
             propertyName,
-            defaultValue,
             redraws: true,
             visible: () =>
                 Ren.DateValueChart_PieLabels.getPlacement(props) !== pieLabelPlacements.Off
@@ -1027,21 +1024,19 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
             ticked: () => Ren.DateValueChart_PieLabels.getPlacement(props) === option.placement
         })).concat([
             Ren.MENU_SEPARATOR,
-            buildPieLabelContentToggle("Series names", "pie-label-names", "pieLabelNames", true),
-            buildPieLabelContentToggle("Values", "pie-label-values", "pieLabelValues", false),
+            buildPieLabelContentToggle("Series names", "pie-label-names", "pieLabelNames"),
+            buildPieLabelContentToggle("Values", "pie-label-values", "pieLabelValues"),
             pieValuePositionMenuItem,
             buildPieLabelContentToggle(
                 "Percentages",
                 "pie-label-percentages",
-                "pieLabelPercentages",
-                true
+                "pieLabelPercentages"
             ),
             buildPropertyToggle({
                 text: "Percentages inside slices",
                 id: "pie-shares-inside",
                 title: "Writes each slice's share inside it, and the rest of its label outside",
                 propertyName: "pieSharesInside",
-                defaultValue: true,
                 redraws: true,
                 visible: () => Ren.DateValueChart_PieLabels.canPutSharesInside(props)
                     && props.pieLabelPercentages !== false
@@ -1182,7 +1177,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Show hovered date",
         id: "show-hover-date-line",
         propertyName: "showHoverDateLine",
-        defaultValue: false,
         redraws: true
     });
 
@@ -1192,7 +1186,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Highlight hovered date",
         id: "hover-date-line-full-height",
         propertyName: "hoverDateLineFullHeight",
-        defaultValue: false,
         redraws: true
     });
 
@@ -1202,7 +1195,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Show hovered values",
         id: "show-hover-values",
         propertyName: "showHoverValues",
-        defaultValue: false,
         redraws: true
     });
 
@@ -1211,7 +1203,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Show change on period before",
         id: "show-hover-change",
         propertyName: "showHoverChange",
-        defaultValue: false,
         onChanged: () => {},
         visible: () => props.showHoverValues === true
             && !Ren.DateValueChart_ValueTransforms.isShareOfTotal(props)
@@ -1223,7 +1214,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text: "Gridlines",
         id: "show-gridlines",
         propertyName: "showGridlines",
-        defaultValue: false,
         onChanged: () => Ren.DateValueChart_Gridlines.render(props),
         visible: () => !Ren.DateValueChart_Pies.isShown(props)
     });
@@ -1274,7 +1264,6 @@ Ren.ContextMenuItems_DateValueChart_Appearance = (chart) => {
         text,
         id,
         propertyName,
-        defaultValue: true,
         redraws: true,
         visible
     });

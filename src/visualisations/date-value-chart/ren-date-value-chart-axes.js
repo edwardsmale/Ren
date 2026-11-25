@@ -284,7 +284,29 @@ Ren.DateValueChart_Axes = (() => {
         wrapTickTextElements(props);
     };
 
+    /**
+     * Builds a value axis' props from its saved settings, where it has any.
+     */
+    const buildValueAxis = (savedAxis) => {
+
+        const axis = savedAxis || {};
+
+        return {
+            maxY: axis.maxY,
+            label: axis.label,
+            yExtent: axis.yExtent || [0, axis.maxY || 0],
+            format: axis.format,
+            formatFunction: axis.formatFunction,
+            showValueLabels: axis.showValueLabels !== undefined ? axis.showValueLabels : true,
+            fromSettings: axis.fromSettings !== undefined ? axis.fromSettings : false,
+            updateYScaleBehaviour: axis.updateYScaleBehaviour,
+            startAtZero: axis.startAtZero !== false,
+            logScale: axis.logScale === true
+        };
+    };
+
     return {
+        buildValueAxis,
         getValueTickCount,
         makeAxisTickFormatter,
         renderAxes,

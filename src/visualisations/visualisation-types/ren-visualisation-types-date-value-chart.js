@@ -281,7 +281,9 @@ Ren.VisualisationTypes_DateValueChart = {
     // Turns the enum key names persistedProperties writes back into the chart's own values.
     resolvePersistedProperties: (properties) => Ren.ChartEnumSettings.resolve(properties),
 
-    persistedProperties: [
+    // A setting Ren.DateValueChart_Settings saves unlessDefault is listed by name alone, and given
+    // the transform leaving out its default there.
+    persistedProperties: Ren.DateValueChart_Settings.withSavedTransforms([
         {
             name: "barNarrowingRatio",
             transform: (barNarrowingRatio) => Math.round(barNarrowingRatio * 10000) / 10000
@@ -302,20 +304,9 @@ Ren.VisualisationTypes_DateValueChart = {
         },
         "shadeLines",
         "lineShadingOpacity",
-        {
-            name: "subdivideColumn",
-            transform: (subdivideColumn) => subdivideColumn || undefined
-        },
-        {
-            name: "subdivisionLabels",
-            transform: (subdivisionLabels) =>
-                subdivisionLabels === "names" ? undefined : subdivisionLabels
-        },
-        {
-            name: "subdivisionLabelPlacement",
-            transform: (subdivisionLabelPlacement) =>
-                subdivisionLabelPlacement === "around" ? subdivisionLabelPlacement : undefined
-        },
+        "subdivideColumn",
+        "subdivisionLabels",
+        "subdivisionLabelPlacement",
         {
             name: "subdivisionLimit",
             transform: (subdivisionLimit) => subdivisionLimit > 0 ? subdivisionLimit : undefined
@@ -337,35 +328,13 @@ Ren.VisualisationTypes_DateValueChart = {
             name: "pieHoleRadius",
             transform: (pieHoleRadius) => pieHoleRadius ? pieHoleRadius : undefined
         },
-        {
-            name: "pieLabels",
-            transform: (pieLabels) => pieLabels === "outside" ? undefined : pieLabels
-        },
-        {
-            name: "pieLabelNames",
-            transform: (pieLabelNames) => pieLabelNames === false ? false : undefined
-        },
-        {
-            name: "pieLabelValues",
-            transform: (pieLabelValues) => pieLabelValues === true ? true : undefined
-        },
-        {
-            name: "pieValuePosition",
-            transform: (pieValuePosition) =>
-                pieValuePosition === "inline" ? undefined : pieValuePosition
-        },
-        {
-            name: "pieLabelPercentages",
-            transform: (pieLabelPercentages) => pieLabelPercentages === false ? false : undefined
-        },
-        {
-            name: "pieSharesInside",
-            transform: (pieSharesInside) => pieSharesInside === false ? false : undefined
-        },
-        {
-            name: "pieHoleTotals",
-            transform: (pieHoleTotals) => pieHoleTotals === false ? false : undefined
-        },
+        "pieLabels",
+        "pieLabelNames",
+        "pieLabelValues",
+        "pieValuePosition",
+        "pieLabelPercentages",
+        "pieSharesInside",
+        "pieHoleTotals",
         {
             name: "pieTotalFormatFunction",
             transform: (pieTotalFormatFunction) => pieTotalFormatFunction || undefined
@@ -403,28 +372,15 @@ Ren.VisualisationTypes_DateValueChart = {
         "legendSeriesLimit",
         "legendSeriesLimitChosen",
         "showLegend",
-        {
-            name: "chartTitle",
-            transform: (chartTitle) => chartTitle || undefined
-        },
-        {
-            name: "chartSubtitle",
-            transform: (chartSubtitle) => chartSubtitle || undefined
-        },
+        "chartTitle",
+        "chartSubtitle",
         "showValueLabelsWhenHighlighted",
         "valueLabelFontSize",
         "axisLabelFontSize",
         "seriesNamesInBarsFontSize",
-        {
-            name: "barValueLabelLayout",
-            transform: (barValueLabelLayout) =>
-                barValueLabelLayout === "auto" ? undefined : barValueLabelLayout
-        },
+        "barValueLabelLayout",
         "lineNamesFontSize",
-        {
-            name: "lineNames",
-            transform: (lineNames) => lineNames === "auto" ? undefined : lineNames
-        },
+        "lineNames",
 
         "showLeftAxis",
         "showRightAxis",
@@ -446,27 +402,11 @@ Ren.VisualisationTypes_DateValueChart = {
                 showIncompleteLastPeriod
             )
         },
-        {
-            name: "showAsShareOfTotal",
-            transform: (showAsShareOfTotal) => showAsShareOfTotal === true ? true : undefined
-        },
-        {
-            name: "showAsIndex",
-            transform: (showAsIndex) => showAsIndex === true ? true : undefined
-        },
-        {
-            name: "showAsChange",
-            transform: (showAsChange) => showAsChange === true ? true : undefined
-        },
-        {
-            name: "showAsYearOnYearChange",
-            transform: (showAsYearOnYearChange) =>
-                showAsYearOnYearChange === true ? true : undefined
-        },
-        {
-            name: "showPerDay",
-            transform: (showPerDay) => showPerDay === true ? true : undefined
-        },
+        "showAsShareOfTotal",
+        "showAsIndex",
+        "showAsChange",
+        "showAsYearOnYearChange",
+        "showPerDay",
         {
             name: "valueLines",
             transform: (valueLines) => valueLines?.length > 0 ? valueLines : undefined
@@ -475,11 +415,7 @@ Ren.VisualisationTypes_DateValueChart = {
             name: "valueBands",
             transform: (valueBands) => valueBands?.length > 0 ? valueBands : undefined
         },
-        {
-            name: "seasonallyAdjustEstimate",
-            transform: (seasonallyAdjustEstimate) =>
-                seasonallyAdjustEstimate === false ? false : undefined
-        },
+        "seasonallyAdjustEstimate",
 
         // The dates grid's filter is saved as the dates to keep, even where the grid holds it as
         // the dates to leave out.
@@ -506,20 +442,9 @@ Ren.VisualisationTypes_DateValueChart = {
 
         "multiChartPeriod",
         "multiChartMaxCount",
-        {
-            name: "multiChartShowDateRange",
-            transform: (multiChartShowDateRange) =>
-                multiChartShowDateRange === false ? false : undefined
-        },
-        {
-            name: "multiChartSlider",
-            transform: (multiChartSlider) => multiChartSlider === true ? true : undefined
-        },
-        {
-            name: "multiChartKeepEmptyPeriods",
-            transform: (multiChartKeepEmptyPeriods) =>
-                multiChartKeepEmptyPeriods === false ? false : undefined
-        },
+        "multiChartShowDateRange",
+        "multiChartSlider",
+        "multiChartKeepEmptyPeriods",
 
         "markerLabelLayout",
 
@@ -531,7 +456,7 @@ Ren.VisualisationTypes_DateValueChart = {
             transform: (chartDataGroupingSettings) =>
                 Ren.DateValueChart_GroupingEntries.getSettingsToSave(chartDataGroupingSettings)
         }
-    ],
+    ]),
     defaultOptions: {
         visualisationWidth: "38rem",
         visualisationHeight: "25rem",
