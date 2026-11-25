@@ -5,8 +5,13 @@
 Ren.DateValueChart_StyleSelection = (() => {
 
     const {
-        getSeriesColour, buildLineStyles, getSelectedSeriesNums, LINE_NAMES_LAYER_CLASS,
-        PIE_LABELS_LAYER_CLASS, SUBDIVISION_LABELS_LAYER_CLASS, valueLabelClasses
+        getSeriesColour,
+        buildLineStyles,
+        getSelectedSeriesNums,
+        LINE_NAMES_LAYER_CLASS,
+        PIE_LABELS_LAYER_CLASS,
+        SUBDIVISION_LABELS_LAYER_CLASS,
+        valueLabelClasses
     } = Ren.DateValueChart_StyleBuilders;
 
     // How much of its colour a selected series' bar edges keep.

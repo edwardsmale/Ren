@@ -148,6 +148,7 @@ Ren.CreateUploadedFilesModule = (_tabularData, visualisation) => {
         }
 
         if (descriptor.key === "uploadedFiles") return formatFileList(value);
+
         if (descriptor.key === "uploadedFilesDelimiter") {
             return Ren.HtmlUtils.escapeHtml(formatDelimiter(value));
         }

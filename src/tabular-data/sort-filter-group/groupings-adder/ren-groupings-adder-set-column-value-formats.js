@@ -52,8 +52,9 @@
                 return valueFormat !== null && isArithmetic(valueFormat) ? valueFormat : null;
             };
 
-            // Gets a value indicating whether the grouping's aggregation of a column leaves its calc
-            // function unapplied (see Ren.AggregationTypeFormatConverter's ignoresCalcFunction).
+            // Gets a value indicating whether the grouping's aggregation of a column leaves its
+            // calc function unapplied (see Ren.AggregationTypeFormatConverter's
+            // ignoresCalcFunction).
             const ignoresCalcFunction = (columnIdOrHeading) => {
 
                 const columnIndex = tabularData.columnResolver.getColumnIndex(columnIdOrHeading);

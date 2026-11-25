@@ -243,6 +243,7 @@ Ren.XlsxWriter = (() => {
         const columnStyles = sheet.columns.map(column =>
             column.format ? formatStyles.get(column.format) : PLAIN_STYLE
         );
+
         const dateStyle = formatStyles.get(DEFAULT_DATE_FORMAT) ?? PLAIN_STYLE;
 
         // A column without a width of its own is fitted to its heading and cells.

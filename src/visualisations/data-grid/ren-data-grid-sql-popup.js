@@ -159,6 +159,7 @@ Ren.DataGridSqlPopup = (() => {
             "click",
             () => Ren.ClipboardUtils.copyAllOfTextArea(sqlTextArea, copyButton)
         );
+
         closeButton.addEventListener("click", () => popup.closeWindow());
 
         // The grid's own key handling (e.g. arrow keys) would otherwise act on the textarea.

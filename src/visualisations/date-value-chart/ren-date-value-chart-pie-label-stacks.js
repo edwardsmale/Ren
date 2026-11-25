@@ -8,11 +8,18 @@ Ren.DateValueChart_PieLabelStacks = (() => {
     const { getPlacement, isStackedPlacement, getFontSizePx } = Ren.DateValueChart_PieLabelContent;
 
     const {
-        INSIDE_CLASS, LINE_HEIGHT_EMS, setFirstLine, placeText, showConnector, fitText
+        INSIDE_CLASS,
+        LINE_HEIGHT_EMS,
+        setFirstLine,
+        placeText,
+        showConnector,
+        fitText
     } = Ren.DateValueChart_PieLabelDrawing;
 
     const {
-        CONNECTOR_START_PX, OUTSIDE_LABEL_GAP_PX, LABEL_PADDING_PX
+        CONNECTOR_START_PX,
+        OUTSIDE_LABEL_GAP_PX,
+        LABEL_PADDING_PX
     } = Ren.DateValueChart_PieLabelGeometry;
 
     // Around, a connector bends this far out from the rim, and runs on level to the label's

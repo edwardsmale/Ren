@@ -147,9 +147,9 @@ Ren.FilterNegation = (() => {
 
     /**
      * Gets a (value) => passes check for one column's filter, honouring its negation.  The value
-     * tested is already normalised to a string (the sentinel for NULL).  Built once and reused across a
-     * level's groups, as a binned grouping filter lists every raw value its bins cover, and
-     * scanning that list once per group froze the page.
+     * tested is already normalised to a string (the sentinel for NULL).  Built once and reused
+     * across a level's groups, as a binned grouping filter lists every raw value its bins cover,
+     * and scanning that list once per group froze the page.
      */
     const createValueMatcher = (filterValues, isNegated) => {
 

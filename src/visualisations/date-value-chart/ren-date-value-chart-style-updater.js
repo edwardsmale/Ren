@@ -1,21 +1,43 @@
 Ren.DateValueChart_StyleUpdater = (() => {
 
     const {
-        seriesColourElements, getSeriesColour, pushSeriesColourProperty, buildLegendSeriesStyles,
-        buildLegendLayoutStyles, buildLineStyles, buildPointStyles, IN_PLACE_PASTEL_STRENGTH,
-        getEstimatePastelStrength, hasEstimate, buildEstimateStyles, buildInsideBarLabelStyle,
-        buildBarSeriesNameStyle, buildEstimateInsideBarLabelStyle, estimateCaptionStyle,
-        SERIES_NAMES_IN_BARS_FONT_SIZE_PX, LINE_NAMES_LAYER_CLASS, PIE_LABELS_LAYER_CLASS,
-        SUBDIVISION_LABELS_LAYER_CLASS, valueLabelClasses, axisTickLabelClasses,
-        defaultLabelFontSizes, valueLabelFontSize, axisLabelFontSize
+        seriesColourElements,
+        getSeriesColour,
+        pushSeriesColourProperty,
+        buildLegendSeriesStyles,
+        buildLegendLayoutStyles,
+        buildLineStyles,
+        buildPointStyles,
+        IN_PLACE_PASTEL_STRENGTH,
+        getEstimatePastelStrength,
+        hasEstimate,
+        buildEstimateStyles,
+        buildInsideBarLabelStyle,
+        buildBarSeriesNameStyle,
+        buildEstimateInsideBarLabelStyle,
+        estimateCaptionStyle,
+        SERIES_NAMES_IN_BARS_FONT_SIZE_PX,
+        LINE_NAMES_LAYER_CLASS,
+        PIE_LABELS_LAYER_CLASS,
+        SUBDIVISION_LABELS_LAYER_CLASS,
+        valueLabelClasses,
+        axisTickLabelClasses,
+        defaultLabelFontSizes,
+        valueLabelFontSize,
+        axisLabelFontSize
     } = Ren.DateValueChart_StyleBuilders;
 
     const {
-        setPreviewColours, setPreviewLines, setPreviewDots, clearPreview
+        setPreviewColours,
+        setPreviewLines,
+        setPreviewDots,
+        clearPreview
     } = Ren.DateValueChart_StylePreviews;
 
     const {
-        updateSelectionStyles, updateHighlightedValueLabels, updateHoverStyles
+        updateSelectionStyles,
+        updateHighlightedValueLabels,
+        updateHoverStyles
     } = Ren.DateValueChart_StyleSelection;
 
     let prevContainerWidth = 0;

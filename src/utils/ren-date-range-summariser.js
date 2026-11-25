@@ -60,9 +60,9 @@ Ren.DateRangeSummariser = (() => {
     };
 
     /**
-     * Returns a human-readable summary of a date range, such as "Today", "Q2 2026", "Q2 2026 to date",
-     * "2025", "2026 to date", "Oct 2026", or "Jun 2026 to date".  Returns null if the range does
-     * not align to a recognised period.
+     * Returns a human-readable summary of a date range, such as "Today", "Q2 2026", "Q2 2026 to
+     * date", "2025", "2026 to date", "Oct 2026", or "Jun 2026 to date".  Returns null if the range
+     * does not align to a recognised period.
      * @param {Date|string} startDate - Start of the range (inclusive).  Date, yyyy-MM-dd, or
      *   yyyy-MM-dd HH:mm:ss.
      * @param {Date|string} endDate - End of the range (exclusive).  Date, yyyy-MM-dd, or

@@ -5,9 +5,16 @@
 Ren.DateValueChart_StylePreviews = (() => {
 
     const {
-        seriesColourElements, pushSeriesColourProperty, buildLegendLineStyle,
-        buildLegendSeriesStyles, buildLineStyles, buildPointStyles, getSelectedSeriesNums,
-        getEstimatePastelStrength, hasEstimate, buildEstimateStyles
+        seriesColourElements,
+        pushSeriesColourProperty,
+        buildLegendLineStyle,
+        buildLegendSeriesStyles,
+        buildLineStyles,
+        buildPointStyles,
+        getSelectedSeriesNums,
+        getEstimatePastelStrength,
+        hasEstimate,
+        buildEstimateStyles
     } = Ren.DateValueChart_StyleBuilders;
 
     const setupTemporaryStylesheet = (props) => {

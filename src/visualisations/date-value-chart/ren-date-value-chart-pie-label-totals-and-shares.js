@@ -9,7 +9,11 @@ Ren.DateValueChart_PieLabelTotalsAndShares = (() => {
     const { writeLines, showLabel } = Ren.DateValueChart_PieLabelDrawing;
 
     const {
-        LABEL_PADDING_PX, measure, getBox, getFurthestDistanceToBox, findPlaceInside
+        LABEL_PADDING_PX,
+        measure,
+        getBox,
+        getFurthestDistanceToBox,
+        findPlaceInside
     } = Ren.DateValueChart_PieLabelGeometry;
 
     // Within LABEL_PADDING_PX, so that a share's background stays inside its slice.

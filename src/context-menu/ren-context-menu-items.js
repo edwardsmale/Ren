@@ -457,6 +457,7 @@ Ren.ContextMenuItems = (
             getColumnCalcInputValueFormat(columnIndex, grouping),
             element
         );
+
         addAggregationMenuItems(columnIndex, rowIndex, grouping, element);
         addSemanticMenuItems(columnIndex, element, cellValue, rowVals);
     };

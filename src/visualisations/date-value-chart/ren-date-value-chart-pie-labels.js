@@ -17,27 +17,56 @@
 Ren.DateValueChart_PieLabels = (() => {
 
     const {
-        PLACEMENTS, VALUE_POSITIONS, DEFAULT_FONT_SIZE_PX, getPlacement, getContent, areLabelsShown,
-        areTotalsShown, canPutSharesInside, areSharesInside, getValuePosition, areValuesInside,
-        isStackedPlacement, getFontSizePx, formatShare, formatValue, addTooltip, getLabelText,
+        PLACEMENTS,
+        VALUE_POSITIONS,
+        DEFAULT_FONT_SIZE_PX,
+        getPlacement,
+        getContent,
+        areLabelsShown,
+        areTotalsShown,
+        canPutSharesInside,
+        areSharesInside,
+        getValuePosition,
+        areValuesInside,
+        isStackedPlacement,
+        getFontSizePx,
+        formatShare,
+        formatValue,
+        addTooltip,
+        getLabelText,
         getLabelLines
     } = Ren.DateValueChart_PieLabelContent;
 
     const {
-        INSIDE_CLASS, ELLIPSIS, writeLines, setFirstLine, showLabel, showConnector, fitText,
+        INSIDE_CLASS,
+        ELLIPSIS,
+        writeLines,
+        setFirstLine,
+        showLabel,
+        showConnector,
+        fitText,
         measureForShortening
     } = Ren.DateValueChart_PieLabelDrawing;
 
     const {
-        measure, isBoxInSlice, findPlaceInside, findPlaceOutside
+        measure,
+        isBoxInSlice,
+        findPlaceInside,
+        findPlaceOutside
     } = Ren.DateValueChart_PieLabelGeometry;
 
     const {
-        toCalloutWidthPx, getMinCalloutWidthPx, getRadiusPx, getHuggingEdgeX, layoutStacked
+        toCalloutWidthPx,
+        getMinCalloutWidthPx,
+        getRadiusPx,
+        getHuggingEdgeX,
+        layoutStacked
     } = Ren.DateValueChart_PieLabelStacks;
 
     const {
-        layoutTotals, getShareCandidates, layoutShares
+        layoutTotals,
+        getShareCandidates,
+        layoutShares
     } = Ren.DateValueChart_PieLabelTotalsAndShares;
 
     const LAYER_CLASS = "ren-pie-labels-layer";

@@ -136,6 +136,7 @@ Ren.CreateTileGroup = (_tabularData, visualisation) => {
 
     // Tiles come and go as they are archived, restored, added, removed and dragged.
     const showArchived = () => {
+
         archivedElement.hidden = archivedTilesElement.children.length === 0;
     };
 
