@@ -853,17 +853,6 @@ Ren.CreateDateValueChart = (() => {
             return "number";
         };
 
-        const formatCategories = [];
-
-        for (let i = 0; i < props.valueColumnFormats.length; i++) {
-
-            const category = getTypeCategory(props.valueColumnFormats[i]);
-
-            if (!formatCategories.includes(category)) {
-                formatCategories.push(category);
-            }
-        }
-
         // A series the chart gains takes up the estimate setting the series already there carry.
         // Where a split has just dropped the series it would come from, the menu leaves it on
         // props.
@@ -899,9 +888,10 @@ Ren.CreateDateValueChart = (() => {
             return Object.assign({
                 column: props.valueHeadings[index],
                 ...(initialLabel ? { label: initialLabel } : {}),
-                valueAxis: formatCategories.length > 1 && seriesCategory === "percentage"
-                    ? "rightAxis"
-                    : "leftAxis",
+                valueAxis: Ren.DateValueChart_Axes.getDefaultValueAxis(
+                    props.valueColumnFormats[index],
+                    props.valueColumnFormats
+                ),
                 colour: Ren.DateValueChart_SeriesColours.getDefaultColour(
                     index,
                     visualisation.colourScheme
@@ -1059,27 +1049,10 @@ Ren.CreateDateValueChart = (() => {
         for (let i = 0; i < effectiveSeriesCount; i++) {
 
             const seriesSettings = visualisation.series && visualisation.series[i] ? visualisation.series[i] : {};
-            let defaultAxis = "leftAxis";
-
-            if (formatCategories.length > 1) {
-
-                const seriesCategory = getTypeCategory(props.valueColumnFormats[i]);
-
-                if (seriesCategory === "percentage") {
-
-                    defaultAxis = "rightAxis";
-                }
-                else if (seriesCategory === "currency" && formatCategories.includes("percentage")) {
-
-                    defaultAxis = "leftAxis";
-                }
-                else if (seriesCategory === "currency" && !formatCategories.includes("percentage")) {
-
-                    if (seriesCategory !== formatCategories[0]) {
-                        defaultAxis = "rightAxis";
-                    }
-                }
-            }
+            const defaultAxis = Ren.DateValueChart_Axes.getDefaultValueAxis(
+                props.valueColumnFormats[i],
+                props.valueColumnFormats
+            );
 
             let defaultChartType = Ren.SeriesChartTypeEnum.Bar;
             const defaultColour = Ren.DateValueChart_SeriesColours.getDefaultColour(

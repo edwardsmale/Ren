@@ -86,4 +86,20 @@ describe("Ren.DateValueChart_Axes", () => {
         expect(Axes.buildValueAxis(savedAxis).yExtent)
             .not.toBe(Axes.buildValueAxis(savedAxis).yExtent);
     });
+
+    const { Currency, Integer, Percentage } = Ren.SpreadsheetColumnFormatEnum;
+
+    test.each([
+        ["PercentageAlongsideCurrency_RightAxis", Percentage, [Currency, Percentage], "rightAxis"],
+        ["PercentageAlongsideNumbers_RightAxis", Percentage, [Integer, Percentage], "rightAxis"],
+        ["PercentageOnly_LeftAxis", Percentage, [Percentage, Percentage], "leftAxis"],
+        ["CurrencyAlongsidePercentage_LeftAxis", Currency, [Percentage, Currency], "leftAxis"],
+        ["CurrencyAfterNumbers_LeftAxis", Currency, [Integer, Currency], "leftAxis"],
+        ["CurrencyBeforeNumbers_LeftAxis", Currency, [Currency, Integer], "leftAxis"],
+        ["NumbersAfterCurrency_LeftAxis", Integer, [Currency, Integer], "leftAxis"],
+        ["NoFormat_LeftAxis", undefined, [Currency, Percentage], "leftAxis"]
+    ])("getDefaultValueAxis_%s", (_name, format, valueColumnFormats, expected) => {
+
+        expect(Axes.getDefaultValueAxis(format, valueColumnFormats)).toBe(expected);
+    });
 });

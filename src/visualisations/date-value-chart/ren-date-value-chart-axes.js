@@ -305,8 +305,26 @@ Ren.DateValueChart_Axes = (() => {
         };
     };
 
+    /**
+     * Gets the value axis a series is drawn on unless set: the right for a percentage shown
+     * when there are also other units present, so the left axis keeps their scale, and otherwise
+     * the left.
+     *
+     * @param {number} format - The series' value column format.
+     * @param {Array} valueColumnFormats - The formats of all the chart's value columns.
+     */
+    const getDefaultValueAxis = (format, valueColumnFormats) => {
+
+        const Percentage = Ren.SpreadsheetColumnFormatEnum.Percentage;
+
+        return format === Percentage && valueColumnFormats.some(other => other !== Percentage)
+            ? "rightAxis"
+            : "leftAxis";
+    };
+
     return {
         buildValueAxis,
+        getDefaultValueAxis,
         getValueTickCount,
         makeAxisTickFormatter,
         renderAxes,
