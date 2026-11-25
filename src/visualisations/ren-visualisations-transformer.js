@@ -143,6 +143,7 @@ Ren.VisualisationsTransformer = (() => {
             delete transformedVisualisation.hasResizeHandles;
             delete transformedVisualisation.instance;
             delete transformedVisualisation.isRendered;
+            delete transformedVisualisation.markupOptionNames;
             delete transformedVisualisation._renderOwner;
             delete transformedVisualisation.sourceDataGroupingSettings;
             delete transformedVisualisation.sourceVisualisationGuid;

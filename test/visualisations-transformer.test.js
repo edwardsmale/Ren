@@ -49,4 +49,14 @@ describe("Ren.VisualisationsTransformer", () => {
         // The chart keeps its indexes.
         expect(chartDataGroupingSettings.groupings.entries[0].groupByColumnIndexes).toEqual([3]);
     });
+
+    test("transform_MarkupOptionNames_LeftOut", () => {
+
+        const transformed = transform({
+            visualisationTypeName: "DateValueChart",
+            markupOptionNames: ["showAsIndex"]
+        });
+
+        expect(transformed.hasOwnProperty("markupOptionNames")).toBe(false);
+    });
 });

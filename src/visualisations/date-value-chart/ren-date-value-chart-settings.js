@@ -81,7 +81,7 @@ Ren.DateValueChart_Settings = (() => {
         customSetting(
             "barLayout",
             Ren.BarLayoutEnum.SideBySide,
-            value => value || Ren.BarLayoutEnum.SideBySide
+            readEnum(Ren.BarLayoutEnum, Ren.BarLayoutEnum.SideBySide)
         ),
 
         // The screen pixels left clear between one period's bars and the next's; none by default.
@@ -113,12 +113,7 @@ Ren.DateValueChart_Settings = (() => {
 
         numberSetting("lineShadingOpacity"),
 
-        customSetting(
-            "showLegend",
-            true,
-            value => value !== undefined ? value : true,
-            Saved.always
-        ),
+        booleanSetting("showLegend", true, Saved.always),
         stringSetting("chartTitle", ""),
         stringSetting("chartSubtitle", ""),
         stringSetting("barValueLabelLayout", "auto"),
@@ -204,18 +199,60 @@ Ren.DateValueChart_Settings = (() => {
     const getDefaultValue = (name) => settingsByName.get(name)?.defaultValue;
 
     /**
+     * Gets a value indicating whether the visualisation's markup or its host's defaults set the
+     * setting, which its saved settings are applied over.
+     */
+    const isSetByMarkup = (visualisation, name) =>
+        visualisation?.markupOptionNames?.includes(name) === true;
+
+    // The persisted properties beyond SETTINGS whose own transforms only leave out their defaults.
+    const DEFAULT_LEAVING_PROPERTY_NAMES = [
+        "subdivisionNameFormatFunction",
+        "subdivisionValueFormatFunction",
+        "showAsPies",
+        "pieTotalFormatFunction",
+        "colourScheme",
+        "shadeNonWorkingDays"
+    ];
+
+    /**
      * Gives each setting persistedProperties names that is saved unlessDefault the transform
-     * leaving it out where it reads as its default.
+     * leaving it out where it reads as its default.  A setting, or one of
+     * DEFAULT_LEAVING_PROPERTY_NAMES, whose own transform leaves it out is instead saved as it is
+     * where its markup set it.  Otherwise the markup's value would win over a setting changed back
+     * to its default.
      */
     const withSavedTransforms = (persistedProperties) => persistedProperties.map(property => {
 
-        const setting = typeof property === "string" ? settingsByName.get(property) : null;
+        const name = typeof property === "string" ? property : property.name;
+        const setting = settingsByName.get(name);
 
-        if (setting?.saved !== Saved.unlessDefault) return property;
+        if (typeof property === "string" && setting?.saved === Saved.unlessDefault) {
+
+            return {
+                name,
+                transform: (value, visualisation) =>
+                    setting.read(value) === setting.defaultValue &&
+                    !isSetByMarkup(visualisation, name)
+                        ? undefined
+                        : value
+            };
+        }
+
+        if (typeof property === "string") return property;
+
+        if (!setting && !DEFAULT_LEAVING_PROPERTY_NAMES.includes(name)) return property;
 
         return {
-            name: property,
-            transform: value => setting.read(value) === setting.defaultValue ? undefined : value
+            name,
+            transform: (value, visualisation) => {
+
+                const savedValue = property.transform(value, visualisation);
+
+                return savedValue === undefined && isSetByMarkup(visualisation, name)
+                    ? value
+                    : savedValue;
+            }
         };
     });
 

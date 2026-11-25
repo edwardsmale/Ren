@@ -50,13 +50,16 @@ Ren.RenElementParser = (() => {
             visualisationType.applyDefaultLogic(visualisation, parameters);
         }
 
-        // The host's defaults for the type, which the element's own attributes override below.
-        Object.assign(
-            visualisation,
-            applyDataSourceNameAlias(
-                Ren.VisualisationTypes.getRegisteredDefaults(visualisationType.visualisationTypeName)
-            )
+        const registeredDefaults = applyDataSourceNameAlias(
+            Ren.VisualisationTypes.getRegisteredDefaults(visualisationType.visualisationTypeName)
         );
+
+        // The host's defaults for the type, which the element's own attributes override below.
+        Object.assign(visualisation, registeredDefaults);
+
+        // The options the host's defaults and the element's attributes set, which saved settings
+        // are applied over, so need to state even where they are a setting's default.
+        const markupOptionNames = Object.keys(registeredDefaults);
 
         if (visualisation.fetchUri && !visualisation.dataSourceUri) {
             visualisation.dataSourceUri = visualisation.fetchUri;
@@ -127,6 +130,7 @@ Ren.RenElementParser = (() => {
                 else {
 
                     visualisation[key] = value;
+                    markupOptionNames.push(key);
                 }
 
                 continue;
@@ -142,7 +146,9 @@ Ren.RenElementParser = (() => {
             if (key === "dataTabIndexes") value = Ren.TextUtils.parseIntegerCSV(value);
 
             if (visualisationAttributeNames.includes(key)) {
+
                 visualisation[key] = value;
+                markupOptionNames.push(key);
             }
             else { // Otherwise, a data source parameter.
                 dataSourceUriParameters[key] = value;
@@ -166,6 +172,7 @@ Ren.RenElementParser = (() => {
         }
 
         visualisation.dataSourceUriParameters = dataSourceUriParameters;
+        visualisation.markupOptionNames = markupOptionNames;
 
         // A group member's uploaded files come from the group's module, so its own uploaded-files-*
         // attributes are ignored (and warned about).

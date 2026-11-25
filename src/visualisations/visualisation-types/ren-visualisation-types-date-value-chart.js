@@ -17,6 +17,10 @@ Ren.VisualisationTypes_DateValueChart = {
         // its bars to keep one period's apart from the next's.  0 by default.
         periodGap: "Number",
 
+        // How several bar series are drawn together: "SideBySide" (the default), "Overlayed",
+        // "Stacked", "OverlayedPerSplit" or "StackedPerSplit", per Ren.BarLayoutEnum.
+        barLayout: "String",
+
         // How several line series are drawn together: "Overlayed" (the default) or "Stacked", per
         // Ren.LineLayoutEnum.  Shaded, each line is filled down to the line below it, or to zero
         // where they are overlayed, at lineShadingOpacity (0 to 1, 0.25 by default).
@@ -170,6 +174,12 @@ Ren.VisualisationTypes_DateValueChart = {
 
         // Handed a marker's label and row, and returning the shorter text its flag shows.
         markerLabelFormatFunction: "String",
+
+        // Shown by default.
+        showLegend: "Boolean",
+
+        // Shows the value labels of the series the pointer highlights.  Off by default.
+        showValueLabelsWhenHighlighted: "Boolean",
 
         // The font sizes, in px, the chart's value labels and its axes' tick labels are drawn at.
         valueLabelFontSize: "Number",

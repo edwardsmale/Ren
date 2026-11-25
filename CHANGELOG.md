@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+- Let `<ren-date-value-chart>` set `bar-layout`, `show-legend` and `show-value-labels-when-highlighted`.
+- Keep a chart setting turned back to its default after reload, where the markup set it otherwise.
+
 ## 1.2.3 (2026-11-24)
 - Fix charts based on calculated columns.
 - Add "Archive tile" to link tiles, which collapses them into their tile group's "Archived" section.

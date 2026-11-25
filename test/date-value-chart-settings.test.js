@@ -87,9 +87,15 @@ describe("Ren.DateValueChart_Settings", () => {
         });
     });
 
-    test("applySettings_ShowLegendNull_Null", () => {
+    test("applySettings_ShowLegendNull_Shown", () => {
 
-        expect(apply({ showLegend: null }).showLegend).toBeNull();
+        expect(apply({ showLegend: null }).showLegend).toBe(true);
+    });
+
+    test("applySettings_BarLayoutAsKeyName_Value", () => {
+
+        expect(apply({ barLayout: "StackedPerSplit" }).barLayout)
+            .toBe(Ren.BarLayoutEnum.StackedPerSplit);
     });
 
     test("applySettings_FalseFlagsGivenTruthyNonBoolean_Off", () => {
@@ -150,16 +156,11 @@ describe("Ren.DateValueChart_Settings", () => {
         persistedProperty => (persistedProperty.name ?? persistedProperty) === name
     );
 
-    // Set by the chart's menus and saved settings, but not from <ren-date-value-chart> attributes,
-    // where barLayout would be read as its enum key name rather than its value.
-    const NOT_ATTRIBUTES = ["barLayout", "showLegend", "showValueLabelsWhenHighlighted"];
-
     Settings.SETTINGS.forEach(setting => {
 
         test(`SETTINGS_${setting.name}_DeclaredAsAvailableOption`, () => {
 
-            expect(NOT_ATTRIBUTES.includes(setting.name)
-                || DateValueChart.availableOptions[setting.name] !== undefined).toBe(true);
+            expect(DateValueChart.availableOptions[setting.name]).toBeDefined();
         });
 
         test(`SETTINGS_${setting.name}_PersistedAsSaved`, () => {
@@ -190,7 +191,7 @@ describe("Ren.DateValueChart_Settings", () => {
     test("withSavedTransforms_OtherProperties_Unchanged", () => {
 
         const transform = () => 1;
-        const ownTransform = { name: "chartTitle", transform };
+        const ownTransform = { name: "dateHeading", transform };
 
         const properties =
             Settings.withSavedTransforms(["dateHeading", ownTransform, "showLegend"]);
@@ -198,6 +199,15 @@ describe("Ren.DateValueChart_Settings", () => {
         expect(properties[0]).toBe("dateHeading");
         expect(properties[1]).toBe(ownTransform);
         expect(properties[2]).toBe("showLegend");
+    });
+
+    test("withSavedTransforms_OtherTransformLeavingOutValueSetByMarkup_LeftOut", () => {
+
+        const [property] = Settings.withSavedTransforms([
+            { name: "dateMarkers", transform: () => undefined }
+        ]);
+
+        expect(property.transform([], { markupOptionNames: ["dateMarkers"] })).toBeUndefined();
     });
 
     // As addPersistedProperties saves a visualisation's property: undefined is left out.
@@ -293,6 +303,46 @@ describe("Ren.DateValueChart_Settings", () => {
         ["pieLabelNames", "no", undefined],
         ["markerLines", [{ column: "Due" }], "not persisted"]
     ];
+
+    // As addPersistedProperties saves the property of a visualisation whose markup set it.
+    const saveSetByMarkup = (name, value) => findPersistedProperty(name)
+        .transform(value, { markupOptionNames: [name] });
+
+    // Each setting as [name, its default, what is saved for it where the markup set it].
+    const SAVED_SETTINGS_SET_BY_MARKUP = [
+        ["showAsIndex", false, false],
+        ["pieLabelNames", true, true],
+        ["chartTitle", "", ""],
+        ["lineNames", "auto", "auto"],
+        ["periodGap", 0, 0],
+        ["subdivisionLimit", 0, 0],
+        ["pieHoleRadius", 0, 0],
+        ["valueLines", [], []],
+        ["showAsPies", false, false],
+        ["shadeNonWorkingDays", false, false],
+        ["colourScheme", 0, 0],
+        ["pieTotalFormatFunction", "", ""]
+    ];
+
+    SAVED_SETTINGS_SET_BY_MARKUP.forEach(([name, value, savedValue]) => {
+
+        test(`persistedProperties_${name}DefaultWhereMarkupSetIt_Saved`, () => {
+
+            expect(saveSetByMarkup(name, value)).toEqual(savedValue);
+        });
+    });
+
+    test("persistedProperties_DefaultWhereMarkupSetAnotherSetting_LeftOut", () => {
+
+        expect(findPersistedProperty("showAsIndex")
+            .transform(false, { markupOptionNames: ["showAsChange"] })).toBeUndefined();
+    });
+
+    test("persistedProperties_ChangedWhereMarkupSetIt_SavedAsBefore", () => {
+
+        expect(saveSetByMarkup("barLayout", Ren.BarLayoutEnum.Stacked)).toBe("Stacked");
+        expect(saveSetByMarkup("periodGap", 6)).toBe(6);
+    });
 
     SAVED_SETTINGS.forEach(([name, value, savedValue]) => {
 
