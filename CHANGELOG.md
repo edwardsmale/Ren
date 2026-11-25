@@ -7,6 +7,7 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 - Let `<ren-date-value-chart>` set `bar-layout`, `show-legend` and `show-value-labels-when-highlighted`.
 - Keep a chart setting turned back to its default after reload, where the markup set it otherwise.
+- Stop saving an empty `columnsSkippingCalcFunctions` with each grouping.
 
 ## 1.2.3 (2026-11-24)
 - Fix charts based on calculated columns.

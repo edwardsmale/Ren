@@ -255,6 +255,11 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
      *
      * @param {boolean} useTransformedGroupByValues - If true, use the transformed values from
      *   groupByCalcFunctions.
+     * @returns {Set} The columns whose calc function applyCalcFunctionsToGroups is to leave alone:
+     *   those it is applied to each value of before aggregating them, rather than to the
+     *   aggregated value (see Ren.Aggregation's getPerValueCalcFunctions), and those whose count it
+     *   is not applied to at all (see its ignoresCalcFunction).  Not held on the grouping, which is
+     *   one of the settings' entries, so would be saved.
     */
     const populateGroupColumnValues = (grouping, groupsMap, columns, useTransformedGroupByValues) => {
 
@@ -323,12 +328,7 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             position++;
         });
 
-        // The columns whose calc function applyCalcFunctionsToGroups is to leave alone: those it is
-        // applied to each value of before aggregating them, rather than to the aggregated value
-        // (see Ren.Aggregation's getPerValueCalcFunctions), and those whose count it is not
-        // applied to at all (see its ignoresCalcFunction).
         const columnsSkippingCalcFunctions = new Set();
-        grouping.columnsSkippingCalcFunctions = columnsSkippingCalcFunctions;
 
         const paras = getParas();
 
@@ -423,6 +423,8 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
 
             groupValues.setColumn(columnIndex, columnValues);
         }
+
+        return columnsSkippingCalcFunctions;
     };
 
     /**
@@ -562,14 +564,15 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
 
         const groups = restoreGroupsFromStructure(structure, groupLevel, false);
 
-        populateGroupColumnValues(grouping, groups, columns, structure.hasTransformedValues);
+        const columnsSkippingCalcFunctions =
+            populateGroupColumnValues(grouping, groups, columns, structure.hasTransformedValues);
         Ren.CalcFunctionsApplyer.applyCalcFunctionsToGroups(
             groups,
             columns,
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsSkippingCalcFunctions
+            columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groups);
@@ -758,14 +761,15 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             structureSlot.transformedDataColumns = transformedDataColumns;
         }
 
-        populateGroupColumnValues(grouping, groups, columns, hasTransformedValues);
+        const columnsSkippingCalcFunctions =
+            populateGroupColumnValues(grouping, groups, columns, hasTransformedValues);
         Ren.CalcFunctionsApplyer.applyCalcFunctionsToGroups(
             groups,
             columns,
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsSkippingCalcFunctions
+            columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groups);
@@ -825,14 +829,15 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             installAllRowsRangeGetter(groupsMap);
         }
 
-        populateGroupColumnValues(grouping, groupsMap, columns, structure.hasTransformedValues);
+        const columnsSkippingCalcFunctions =
+            populateGroupColumnValues(grouping, groupsMap, columns, structure.hasTransformedValues);
         Ren.CalcFunctionsApplyer.applyCalcFunctionsToGroups(
             groupsMap,
             columns,
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsSkippingCalcFunctions
+            columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groupsMap);
@@ -1012,14 +1017,15 @@ Ren.GroupingFactory = (tabularData, dataGroupingSettings, aggregation) => {
             );
         }
 
-        populateGroupColumnValues(grouping, groupsMap, columns, hasTransformedValues);
+        const columnsSkippingCalcFunctions =
+            populateGroupColumnValues(grouping, groupsMap, columns, hasTransformedValues);
         Ren.CalcFunctionsApplyer.applyCalcFunctionsToGroups(
             groupsMap,
             columns,
             tabularData,
             grouping.columnsWithAppendedValues,
             getParas(),
-            grouping.columnsSkippingCalcFunctions
+            columnsSkippingCalcFunctions
         );
 
         grouping.setGroups(groupsMap);

@@ -273,6 +273,9 @@ Ren.DataGroupingSettingsTransformer = (() => {
 
             // Derived from the compression dictionary each time the grouping is applied.
             delete grouping.columnsWithAppendedValues;
+
+            // No longer held on the grouping, but saved, as {}, by Ren 1.2.3.
+            delete grouping.columnsSkippingCalcFunctions;
         }
     };
 

@@ -203,6 +203,15 @@ describe("Calc functions that change a column's kind of value", () => {
         expect(String(counts.get("North"))).toBe("2");
     });
 
+    // The groupings are the settings' entries, so are saved as they are, other than what the
+    // transformer leaves out.
+    test("create_GroupingCalculatesLengthsAndCounts_EntrySavesNoSkippedColumns", () => {
+
+        const settings = groupProductsByRegionCalculatingLengths("Count");
+
+        expect("columnsSkippingCalcFunctions" in getRegionEntry(settings)).toBe(false);
+    });
+
     // Grouped by the lengths of the products within each region, as binning a grouping by string
     // length does, so the region rows aggregate the lengths too.
     test("create_GroupedByLengthsInsideRegionsSummed_AddsTheLengths", () => {
