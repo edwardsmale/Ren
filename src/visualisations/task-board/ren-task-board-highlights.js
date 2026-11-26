@@ -59,8 +59,37 @@ Ren.TaskBoardHighlights = (() => {
         getStylesheet(boardKey, "hovered").updateIfChanged(styles);
     };
 
+    /**
+     * Gets the element ID of the tile with the given task ID on the given board, prefixed with the
+     * board's key so that each board on the page has its own.
+     */
+    const getAnchorId = (boardKey, taskId) => boardKey + "-task-" + taskId;
+
+    /**
+     * Scrolls to the tile with the given task ID on the given board, and outlines it.
+     */
+    const goToTile = (boardKey, taskId) => {
+
+        const anchorId = getAnchorId(boardKey, taskId);
+        const tileElement = document.getElementById(anchorId);
+
+        if (!tileElement) return;
+
+        Ren.TaskTileScrolling.scrollTo(tileElement);
+        showTargeted(boardKey, anchorId);
+    };
+
+    /**
+     * Highlights the tiles with the given task IDs on the given board, or none for an empty list.
+     */
+    const showHoveredTiles = (boardKey, taskIds) => showHovered(
+        boardKey,
+        taskIds.map(taskId => getAnchorId(boardKey, taskId))
+    );
+
     return {
-        showHovered,
-        showTargeted
+        getAnchorId,
+        goToTile,
+        showHoveredTiles
     };
 })();

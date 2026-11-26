@@ -122,6 +122,12 @@
         }
     }
 
+    // A line of the text with "(?)" in it, which the board lists.
+    &__question
+    {
+        color: #b22222;
+    }
+
     // Kept right-clickable when empty.
     &__text
     {

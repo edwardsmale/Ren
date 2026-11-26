@@ -22,6 +22,15 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
 
     const EMPTY_CLASS_NAME = "ren-task-tile__part--empty";
     const SIZE_CLASS_NAME_PREFIX = "ren-task-tile__size--";
+    const QUESTION_CLASS_NAME = "ren-task-tile__question";
+    const QUESTION_MARKER = "(?)";
+
+    // The elements that start a new line of the text, as well as a <br>.
+    const BLOCK_TAG_NAMES = new Set([
+        "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT", "FIGURE", "FOOTER",
+        "H1", "H2", "H3", "H4", "H5", "H6", "HEADER", "HR", "LI", "OL", "P", "PRE", "SECTION",
+        "TABLE", "TBODY", "TD", "TH", "THEAD", "TR", "UL"
+    ]);
 
     const element = Ren.HtmlTemplateFunctions.reifyHtmlTemplate("TaskTile", {});
 
@@ -84,30 +93,10 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
         return "task-board";
     };
 
-    /**
-     * Gets the element ID of the tile with the given task ID on this tile's board, prefixed with
-     * the board's ID so that each board on the page has its own.
-     */
-    const getAnchorId = (taskId) => getBoardKey() + "-task-" + taskId;
+    const goToTile = (taskId) => Ren.TaskBoardHighlights.goToTile(getBoardKey(), taskId);
 
-    /**
-     * Scrolls to the tile with the given task ID on this tile's board, and outlines it.
-     */
-    const goToTile = (taskId) => {
-
-        const anchorId = getAnchorId(taskId);
-        const tileElement = document.getElementById(anchorId);
-
-        if (!tileElement) return;
-
-        Ren.TaskTileScrolling.scrollTo(tileElement);
-        Ren.TaskBoardHighlights.showTargeted(getBoardKey(), anchorId);
-    };
-
-    const showHoveredTiles = (taskIds) => Ren.TaskBoardHighlights.showHovered(
-        getBoardKey(),
-        taskIds.map(getAnchorId)
-    );
+    const showHoveredTiles = (taskIds) =>
+        Ren.TaskBoardHighlights.showHoveredTiles(getBoardKey(), taskIds);
 
     /**
      * Highlights the tiles named in the prerequisites list while the mouse is over it.
@@ -153,6 +142,9 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
 
             referenceElement.className = className;
             referenceElement.textContent = taskId;
+
+            // For the copy of a question line on the board (see Ren.CreateTaskBoard).
+            referenceElement.setAttribute("data-task-id", taskId);
             referenceElement.addEventListener("click", () => goToTile(taskId));
 
             if (isHoverHighlighted) {
@@ -216,10 +208,91 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
         );
     };
 
+    const isLineBreak = (node) =>
+        node.nodeType === Node.ELEMENT_NODE &&
+        (node.tagName === "BR" || BLOCK_TAG_NAMES.has(node.tagName));
+
+    /**
+     * Marks the line of text the given text node is in as a task question: the run of nodes
+     * around it in its block, up to a line break or another block either side.
+     */
+    const markQuestionLine = (textNode) => {
+
+        let lineNode = textNode;
+
+        while (lineNode.parentNode !== textElement && !isLineBreak(lineNode.parentNode)) {
+            lineNode = lineNode.parentNode;
+        }
+
+        let firstNode = lineNode;
+        let lastNode = lineNode;
+
+        while (firstNode.previousSibling && !isLineBreak(firstNode.previousSibling)) {
+            firstNode = firstNode.previousSibling;
+        }
+
+        while (lastNode.nextSibling && !isLineBreak(lastNode.nextSibling)) {
+            lastNode = lastNode.nextSibling;
+        }
+
+        const questionElement = document.createElement("span");
+        questionElement.className = QUESTION_CLASS_NAME;
+
+        lineNode.parentNode.insertBefore(questionElement, firstNode);
+
+        let node = firstNode;
+
+        while (node) {
+
+            const nextNode = node === lastNode ? null : node.nextSibling;
+
+            questionElement.appendChild(node);
+            node = nextNode;
+        }
+    };
+
+    /**
+     * Removes each "(?)" from the shown text, with the space before it.  It stays in the text
+     * edited.
+     */
+    const removeQuestionMarkers = (textNodes) => {
+
+        for (let i = 0; i < textNodes.length; i++) {
+            textNodes[i].nodeValue = textNodes[i].nodeValue.replace(/\s*\(\?\)/g, "");
+        }
+    };
+
+    /**
+     * Marks each line of the text with "(?)" in it as a task question, which the board lists.
+     */
+    const markQuestionLines = () => {
+
+        const textNodes = [];
+        const walker = document.createTreeWalker(textElement, NodeFilter.SHOW_TEXT);
+
+        while (walker.nextNode()) {
+
+            if (walker.currentNode.nodeValue.indexOf(QUESTION_MARKER) !== -1) {
+                textNodes.push(walker.currentNode);
+            }
+        }
+
+        for (let i = 0; i < textNodes.length; i++) {
+
+            // Already in the line of an earlier one.
+            if (textNodes[i].parentElement.closest("." + QUESTION_CLASS_NAME)) continue;
+
+            markQuestionLine(textNodes[i]);
+        }
+
+        removeQuestionMarkers(textNodes);
+    };
+
     const showText = () => {
 
         Ren.HtmlUtils.setHTML(textElement, visualisation.contentHtml);
         showTileReferences(textElement);
+        markQuestionLines();
 
         Ren.ShowDataLinks.setUpElements(textElement);
     };
@@ -255,7 +328,7 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
         showPart(idElement, idElement, visualisation.taskId);
 
         if (visualisation.taskId) {
-            element.id = getAnchorId(visualisation.taskId);
+            element.id = Ren.TaskBoardHighlights.getAnchorId(getBoardKey(), visualisation.taskId);
         }
         else {
 

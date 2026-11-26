@@ -28,6 +28,8 @@ Ren.CreateTaskBoard = (_tabularData, visualisation) => {
     const laneHeadingColumnElement =
         element.querySelector(".js-ren-task-board-lane-heading-column");
     const lanesElement = element.querySelector(".js-ren-task-board-lanes");
+    const questionsElement = element.querySelector(".js-ren-task-board-questions");
+    const questionListElement = element.querySelector(".js-ren-task-board-question-list");
 
     if (!visualisation.columns) {
         visualisation.columns = [];
@@ -665,6 +667,90 @@ Ren.CreateTaskBoard = (_tabularData, visualisation) => {
 
     element.addEventListener("transitionend", endShifting);
     element.addEventListener("transitioncancel", endShifting);
+
+    /**
+     * Lists the task questions in the board's tiles (see Ren.CreateTaskTile), each after its
+     * task's ID.
+     */
+    const showQuestions = () => {
+
+        const lineElements = lanesElement.querySelectorAll(".ren-task-tile__question");
+
+        questionListElement.textContent = "";
+
+        for (let index = 0; index < lineElements.length; index++) {
+
+            const tileElement = lineElements[index].closest(".ren-task-tile");
+            const taskId = tileElement.querySelector(".js-ren-task-tile-id").textContent;
+
+            const idElement = document.createElement("span");
+            idElement.className = "ren-task-board__question-id";
+            idElement.textContent = taskId;
+
+            if (taskId) {
+                idElement.setAttribute("data-task-id", taskId);
+            }
+
+            const textElement = document.createElement("span");
+            textElement.className = "ren-task-board__question-text";
+
+            const lineNodes = lineElements[index].childNodes;
+
+            for (let nodeIndex = 0; nodeIndex < lineNodes.length; nodeIndex++) {
+                textElement.appendChild(lineNodes[nodeIndex].cloneNode(true));
+            }
+
+            questionListElement.appendChild(idElement);
+            questionListElement.appendChild(textElement);
+        }
+
+        questionsElement.hidden = lineElements.length === 0;
+    };
+
+    /**
+     * Gets the task ID of the task ID or tile reference under the given event's target, or null.
+     */
+    const getEventTaskId = (event) =>
+        event.target.closest?.("[data-task-id]")?.getAttribute("data-task-id") ?? null;
+
+    questionListElement.addEventListener("click", (event) => {
+
+        const taskId = getEventTaskId(event);
+
+        if (taskId) {
+            Ren.TaskBoardHighlights.goToTile(visualisation.visualisationId, taskId);
+        }
+    });
+
+    questionListElement.addEventListener("mouseover", (event) => {
+
+        const taskId = getEventTaskId(event);
+
+        Ren.TaskBoardHighlights.showHoveredTiles(
+            visualisation.visualisationId,
+            taskId ? [taskId] : []
+        );
+    });
+
+    questionListElement.addEventListener("mouseleave", () =>
+        Ren.TaskBoardHighlights.showHoveredTiles(visualisation.visualisationId, [])
+    );
+
+    // Listed again once a frame at most while tiles are drawn, placed, edited or removed.
+    let isQuestionsUpdatePending = false;
+
+    new MutationObserver(() => {
+
+        if (isQuestionsUpdatePending) return;
+
+        isQuestionsUpdatePending = true;
+
+        requestAnimationFrame(() => {
+
+            isQuestionsUpdatePending = false;
+            showQuestions();
+        });
+    }).observe(lanesElement, { childList: true, subtree: true });
 
     Ren.VisualisationContainers.registerChildrenElement(visualisation, lanesElement);
 
