@@ -4,7 +4,7 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
-## Unreleased
+## 1.2.7 (2026-11-26)
 
 - Add `openInNewTab` to link tiles, toggled by "Open in new tab" on the tile's menu.
 - Add `showReportHeader` to report settings, toggled by "Show report header" on the report-wide
