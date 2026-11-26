@@ -1,11 +1,8 @@
 // A task board (see Ren.CreateTaskBoard): its column headings and its lanes share a grid, each
-// lane laying out its heading and cells to the same columns as the board's header.
+// lane laying out its heading and cells to the same columns as the board's header, which
+// --ren-task-board-grid-columns gives.
 .ren-task-board
 {
-    --ren-task-board-grid-columns:
-        var(--ren-task-board-lane-heading-width, 8rem)
-        repeat(var(--ren-task-board-column-count), var(--ren-task-board-column-width, 18rem));
-
     width: max-content;
 
     &__header
@@ -16,12 +13,62 @@
         margin-bottom: 0.5rem;
     }
 
+    &__lane-heading-column,
+    &__column-heading
+    {
+        position: relative;
+    }
+
     &__column-heading
     {
         padding-bottom: 0.25rem;
         border-bottom: 2px solid #3046b8;
         color: #3046b8;
         font-weight: bold;
+    }
+
+    // Centred in the gap after the column, so it reaches the next column no more than this one.
+    &__resize-handle
+    {
+        position: absolute;
+        top: 0;
+        right: -0.75rem;
+        bottom: 0;
+        width: 0.5rem;
+        cursor: col-resize;
+        touch-action: none;
+        z-index: 1;
+
+        &:hover
+        {
+            background-color: rgba(48, 70, 184, 0.15);
+        }
+    }
+
+    &--resizing
+    {
+        cursor: col-resize;
+        user-select: none;
+    }
+
+    &__column-heading--dragging
+    {
+        opacity: 0.6;
+        outline: dashed 1px #668CAF;
+        outline-offset: 2px;
+        cursor: grabbing;
+    }
+
+    &--dragging-column
+    {
+        cursor: grabbing;
+        user-select: none;
+    }
+
+    // A heading or cell sliding to where a dragged column's move has put it.
+    &__shifting
+    {
+        transition: transform 0.15s ease-out;
     }
 
     &__heading,
@@ -110,5 +157,10 @@
         gap: 0.75rem;
         min-height: 2rem;
         padding-top: 0.75rem;
+    }
+
+    &__cell--dragging
+    {
+        opacity: 0.6;
     }
 }

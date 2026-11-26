@@ -340,7 +340,10 @@ __The container types__
   the tile into its group's archived slot (`"containerSlot": "archived"`), unticking it back.
 - `TaskBoard` has a row of `columns` across the top, each `{ "id", "heading", "subheading" }`,
   and its children are task lanes, one under the other.  `columnWidth` (18rem by default) and
-  `laneHeadingWidth` (8rem) are CSS lengths.
+  `laneHeadingWidth` (11rem) are CSS lengths.  Dragging a column's right edge gives it a `width`
+  of its own, and double-clicking the edge takes it away again.  Columns are added and removed
+  from the headings' context menu, and moved by holding the mouse button down on a heading for
+  half a second and dragging it, as lanes and tiles are.
 - `TaskLane` has a `heading` and a cell for each of its board's columns, and its children are task
   tiles.  The slots are the column IDs, so a tile's `containerSlot` says which column it's in.
   Tiles can be dragged between cells and into other lanes.  The lane's colour, on its heading and
