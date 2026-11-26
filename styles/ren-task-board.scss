@@ -95,6 +95,14 @@
         z-index: 1;
     }
 
+    // Down to the bottom of the lanes, which the board measures.
+    &__lane-heading-column > &__resize-handle,
+    &__column-heading > &__resize-handle
+    {
+        bottom: auto;
+        height: var(--ren-task-board-columns-height, 100%);
+    }
+
     &--resizing
     {
         cursor: col-resize;

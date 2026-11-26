@@ -774,6 +774,15 @@ Ren.CreateTaskBoard = (_tabularData, visualisation) => {
         });
     }).observe(lanesElement, { childList: true, subtree: true });
 
+    // So that the column resize handles reach from the headings to the bottom of the lanes.
+    new ResizeObserver(() => {
+
+        const height =
+            lanesElement.getBoundingClientRect().bottom - headerElement.getBoundingClientRect().top;
+
+        element.style.setProperty("--ren-task-board-columns-height", height + "px");
+    }).observe(element);
+
     Ren.VisualisationContainers.registerChildrenElement(visualisation, lanesElement);
 
     return {
