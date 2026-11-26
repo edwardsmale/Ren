@@ -9,9 +9,13 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
 
     const statuses = [
         { name: "NotStarted", text: "Not started" },
+        { name: "Tentative", text: "Tentative" },
         { name: "InProgress", text: "In progress" },
+        { name: "AwaitingInput", text: "Awaiting input" },
+        { name: "OnHold", text: "On hold" },
         { name: "InReview", text: "In review" },
-        { name: "Complete", text: "Complete" }
+        { name: "Complete", text: "Complete" },
+        { name: "NotDoing", text: "Not doing" }
     ];
 
     const sizes = ["XS", "S", "M", "L", "XL"];

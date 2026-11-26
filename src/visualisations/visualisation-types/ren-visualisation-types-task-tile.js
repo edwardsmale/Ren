@@ -27,7 +27,8 @@ Ren.VisualisationTypes_TaskTile = {
         taskPrerequisites: "String",
 
         /**
-         * "NotStarted" (the default), "InProgress", "InReview" or "Complete".
+         * "NotStarted" (the default), "Tentative", "InProgress", "AwaitingInput", "OnHold",
+         * "InReview", "Complete" or "NotDoing".
          */
         taskStatus: "String",
 

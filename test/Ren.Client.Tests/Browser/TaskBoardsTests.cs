@@ -167,6 +167,35 @@ public class TaskBoardsTests : BrowserTest
         Expect(column).ToBe("""{"heading":"Later","id":"next"}""");
     }
 
+    [TestMethod("a status is set from the tile's status menu")]
+    [DataRow("Tentative", "tentative", "Tentative")]
+    [DataRow("AwaitingInput", "awaiting-input", "Awaiting input")]
+    [DataRow("OnHold", "on-hold", "On hold")]
+    [DataRow("NotDoing", "not-doing", "Not doing")]
+    public async Task AStatusIsSetFromTheTilesStatusMenu(string status, string modifier, string text)
+    {
+        await Ren.OpenAsync(Fixture);
+        await Poll(GetBoardAsync).ToEqual(StartingBoard);
+
+        var tile = GetTile("A");
+
+        await tile.Locator(".qa-ren-task-tile-status").ClickAsync();
+        await Page.Locator("#task-tile-status-" + modifier).ClickAsync();
+
+        await Expect(tile).ToHaveClassAsync(new Regex("ren-task-tile--" + modifier));
+        await Expect(tile.Locator(".qa-ren-task-tile-status")).ToHaveTextAsync(text);
+
+        var saved = await Page.EvaluateAsync<string>("""
+            () => window.Ren.ReportSerializer
+                .getReportSettingsObject(false)
+                .visualisations
+                .find(visualisation => visualisation.taskId === "A")
+                .taskStatus
+            """);
+
+        Expect(saved).ToBe(status);
+    }
+
     [TestMethod("tiles keep their lanes and columns once saved and reloaded")]
     public async Task TilesKeepTheirLanesAndColumnsOnceSavedAndReloaded()
     {
