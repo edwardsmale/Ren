@@ -110,6 +110,35 @@ public class TaskBoardsTests : BrowserTest
         });
     }
 
+    [TestMethod("a dragged task is put back where it was by its Reset")]
+    public async Task ADraggedTaskIsPutBackWhereItWasByItsReset()
+    {
+        await Ren.OpenAsync(Fixture);
+        await Poll(GetBoardAsync).ToEqual(StartingBoard);
+
+        var from = (await GetTile("A").BoundingBoxAsync())!;
+        var to = (await GetTile("B").BoundingBoxAsync())!;
+
+        await Page.Mouse.MoveAsync(from.X + 10, from.Y + 10);
+        await Page.Mouse.DownAsync();
+        await Expect(Page.Locator(".ren-container-child--dragging")).ToHaveCountAsync(1);
+        await Page.Mouse.MoveAsync(to.X + to.Width / 2, to.Y + 2, new() { Steps = 10 });
+        await Page.Mouse.UpAsync();
+
+        await Poll(GetBoardAsync).ToEqual(new[] { "Containers:  | A B", "Tiles: C | " });
+
+        await GetTile("A").ClickAsync(new() { Button = MouseButton.Right });
+        await Page.Locator("#visualisation-reset").ClickAsync();
+
+        await Poll(GetBoardAsync).ToEqual(StartingBoard);
+        Expect(await GetSavedTilesAsync()).ToEqual(new[]
+        {
+            "A lane-1 start 1",
+            "B lane-1 next 1",
+            "C lane-2  1"
+        });
+    }
+
     [TestMethod("a lane is renamed in place")]
     public async Task ALaneIsRenamedInPlace()
     {

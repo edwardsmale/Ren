@@ -86,6 +86,37 @@ Ren.VisualisationContainerEditing = (() => {
     };
 
     /**
+     * Puts a child whose container, slot or order was set other than by a drag (by a reset, say)
+     * where they now say it goes among the others in that slot, renumbering them, and the ones in
+     * the slot it was in before.
+     */
+    const placeChildBySettings = (child, oldContainer, oldSlot) => {
+
+        const container = Ren.VisualisationContainers.getContainer(child);
+
+        if (!container) return;
+
+        const slot = Ren.VisualisationContainers.getChildSlot(child);
+        const children = Ren.VisualisationContainers.getChildren(container, slot)
+            .filter(sibling => sibling !== child);
+
+        const order = child.containerOrder ?? Infinity;
+        const index = Math.max(0, Math.min(order - 1, children.length));
+
+        children.splice(index, 0, child);
+        setChildren(container, slot, children);
+
+        if (oldContainer && (oldContainer !== container || oldSlot !== slot)) {
+
+            setChildren(
+                oldContainer,
+                oldSlot,
+                Ren.VisualisationContainers.getChildren(oldContainer, oldSlot)
+            );
+        }
+    };
+
+    /**
      * Gets the given child's siblings in its slot, itself included, in order.
      */
     const getSlotChildren = (child) => Ren.VisualisationContainers.getChildren(
@@ -601,6 +632,7 @@ Ren.VisualisationContainerEditing = (() => {
     });
 
     return {
+        placeChildBySettings,
         setUpChild,
         setUpContainer
     };

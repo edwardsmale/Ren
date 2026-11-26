@@ -205,13 +205,23 @@ Ren.VisualisationOriginalSettings = (() => {
     };
 
     /**
-     * Gives a visualisation the settings in a snapshot, and only those, and keeps the change.
+     * Gives a visualisation the settings in a snapshot, and only those, and keeps the change.  One
+     * in a container is moved to where they put it, as it is drawn again in its own element.
      */
     const applySettings = (visualisation, settings) => {
+
+        const oldContainer = Ren.VisualisationContainers.getContainer(visualisation);
+        const oldSlot = Ren.VisualisationContainers.getChildSlot(visualisation);
 
         removeAddedSettings(visualisation, settings);
 
         Object.assign(visualisation, Ren.ObjectUtils.clone(settings));
+
+        Ren.VisualisationContainerEditing.placeChildBySettings(
+            visualisation,
+            oldContainer,
+            oldSlot
+        );
 
         Ren.VisualisationSettingsSynchroniser.commitChange(visualisation);
     };
