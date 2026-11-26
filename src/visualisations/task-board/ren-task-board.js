@@ -195,7 +195,7 @@ Ren.CreateTaskBoard = (_tabularData, visualisation) => {
     };
 
     /**
-     * Puts a handle on the given header cell's right edge, which is dragged to set its width (by
+     * Puts a handle on the given element's right edge, which is dragged to set its width (by
      * the given function, given a CSS length or null for the default) and double-clicked to go
      * back to the default.
      */
@@ -657,6 +657,28 @@ Ren.CreateTaskBoard = (_tabularData, visualisation) => {
     }
 
     setGridColumns();
+
+    const showQuestionsWidth = () => {
+        questionsElement.style.width = visualisation.questionsWidth ?? "";
+    };
+
+    showQuestionsWidth();
+
+    if (isEditable) {
+
+        addResizeHandle(questionsElement, (width) => {
+
+            if (width) {
+                visualisation.questionsWidth = width;
+            }
+            else {
+
+                delete visualisation.questionsWidth;
+            }
+
+            showQuestionsWidth();
+        });
+    }
 
     const endShifting = (event) => {
 

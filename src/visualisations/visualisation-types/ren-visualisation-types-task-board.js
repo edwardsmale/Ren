@@ -26,6 +26,12 @@ Ren.VisualisationTypes_TaskBoard = {
          */
         laneHeadingWidth: "String",
 
+        /**
+         * The width of the list of task questions, as a CSS length, set by dragging its right edge.
+         * Up to 60rem by default.
+         */
+        questionsWidth: "String",
+
         moduleCssClass: "String"
     },
     synchronisedOptions: {},

@@ -5,16 +5,29 @@
 {
     width: max-content;
 
-    // The task questions in the board's tiles, each after its task's ID.
+    // The task questions in the board's tiles, each after its task's ID.  60rem wide at most,
+    // unless resized.
     &__questions
     {
+        position: relative;
+        box-sizing: border-box;
         max-width: 60rem;
         margin-bottom: 1rem;
         padding: 0.5rem 0.75rem;
         border: 1px solid #e3b4b4;
-        background-color: #fdf3f3;
         font-size: 0.8125rem;
         line-height: 1.35;
+
+        &[style*="width"]
+        {
+            max-width: none;
+        }
+
+        // Inside its edge, which has no gap after it as a column's has.
+        .ren-task-board__resize-handle
+        {
+            right: 0;
+        }
     }
 
     &__questions-heading
@@ -80,11 +93,6 @@
         cursor: col-resize;
         touch-action: none;
         z-index: 1;
-
-        &:hover
-        {
-            background-color: rgba(48, 70, 184, 0.15);
-        }
     }
 
     &--resizing
