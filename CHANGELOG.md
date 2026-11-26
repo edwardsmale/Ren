@@ -4,6 +4,10 @@ Each version's changes, newest first.  Ren follows semantic versioning, and the 
 and the NuGet package (`Ren`) always share a version (see "Versions" in
 [docs/development.md](docs/development.md) for what counts as a breaking change).
 
+## Unreleased
+
+- Add `openInNewTab` to link tiles, toggled by "Open in new tab" on the tile's menu.
+
 ## 1.2.6 (2026-11-26)
 
 - Improve the taskboard visualisation further (checkboxes, questions, linking between tasks).

@@ -1,7 +1,8 @@
 /**
  * Renders a link as a tile: an image and a title, the whole of it the link.  The title, link,
- * image and image filter are each edited from the tile's context menu, which also archives the
- * tile, moving it into its tile group's collapsed "Archived" section, and restores it.
+ * image and image filter are each edited from the tile's context menu, which also toggles
+ * opening the link in a new tab and archives the tile, moving it into its tile group's collapsed
+ * "Archived" section, and restores it.
  */
 Ren.CreateLinkTile = (_tabularData, visualisation) => {
 
@@ -35,6 +36,17 @@ Ren.CreateLinkTile = (_tabularData, visualisation) => {
         else {
 
             linkElement.removeAttribute("href");
+        }
+
+        if (visualisation.openInNewTab) {
+
+            linkElement.target = "_blank";
+            linkElement.rel = "noopener";
+        }
+        else {
+
+            linkElement.removeAttribute("target");
+            linkElement.removeAttribute("rel");
         }
 
         if (visualisation.imageUrl) {
@@ -85,6 +97,21 @@ Ren.CreateLinkTile = (_tabularData, visualisation) => {
             }
         )
     });
+
+    const toggleOpenInNewTab = () => {
+
+        if (visualisation.openInNewTab) {
+            delete visualisation.openInNewTab;
+        }
+        else {
+
+            visualisation.openInNewTab = true;
+        }
+
+        showTile();
+
+        Ren.Messages.Events.visualisationSettingsChanged.notify(visualisation);
+    };
 
     const isArchived = () => visualisation.containerSlot === Ren.CreateTileGroup.ARCHIVED_SLOT;
 
@@ -152,6 +179,13 @@ Ren.CreateLinkTile = (_tabularData, visualisation) => {
                 "link-tile-edit-image-filter",
                 "imageFilter"
             ),
+            {
+                section: "Link tile",
+                text: "Open in new tab",
+                id: "link-tile-open-in-new-tab",
+                ticked: () => !!visualisation.openInNewTab,
+                action: toggleOpenInNewTab
+            },
             ...getArchiveMenuItems()
         ]);
     }

@@ -24,6 +24,11 @@ Ren.VisualisationTypes_LinkTile = {
          */
         imageFilter: "String",
 
+        /**
+         * Gets a value indicating whether the link opens in a new tab.
+         */
+        openInNewTab: "Boolean",
+
         moduleCssClass: "String"
     },
     synchronisedOptions: {},

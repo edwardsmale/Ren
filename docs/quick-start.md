@@ -335,9 +335,11 @@ __The container types__
   underneath, the whole tile being a link to `url`.  `imageFilter` is a CSS filter for the image,
   which is how I get several colours out of one icon.  The `url` and `imageUrl` go through
   `Ren.HostUrls`, so if the page defines `reportUrl()` and `imageUrl()` (see Page globals) the
-  host gets to map them, and otherwise they're used as they are.  The title, link, image and
-  filter can all be edited from the tile's context menu, and ticking "Archive tile" there moves
-  the tile into its group's archived slot (`"containerSlot": "archived"`), unticking it back.
+  host gets to map them, and otherwise they're used as they are.  `"openInNewTab": true` opens
+  the link in a new tab.  The title, link, image and filter can all be edited from the tile's
+  context menu, "Open in new tab" there sets or clears `openInNewTab`, and ticking "Archive tile"
+  moves the tile into its group's archived slot (`"containerSlot": "archived"`), unticking it
+  back.
 - `TaskBoard` has a row of `columns` across the top, each `{ "id", "heading", "subheading" }`,
   and its children are task lanes, one under the other.  `columnWidth` (18rem by default) and
   `laneHeadingWidth` (11rem) are CSS lengths.  Dragging a column's right edge gives it a `width`

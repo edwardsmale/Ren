@@ -78,6 +78,40 @@ public class TileGroupsTests : BrowserTest
         await Poll(GetSavedTilesAsync).ToContain("Brand Sales 2 /BrandSalesByMonth");
     }
 
+    // Gets the titles of the saved link tiles that open in a new tab.
+    private Task<string[]> GetSavedNewTabTitlesAsync() => Page.EvaluateAsync<string[]>("""
+        () => window.Ren.ReportSerializer
+            .getReportSettingsObject(false)
+            .visualisations
+            .filter(visualisation => visualisation.visualisationTypeName === "LinkTile")
+            .filter(visualisation => visualisation.openInNewTab)
+            .map(visualisation => visualisation.title)
+        """);
+
+    [TestMethod("a link tile's opening in a new tab is toggled from its menu and saved")]
+    public async Task ALinkTilesOpeningInANewTabIsToggledFromItsMenuAndSaved()
+    {
+        await Ren.OpenAsync("tile-groups.html");
+
+        var link = GetTile("Brand Sales").Locator(".ren-link-tile__link");
+
+        await Expect(link).Not.ToHaveAttributeAsync("target", "_blank");
+
+        await GetTile("Brand Sales").ClickAsync(new() { Button = MouseButton.Right });
+        await Expect(Page.Locator("#link-tile-open-in-new-tab")).Not.ToHaveClassAsync(new Regex("ren-is-checked"));
+        await Page.Locator("#link-tile-open-in-new-tab").ClickAsync();
+
+        await Expect(link).ToHaveAttributeAsync("target", "_blank");
+        await Poll(GetSavedNewTabTitlesAsync).ToEqual(new[] { "Brand Sales" });
+
+        await GetTile("Brand Sales").ClickAsync(new() { Button = MouseButton.Right });
+        await Expect(Page.Locator("#link-tile-open-in-new-tab")).ToHaveClassAsync(new Regex("ren-is-checked"));
+        await Page.Locator("#link-tile-open-in-new-tab").ClickAsync();
+
+        await Expect(link).Not.ToHaveAttributeAsync("target", "_blank");
+        await Poll(GetSavedNewTabTitlesAsync).ToEqual(Array.Empty<string>());
+    }
+
     [TestMethod("a tile group adds link tiles from its menu")]
     public async Task ATileGroupAddsLinkTilesFromItsMenu()
     {
