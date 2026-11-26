@@ -122,6 +122,19 @@
         }
     }
 
+    // A "[ ]" or "[✓]" in the text.
+    &__checkbox
+    {
+        margin: 0 0.125rem;
+        vertical-align: -0.125em;
+        cursor: pointer;
+
+        &:disabled
+        {
+            cursor: default;
+        }
+    }
+
     // A line of the text with "(?)" in it, which the board lists.
     &__question
     {

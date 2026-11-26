@@ -25,6 +25,12 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     const QUESTION_CLASS_NAME = "ren-task-tile__question";
     const QUESTION_MARKER = "(?)";
 
+    // A checkbox in the text, "[]" or "[ ]" unticked and "[✓]" ticked, as shown and as saved.
+    const CHECKBOX_PATTERN = /\[([  ✓]?)\]/g;
+    const CHECKBOX_SOURCE_PATTERN = /\[(?: |&nbsp;|✓)?\]/g;
+    const CHECKED_MARKER = "[✓]";
+    const UNCHECKED_MARKER = "[ ]";
+
     // The elements that start a new line of the text, as well as a <br>.
     const BLOCK_TAG_NAMES = new Set([
         "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT", "FIGURE", "FOOTER",
@@ -114,11 +120,10 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     };
 
     /**
-     * Replaces each match of the given pattern in a text node, whose first group is a tile ID, with
-     * an element of the given class showing the ID, which goes to that tile when clicked and, if
-     * isHoverHighlighted, highlights it while the mouse is over it.
+     * Replaces each match of the given pattern in a text node with the element the given function
+     * creates for it.
      */
-    const showTileReferencesInTextNode = (textNode, pattern, className, isHoverHighlighted) => {
+    const replaceMatchesInTextNode = (textNode, pattern, createElement) => {
 
         const text = textNode.nodeValue;
 
@@ -137,23 +142,7 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
                 fragment.appendChild(document.createTextNode(precedingText));
             }
 
-            const taskId = match[1];
-            const referenceElement = document.createElement("span");
-
-            referenceElement.className = className;
-            referenceElement.textContent = taskId;
-
-            // For the copy of a question line on the board (see Ren.CreateTaskBoard).
-            referenceElement.setAttribute("data-task-id", taskId);
-            referenceElement.addEventListener("click", () => goToTile(taskId));
-
-            if (isHoverHighlighted) {
-
-                referenceElement.addEventListener("mouseenter", () => showHoveredTiles([taskId]));
-                referenceElement.addEventListener("mouseleave", () => showHoveredTiles([]));
-            }
-
-            fragment.appendChild(referenceElement);
+            fragment.appendChild(createElement(match));
 
             position = match.index + match[0].length;
             match = pattern.exec(text);
@@ -167,10 +156,10 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     };
 
     /**
-     * Shows each tile ID in square brackets in the given element's text, such as "[B]", as a badge
-     * styled like a tile's own ID.
+     * Replaces each match of the given pattern in the given element's text with the element the
+     * given function creates for it.
      */
-    const showTileReferences = (parentElement) => {
+    const replaceMatches = (parentElement, pattern, createElement) => {
 
         const textNodes = [];
         const walker = document.createTreeWalker(parentElement, NodeFilter.SHOW_TEXT);
@@ -180,14 +169,85 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
         }
 
         for (let i = 0; i < textNodes.length; i++) {
-
-            showTileReferencesInTextNode(
-                textNodes[i],
-                /\[([A-Z][A-Z0-9]?)\]/g,
-                "ren-task-tile__reference",
-                true
-            );
+            replaceMatchesInTextNode(textNodes[i], pattern, createElement);
         }
+    };
+
+    /**
+     * Creates an element of the given class showing a tile ID, which goes to that tile when
+     * clicked and, if isHoverHighlighted, highlights it while the mouse is over it.
+     */
+    const createReferenceElement = (taskId, className, isHoverHighlighted) => {
+
+        const referenceElement = document.createElement("span");
+
+        referenceElement.className = className;
+        referenceElement.textContent = taskId;
+
+        // For the copy of a question line on the board (see Ren.CreateTaskBoard).
+        referenceElement.setAttribute("data-task-id", taskId);
+        referenceElement.addEventListener("click", () => goToTile(taskId));
+
+        if (isHoverHighlighted) {
+
+            referenceElement.addEventListener("mouseenter", () => showHoveredTiles([taskId]));
+            referenceElement.addEventListener("mouseleave", () => showHoveredTiles([]));
+        }
+
+        return referenceElement;
+    };
+
+    /**
+     * Shows each tile ID in square brackets in the given element's text, such as "[B]", as a badge
+     * styled like a tile's own ID.
+     */
+    const showTileReferences = (parentElement) => replaceMatches(
+        parentElement,
+        /\[([A-Z][A-Z0-9]?)\]/g,
+        match => createReferenceElement(match[1], "ren-task-tile__reference", true)
+    );
+
+    /**
+     * Ticks or unticks the checkbox with the given index in the text, by rewriting its brackets.
+     */
+    const setCheckbox = (checkboxIndex, isChecked) => {
+
+        let index = 0;
+
+        const html = (visualisation.contentHtml ?? "").replace(CHECKBOX_SOURCE_PATTERN, marker => {
+
+            if (index++ !== checkboxIndex) return marker;
+
+            return isChecked ? CHECKED_MARKER : UNCHECKED_MARKER;
+        });
+
+        applyText(html);
+    };
+
+    /**
+     * Shows each checkbox in the text (see CHECKBOX_PATTERN), which saves its state when clicked.
+     */
+    const showCheckboxes = () => {
+
+        let checkboxIndex = 0;
+
+        replaceMatches(textElement, CHECKBOX_PATTERN, (match) => {
+
+            const index = checkboxIndex++;
+            const checkboxElement = document.createElement("input");
+
+            checkboxElement.type = "checkbox";
+            checkboxElement.className = "ren-task-tile__checkbox";
+            checkboxElement.checked = match[1] === "✓";
+            checkboxElement.disabled = !isEditable;
+
+            checkboxElement.addEventListener(
+                "change",
+                () => setCheckbox(index, checkboxElement.checked)
+            );
+
+            return checkboxElement;
+        });
     };
 
     /**
@@ -200,11 +260,10 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
 
         if (!textNode) return;
 
-        showTileReferencesInTextNode(
+        replaceMatchesInTextNode(
             textNode,
             /\b([A-Z][A-Z0-9]?)\b/g,
-            "ren-task-tile__prerequisite",
-            false
+            match => createReferenceElement(match[1], "ren-task-tile__prerequisite", false)
         );
     };
 
@@ -291,6 +350,7 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     const showText = () => {
 
         Ren.HtmlUtils.setHTML(textElement, visualisation.contentHtml);
+        showCheckboxes();
         showTileReferences(textElement);
         markQuestionLines();
 
