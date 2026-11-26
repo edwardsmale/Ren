@@ -180,10 +180,11 @@
             font-style: italic;
         }
 
+        // 1px less padding all round keeps it the size of the borderless statuses.
         .ren-task-tile__status
         {
-            border-style: dashed;
-            border-color: #7d8899;
+            padding: 0 0.4375rem;
+            border: 1px dashed #9aa5b5;
             background-color: #f7f8fa;
             color: #4a5463;
         }
@@ -196,7 +197,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #e0a800;
             background-color: #fff3c4;
             color: #6b5000;
         }
@@ -209,7 +209,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #d9622b;
             background-color: #fde6da;
             color: #8a3510;
         }
@@ -223,7 +222,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #8a94a3;
             background-color: #e2e5ea;
             color: #3f4754;
         }
@@ -236,7 +234,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #7a4fc4;
             background-color: #ece3fa;
             color: #4b2a85;
         }
@@ -249,7 +246,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #1e9e1e;
             background-color: #1e9e1e;
             color: white;
         }
@@ -269,7 +265,6 @@
 
         .ren-task-tile__status
         {
-            border-color: #a3a3a3;
             background-color: #e5e5e5;
             color: #525252;
         }
