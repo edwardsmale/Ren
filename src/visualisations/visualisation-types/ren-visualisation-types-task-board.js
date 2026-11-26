@@ -16,7 +16,7 @@ Ren.VisualisationTypes_TaskBoard = {
         columns: "Array",
 
         /**
-         * The width of each column, as a CSS length.  15.5rem by default.
+         * The width of each column, as a CSS length.  18rem by default.
          */
         columnWidth: "String",
 

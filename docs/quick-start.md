@@ -339,7 +339,7 @@ __The container types__
   filter can all be edited from the tile's context menu, and ticking "Archive tile" there moves
   the tile into its group's archived slot (`"containerSlot": "archived"`), unticking it back.
 - `TaskBoard` has a row of `columns` across the top, each `{ "id", "heading", "subheading" }`,
-  and its children are task lanes, one under the other.  `columnWidth` (15.5rem by default) and
+  and its children are task lanes, one under the other.  `columnWidth` (18rem by default) and
   `laneHeadingWidth` (8rem) are CSS lengths.
 - `TaskLane` has a `heading` and a cell for each of its board's columns, and its children are task
   tiles.  The slots are the column IDs, so a tile's `containerSlot` says which column it's in.

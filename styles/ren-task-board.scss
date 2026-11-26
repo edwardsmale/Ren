@@ -4,7 +4,7 @@
 {
     --ren-task-board-grid-columns:
         var(--ren-task-board-lane-heading-width, 8rem)
-        repeat(var(--ren-task-board-column-count), var(--ren-task-board-column-width, 15.5rem));
+        repeat(var(--ren-task-board-column-count), var(--ren-task-board-column-width, 18rem));
 
     width: max-content;
 
