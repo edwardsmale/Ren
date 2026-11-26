@@ -66,9 +66,160 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
         statusButton.textContent = status.text;
     };
 
+    /**
+     * Gets the visualisationId of the task board the tile is on, or "task-board" for a tile on
+     * none.
+     */
+    const getBoardKey = () => {
+
+        let container = Ren.VisualisationContainers.getContainer(visualisation);
+
+        while (container) {
+
+            if (container.visualisationTypeName === "TaskBoard") return container.visualisationId;
+
+            container = Ren.VisualisationContainers.getContainer(container);
+        }
+
+        return "task-board";
+    };
+
+    /**
+     * Gets the element ID of the tile with the given task ID on this tile's board, prefixed with
+     * the board's ID so that each board on the page has its own.
+     */
+    const getAnchorId = (taskId) => getBoardKey() + "-task-" + taskId;
+
+    /**
+     * Scrolls to the tile with the given task ID on this tile's board, and outlines it.
+     */
+    const goToTile = (taskId) => {
+
+        const anchorId = getAnchorId(taskId);
+        const tileElement = document.getElementById(anchorId);
+
+        if (!tileElement) return;
+
+        Ren.TaskTileScrolling.scrollTo(tileElement);
+        Ren.TaskBoardHighlights.showTargeted(getBoardKey(), anchorId);
+    };
+
+    const showHoveredTiles = (taskIds) => Ren.TaskBoardHighlights.showHovered(
+        getBoardKey(),
+        taskIds.map(getAnchorId)
+    );
+
+    /**
+     * Highlights the tiles named in the prerequisites list while the mouse is over it.
+     */
+    const addPrerequisitesHover = () => {
+
+        prerequisitesElement.addEventListener("mouseenter", () => {
+
+            const taskIds = (visualisation.taskPrerequisites ?? "").match(/\b[A-Z][A-Z0-9]?\b/g);
+
+            showHoveredTiles(taskIds ?? []);
+        });
+
+        prerequisitesElement.addEventListener("mouseleave", () => showHoveredTiles([]));
+    };
+
+    /**
+     * Replaces each match of the given pattern in a text node, whose first group is a tile ID, with
+     * an element of the given class showing the ID, which goes to that tile when clicked and, if
+     * isHoverHighlighted, highlights it while the mouse is over it.
+     */
+    const showTileReferencesInTextNode = (textNode, pattern, className, isHoverHighlighted) => {
+
+        const text = textNode.nodeValue;
+
+        let match = pattern.exec(text);
+
+        if (!match) return;
+
+        const fragment = document.createDocumentFragment();
+        let position = 0;
+
+        while (match) {
+
+            if (match.index > position) {
+
+                const precedingText = text.substring(position, match.index);
+                fragment.appendChild(document.createTextNode(precedingText));
+            }
+
+            const taskId = match[1];
+            const referenceElement = document.createElement("span");
+
+            referenceElement.className = className;
+            referenceElement.textContent = taskId;
+            referenceElement.addEventListener("click", () => goToTile(taskId));
+
+            if (isHoverHighlighted) {
+
+                referenceElement.addEventListener("mouseenter", () => showHoveredTiles([taskId]));
+                referenceElement.addEventListener("mouseleave", () => showHoveredTiles([]));
+            }
+
+            fragment.appendChild(referenceElement);
+
+            position = match.index + match[0].length;
+            match = pattern.exec(text);
+        }
+
+        if (position < text.length) {
+            fragment.appendChild(document.createTextNode(text.substring(position)));
+        }
+
+        textNode.parentNode.replaceChild(fragment, textNode);
+    };
+
+    /**
+     * Shows each tile ID in square brackets in the given element's text, such as "[B]", as a badge
+     * styled like a tile's own ID.
+     */
+    const showTileReferences = (parentElement) => {
+
+        const textNodes = [];
+        const walker = document.createTreeWalker(parentElement, NodeFilter.SHOW_TEXT);
+
+        while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
+        }
+
+        for (let i = 0; i < textNodes.length; i++) {
+
+            showTileReferencesInTextNode(
+                textNodes[i],
+                /\[([A-Z][A-Z0-9]?)\]/g,
+                "ren-task-tile__reference",
+                true
+            );
+        }
+    };
+
+    /**
+     * Makes each tile ID in the prerequisites list, such as "C, E, P", go to that tile when
+     * clicked.
+     */
+    const showPrerequisiteReferences = () => {
+
+        const textNode = prerequisitesElement.firstChild;
+
+        if (!textNode) return;
+
+        showTileReferencesInTextNode(
+            textNode,
+            /\b([A-Z][A-Z0-9]?)\b/g,
+            "ren-task-tile__prerequisite",
+            false
+        );
+    };
+
     const showText = () => {
 
         Ren.HtmlUtils.setHTML(textElement, visualisation.contentHtml);
+        showTileReferences(textElement);
 
         Ren.ShowDataLinks.setUpElements(textElement);
     };
@@ -102,9 +253,20 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     const showDetails = () => {
 
         showPart(idElement, idElement, visualisation.taskId);
+
+        if (visualisation.taskId) {
+            element.id = getAnchorId(visualisation.taskId);
+        }
+        else {
+
+            element.removeAttribute("id");
+        }
+
         titleElement.textContent = visualisation.taskTitle ?? "";
+        showTileReferences(titleElement);
         showSize();
         showPart(prerequisitesLineElement, prerequisitesElement, visualisation.taskPrerequisites);
+        showPrerequisiteReferences();
     };
 
     const notifyChanged = () => {
@@ -232,6 +394,7 @@ Ren.CreateTaskTile = (_tabularData, visualisation) => {
     showDetails();
     showText();
     showStatus();
+    addPrerequisitesHover();
 
     if (isEditable) {
 

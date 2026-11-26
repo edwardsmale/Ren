@@ -1,6 +1,12 @@
 .ren-task-tile
 {
+    // So that going to a tile from a reference to it stops a little above it.
+    scroll-margin-top: 3rem;
     padding: 0.625rem 0.75rem;
+    // Outlined and highlighted by the board's dynamic stylesheets (see Ren.TaskBoardHighlights).
+    transition: outline-color 0.3s, background-color 0.15s;
+    outline: 3px solid transparent;
+    outline-offset: 2px;
     border: 1px solid lightgray;
     background-color: #F5F5F5;
     font-size: 0.8125rem;
@@ -30,6 +36,22 @@
     &__title
     {
         font-weight: bold;
+    }
+
+    // A tile ID in square brackets in the title or text, shown inline like the tile's own ID.
+    &__reference
+    {
+        display: inline-block;
+        min-width: 1.25em;
+        padding: 0 0.25rem;
+        border-radius: 0.25rem;
+        background-color: #3046b8;
+        color: white;
+        font-style: normal;
+        font-weight: bold;
+        line-height: 1.25;
+        text-align: center;
+        cursor: pointer;
     }
 
     &__size
@@ -87,6 +109,16 @@
         b
         {
             color: #3046b8;
+        }
+    }
+
+    &__prerequisite
+    {
+        cursor: pointer;
+
+        &:hover
+        {
+            text-decoration: underline;
         }
     }
 
