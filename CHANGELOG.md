@@ -7,6 +7,8 @@ and the NuGet package (`Ren`) always share a version (see "Versions" in
 ## Unreleased
 
 - Add `openInNewTab` to link tiles, toggled by "Open in new tab" on the tile's menu.
+- Add `showReportHeader` to report settings, toggled by "Show report header" on the report-wide
+  menu, to hide the header's buttons and Edit toggle.
 
 ## 1.2.6 (2026-11-26)
 

@@ -236,6 +236,16 @@ Ren.ReportWideContextMenu = (() => {
             action: () => Ren.GlobalReportSettingsCollection.toggleRaiseReport()
         }]);
 
+        // --- Show report header ---
+
+        contextMenu.addMenuItems(body, [{
+            section: "Other",
+            text: "Show report header",
+            visible: () => isPageBackgroundClick() || isRaiseReportClickTarget(),
+            ticked: () => Ren.GlobalReportSettingsCollection.getShowReportHeader(),
+            action: () => Ren.GlobalReportSettingsCollection.toggleShowReportHeader()
+        }]);
+
         // --- Convert to settings-only report ---
 
         contextMenu.addMenuItems(body, [{
